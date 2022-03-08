@@ -1,1 +1,1 @@
-$(".p").after("<div>nice</div>");
+$(".first").append("<div>nice</div>");
