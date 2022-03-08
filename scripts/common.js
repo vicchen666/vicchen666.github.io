@@ -1,0 +1,1 @@
+$(".p").after("<div>nice</div>");
