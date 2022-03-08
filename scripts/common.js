@@ -1,3 +1,3 @@
 $(".first").click(function() { 
-    $(this).hind();
+    $(this).hide();
 });

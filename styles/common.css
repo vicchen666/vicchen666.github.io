@@ -5,6 +5,7 @@
     width: 200px;
     color: black;
     background-color: gray;
+    position: fixed;
 }
 .signin {
     height: 100px;
