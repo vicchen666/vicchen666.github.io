@@ -1,1 +1,3 @@
-$(".first").append("<div>nice</div>");
+$(".first").click(function() { 
+    $(this).hind();
+});
