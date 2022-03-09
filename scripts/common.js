@@ -1,5 +1,5 @@
 $('.startoptions div:nth-child(1)').click(function() { 
-    $(this).hide();
+    $(this).parent().hind();
 });
 $('.startoptions div:nth-child(3)').click(function() {
     window.close();
