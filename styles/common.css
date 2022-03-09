@@ -1,11 +1,14 @@
 .first {
-    margin: auto;
+    font-size: 30px;
     padding: 10px;
     height: 200px;
     width: 200px;
-    color: black;
-    background-color: gray;
-    position: fixed;
+    color: white;
+    background-color: black;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(50%, 50%);
 }
 .signin {
     height: 100px;
