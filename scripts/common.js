@@ -1,6 +1,6 @@
-$(".startoptions").click(function() { 
+$('.startoptions div:nth-child(1)').click(function() { 
     $(this).hide();
 });
-$('.startoptions div:last').click(function() {
+$('.startoptions div:nth-child(3)').click(function() {
     window.close();
 });
