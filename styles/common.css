@@ -7,9 +7,17 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
 .startoptions div {
-    font-size: 30px;
     margin: 105px;
     height: 30px;
     color: white;
+}
+
+.button {
+    font-size: 30px;
+}
+
+.button:hover {
+    font-size: 35px;
 }
