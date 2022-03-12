@@ -12,7 +12,7 @@ let data = $.ajax({
         $.ajax({
             type: "POST",
             url: "/data.json",
-            data: {test:[x]}
+            data: {"test":[x]}
         });
     });
 });
