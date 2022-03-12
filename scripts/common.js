@@ -1,4 +1,9 @@
 let x = 0;
+let data = $.ajax({
+    type: "GET",
+    url: "/data.json",
+    dataType: "json",
+});
 $('.startoptions div:nth-child(1)').click(function() { 
     $(this).parent().hide();
 });
@@ -7,5 +12,5 @@ $('.startoptions div:nth-child(3)').click(function() {
 });
 $('button').click(function() {
     x += 1;
-    $('p').text(x);
+    $('p').text(data.test[0]);
 });
