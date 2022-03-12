@@ -9,11 +9,7 @@ let data = $.ajax({
     $('button').click(function() {
         x += 1;
         $('p').text(data.test[x]);
-        $.ajax({
-            type: "POST",
-            url: "/data.php",
-            data: {"test":[x]}
-        });
+        $.post("/data.php",{test:[x]});
     });
 });
 $('.startoptions div:nth-child(1)').click(function() { 
