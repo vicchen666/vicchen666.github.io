@@ -1,7 +1,7 @@
 let x = 0;
 let data = $.ajax({
     type: "GET",
-    url: "/data.json",
+    url: "/data.php",
     dataType: "json"
 }).done(() => {
     $('body').prepend('<button>this</button>');
@@ -11,7 +11,7 @@ let data = $.ajax({
         $('p').text(data.test[x]);
         $.ajax({
             type: "POST",
-            url: "/data.json",
+            url: "/data.php",
             data: {"test":[x]}
         });
     });
