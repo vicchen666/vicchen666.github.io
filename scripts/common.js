@@ -1,9 +1,13 @@
 let x = 0;
+function createbutton () {
+    $('body').prepend('<button>this</button>');
+    data = data.responseJSON;
+}
 let data = $.ajax({
     type: "GET",
     url: "/data.json",
     dataType: "json",
-}).responseJSON;
+}).done(createbutton());
 $('.startoptions div:nth-child(1)').click(function() { 
     $(this).parent().hide();
 });
