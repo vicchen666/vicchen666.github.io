@@ -3,7 +3,7 @@ let data = $.ajax({
     type: "GET",
     url: "/data.json",
     dataType: "json",
-});
+}).responseJSON;
 $('.startoptions div:nth-child(1)').click(function() { 
     $(this).parent().hide();
 });
