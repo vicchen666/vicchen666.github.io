@@ -51,9 +51,11 @@ h3 {
 }
 #TotalRecipes p {
     font-style: italic;
+    float: right;
 }
 .edit-count {
     color: gray;
+    margin-left: 7px;
 }
 #SearchRow {
     clear: both;
@@ -68,7 +70,10 @@ h3 {
    align-items: center;
    justify-content: center;
    font-size: 12px;
-   padding: 7px 15 px;
+   padding: 7px 15px;
    text-transform: uppercase;
    margin: 1.5em 0;
+}
+button {
+    background-color: chocolate;
 }
