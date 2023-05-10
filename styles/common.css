@@ -1,25 +1,15 @@
-.startoptions {
-    padding: 10px;
-    height: 510px;
-    width: 300px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+#CraftingRecipesEditor {
+    width:1200px;
+    height: 700px;
+    background-color: chocolate;
+    color:white;
 }
-
-.startoptions div {
-    margin: 105px;
-    height: 30px;
-    color: white;
+#CraftingRecipesEditor > header {
+    padding: 12px 20px;
+    background-color: hsla(0, 0%, 75%, 0.3);
 }
-
-.button {
-    font-size: 30px;
-    user-select: none;
-}
-
-.button:hover {
-    font-size: 35px;
-    cursor: pointer;
+h3 {
+    display: block;
+    font-weight: bold;
+    font-size: 1.3em;
 }
