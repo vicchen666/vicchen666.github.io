@@ -24,11 +24,12 @@ h3 {
     
 }
 #CraftingRecipesEditor {
+    border-radius: 3px;
     display: flex;
     flex-direction: column;
     max-height: 100% - 100px;
     min-width: 800px;
-    background-color: chocolate;
+    background-color: #b35919;
     color:white;
 }
 #CraftingRecipesEditor > header, #CraftingRecipesEditor > footer {
@@ -52,6 +53,7 @@ h3 {
 #TotalRecipes p {
     font-style: italic;
     float: right;
+    margin: 0;
 }
 .edit-count {
     color: gray;
@@ -66,14 +68,15 @@ h3 {
 #SearchInput {
     margin-left: 1em;
 }
-#AddNew {
-   align-items: center;
-   justify-content: center;
-   font-size: 12px;
-   padding: 7px 15px;
-   text-transform: uppercase;
-   margin: 1.5em 0;
-}
 button {
     background-color: chocolate;
+    border-radius: 3px;
+    color: white;
+    border: none;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 7px 15px;
+    margin: 1.5em 0;
 }
