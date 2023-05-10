@@ -1,12 +1,22 @@
 body{
     font-family: rubik,helvetica,arial,sans-serif;
     background-color: #2d1606;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+h3 {
+    display: block;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 0;
 }
 #Container{
     display: flex;
     align-items: center;
     justify-content: center;
     position: fixed;
+    font-size: 14px;
     top: 0;
     bottom: 0;
     left: 0;
@@ -39,9 +49,26 @@ body{
     font-size: 1.3em;
     font-weight: bold;
 }
-h3 {
-    display: block;
-    font-weight: bold;
-    font-size: 1.3em;
-    margin: 0;
+#TotalRecipes p {
+    font-style: italic;
+}
+.edit-count {
+    color: gray;
+}
+#SearchRow {
+    clear: both;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+#SearchInput {
+    margin-left: 1em;
+}
+#AddNew {
+   align-items: center;
+   justify-content: center;
+   font-size: 12px;
+   padding: 7px 15 px;
+   text-transform: uppercase;
+   margin: 1.5em 0;
 }
