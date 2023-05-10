@@ -1,12 +1,18 @@
+body{
+    font-family: rubik,helvetica,arial,sans-serif;
+}
 #CraftingRecipesEditor {
     width:1200px;
     height: 700px;
     background-color: chocolate;
     color:white;
+    align-items: center;
+    justify-items: center;
 }
 #CraftingRecipesEditor > header {
     padding: 12px 20px;
     background-color: hsla(0, 0%, 75%, 0.3);
+    min-height: 22px;
 }
 h3 {
     display: block;
