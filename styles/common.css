@@ -17,7 +17,6 @@ body{
     display: flex;
     flex-direction: column;
     max-height: 100% - 100px;
-    min-height: 500px;
     min-width: 800px;
     background-color: chocolate;
     color:white;
@@ -28,8 +27,17 @@ body{
     background-color: hsla(0, 0%, 75%, 0.3);
     min-height: 22px;
 }
-#CraftingRecipesEditor > foot {
+#CraftingRecipesEditor > footer {
     flex-direction: row-reverse;
+}
+#CraftingRecipesEditor > section {
+    min-width: 100px;
+    padding: 20px;
+}
+#PageTitle{
+    float: left;
+    font-size: 1.3em;
+    font-weight: bold;
 }
 h3 {
     display: block;
