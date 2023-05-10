@@ -1,14 +1,20 @@
 body{
     font-family: rubik,helvetica,arial,sans-serif;
 }
+#Container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 #CraftingRecipesEditor {
+    display: flex;
+    flex-direction: column;
     margin: auto;
-    width:1200px;
-    height: 700px;
+    max-height: 100% - 100px;
+    min-height: 500px;
+    min-width: 1000px;
     background-color: chocolate;
     color:white;
-    align-items: center;
-    justify-items: center;
 }
 #CraftingRecipesEditor > header {
     padding: 12px 20px;
