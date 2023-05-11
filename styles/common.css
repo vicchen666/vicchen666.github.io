@@ -1,0 +1,137 @@
+body {
+    background-color: #2d1606;
+    display: block;
+}
+body, ul, p {
+    font-family: rubik,helvetica,arial,sans-serif;
+    list-style-type: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+h3 {
+    display: block;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 0;
+}
+#Container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    font-size: 14px;
+    line-height: 22px;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    
+}
+#CraftingRecipesEditor {
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100% - 100px;
+    min-width: 800px;
+    background-color: #b35919;
+    color:white;
+}
+#CraftingRecipesEditor > header, #CraftingRecipesEditor > footer {
+    display: flex;
+    padding: 12px 20px;
+    background-color: hsla(0, 0%, 75%, 0.3);
+    min-height: 22px;
+}
+#CraftingRecipesEditor > footer {
+    flex-direction: row-reverse;
+}
+#CraftingRecipesEditor > section {
+    min-width: 100px;
+    padding: 20px;
+}
+
+/* Input */
+.step {
+    margin-top: 0.5em;
+}
+#Code {
+    margin: 0.5em 0.5em 0 0;
+}
+/* #Search */
+#PageTitle, #Instruction{
+    float: left;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+#TotalRecipes p {
+    font-style: italic;
+    float: right;
+    margin: 0;
+}
+.edit-count {
+    color: gray;
+    margin-left: 7px;
+    font-weight: bold;
+}
+#SearchRow {
+    clear: both;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+#SearchInput {
+    margin-left: 1em;
+}
+#ActionLog {
+    margin-left: 0.8em;
+    font-style: italic;
+}
+.actions-none {
+    color: #ababab;
+}
+.actions-add, .actions-modify, .actions-remove {
+    font-weight: bold;
+    font-size: 13px;
+}
+.actions-add::before, .actions-modify::before, .actions-remove::before {
+    margin-right: 1.5em;
+}
+.actions-add {
+    color: lime;
+}
+.actions-add::before {
+    content: '+ ';
+}
+.actions-modify {
+    color: #DAA520;
+}
+.actions-modify::before {
+    content: '≠ ';
+}
+.actions-remove {
+    color: red;
+}
+.actions-remove::before {
+    content: '– ';
+}
+#SearchResult {
+    list-style-type: square;
+    margin-left: 0.8em;
+}
+button {
+    cursor: pointer;
+    background-color: chocolate;
+    font-family: rubik,helvetica,arial,sans-serif;
+    font-weight: bold;
+    line-height: 1.5;
+    border-radius: 3px;
+    color: white;
+    border: none;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 7px 15px;
+    margin: 1.5em 0;
+}
