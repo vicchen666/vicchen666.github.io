@@ -1,8 +1,9 @@
 body {
     background-color: #2d1606;
 }
-body, ul {
+body, ul, p {
     font-family: rubik,helvetica,arial,sans-serif;
+    list-style-type: none;
     border: 0;
     margin: 0;
     padding: 0;
@@ -19,6 +20,7 @@ h3 {
     justify-content: center;
     position: fixed;
     font-size: 14px;
+    line-height: 22px;
     top: 0;
     bottom: 0;
     left: 0;
@@ -57,12 +59,10 @@ h3 {
     float: right;
     margin: 0;
 }
-#TotalRecipes p span {
-    font-size: bold;
-}
 .edit-count {
     color: gray;
     margin-left: 7px;
+    font-weight: bold;
 }
 #SearchRow {
     clear: both;
@@ -76,7 +76,6 @@ h3 {
 #ActionLog {
     margin-left: 0.8em;
     font-style: italic;
-    list-style-type: none;
 }
 .actions-none {
     color: #ababab;
@@ -105,6 +104,10 @@ h3 {
 }
 .actions-remove::before {
     content: '– ';
+}
+#SearchResult {
+    list-style-type: square;
+    margin-left: 0.8em;
 }
 button {
     background-color: chocolate;
