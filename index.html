@@ -8,13 +8,21 @@
 </head>
 
 <body>
-    <div id = "Container">
-        <div id ="CraftingRecipesEditor">
+    <div id="Container">
+        <div id="CraftingRecipesEditor">
             <header>
                 <h3>Crafting Recipes Editor</h3>
             </header>
             <section>
-                <div id="Search">
+                <div id="Input" style="display: block;">
+                    <div id="Instruction">How To Use</div><br>
+                    <div class="step">Step 1: Go to <a href="https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data" target="_blank">https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data</a></div>
+                    <div class="step">Step 2: Copy the code inside Module Code</div>
+                    <div class="step">Step 3: Paste the code inside the input</div>
+                    <input id="Code" maxlength="100000">
+                    <button>Confirm</button>
+                </div>
+                <div id="Search" style="display: none;">
                     <div id="PageTitle">Crafting Recipes Editor Main Page</div>
                     <div id="TotalRecipes">
                         <p>
@@ -41,6 +49,12 @@
                     <ul id="SearchResult">
                         <p>Enter a search term to start searching</p>
                     </ul>
+                </div>
+                <div id="Editor">
+
+                </div>
+                <div id="Result">
+
                 </div>
             </section>
             <footer>

@@ -1,5 +1,6 @@
 body {
     background-color: #2d1606;
+    display: block;
 }
 body, ul, p {
     font-family: rubik,helvetica,arial,sans-serif;
@@ -49,7 +50,16 @@ h3 {
     min-width: 100px;
     padding: 20px;
 }
-#PageTitle{
+
+/* Input */
+.step {
+    margin-top: 0.5em;
+}
+#Code {
+    margin: 0.5em 0.5em 0 0;
+}
+/* #Search */
+#PageTitle, #Instruction{
     float: left;
     font-size: 1.3em;
     font-weight: bold;
@@ -110,6 +120,7 @@ h3 {
     margin-left: 0.8em;
 }
 button {
+    cursor: pointer;
     background-color: chocolate;
     font-family: rubik,helvetica,arial,sans-serif;
     font-weight: bold;
