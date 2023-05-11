@@ -1,6 +1,8 @@
-body{
-    font-family: rubik,helvetica,arial,sans-serif;
+body {
     background-color: #2d1606;
+}
+body, ul {
+    font-family: rubik,helvetica,arial,sans-serif;
     border: 0;
     margin: 0;
     padding: 0;
@@ -55,6 +57,9 @@ h3 {
     float: right;
     margin: 0;
 }
+#TotalRecipes p span {
+    font-size: bold;
+}
 .edit-count {
     color: gray;
     margin-left: 7px;
@@ -67,6 +72,39 @@ h3 {
 }
 #SearchInput {
     margin-left: 1em;
+}
+#ActionLog {
+    margin-left: 0.8em;
+    font-style: italic;
+    list-style-type: none;
+}
+.actions-none {
+    color: #ababab;
+}
+.actions-add, .actions-modify, .actions-remove {
+    font-weight: bold;
+    font-size: 13px;
+}
+.actions-add::before, .actions-modify::before, .actions-remove::before {
+    margin-right: 1.5em;
+}
+.actions-add {
+    color: lime;
+}
+.actions-add::before {
+    content: '+ ';
+}
+.actions-modify {
+    color: #DAA520;
+}
+.actions-modify::before {
+    content: '≠ ';
+}
+.actions-remove {
+    color: red;
+}
+.actions-remove::before {
+    content: '– ';
 }
 button {
     background-color: chocolate;
