@@ -15,7 +15,7 @@ function parse(code) {
     code = code.split(/[,]?\t/);
     code = code.filter(recipe => recipe !== " ");
     code.forEach(recipe => {
-        names.push(recipe.match(/(?<=\[').+(?='\])/)[0]);  // names = ["name1", "name2", "name3", ...]
+        names.push(recipe.match(/(?<=\[')[^,\]]+(?=('\]|,))/)[0]);  // names = ["name1", "name2", "name3", ...]
         if (recipe.includes("//")) {
             // slots
             slots.push([[]]);  // slots = [..., [[]]]          
@@ -146,27 +146,43 @@ function parse(code) {
             }
         } else {
             // items
-            let output_items = recipe.match(/(?<=\[').+(?='\])/g)  // match ['...']
+            let output_items = recipe.match(/(?<=\[')[^,\]]+(?=('\]|,))/g)  // match ['...']
             for (i = 0; i < slots[slots.length - 1].length; i++) {
                 items[items.length - 1][i].push(output_items[0]);
             }
 
             // amounts
             let output_amounts = recipe.match(/(?<=, ).+(?='\])/g)  // match [', ...']
-            console.log(recipe);
-            console.log(output_amounts);
-            console.log(slots[slots.length - 1]);
-            console.log(amounts[amounts.length - 1]);
             for (i = 0; i < slots[slots.length - 1].length; i++) {
                 if (output_amounts !== null) {
                     amounts[amounts.length - 1][i].push(output_amounts[0]);  // amounts = [..., [..., [..., "64"], ...]]
                 } else {
-                    console.log(i);
                     amounts[amounts.length - 1][i].push("1");  // amounts = [..., [..., [..., "1"], ...]]
                 }
             }
         }
     });
+    let names_sort = Array.from(names);
+    names_sort.sort();
+    for (let i = 0; i < names.length; i++) {  // move T:... to the last
+        if (names_sort[i].includes("T:")) {
+            names_sort.push(names_sort[i]);
+            names_sort.splice(i,1,"");
+        }
+    }
+    names_sort = names_sort.filter(recipe => recipe !== "");
+    for (let i = 0; i < names.length; i++) {  // sort all the things
+        let sort = names.indexOf(names_sort[i]);
+        names.splice(i, 0, names[sort])
+        names.splice(sort + 1, 1)
+        slots.splice(i, 0, slots[sort])
+        slots.splice(sort + 1, 1)
+        items.splice(i, 0, items[sort])
+        items.splice(sort + 1, 1)
+        amounts.splice(i, 0, amounts[sort])
+        amounts.splice(sort + 1, 1)
+    }
+    console.log(names_sort)
     return [names, slots, items, amounts];
 }
 

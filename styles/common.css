@@ -15,6 +15,30 @@ h3 {
     font-size: 1.3em;
     margin: 0;
 }
+a {
+    color: #f2c6a6;
+    text-decoration: none;
+    cursor: pointer;
+}
+a:hover {
+    text-decoration: underline;
+}
+button {
+    cursor: pointer;
+    background-color: chocolate;
+    font-family: rubik,helvetica,arial,sans-serif;
+    font-weight: bold;
+    line-height: 1.5;
+    border-radius: 3px;
+    color: white;
+    border: none;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 7px 15px;
+    margin: 1.5em 0;
+}
 #Container{
     display: flex;
     align-items: center;
@@ -32,7 +56,7 @@ h3 {
     border-radius: 3px;
     display: flex;
     flex-direction: column;
-    max-height: 100% - 100px;
+    max-height: calc(100% - 100px);
     min-width: 800px;
     background-color: #b35919;
     color:white;
@@ -48,6 +72,7 @@ h3 {
 }
 #CraftingRecipesEditor > section {
     min-width: 100px;
+    overflow-y: auto;
     padding: 20px;
 }
 
@@ -115,23 +140,10 @@ h3 {
 .actions-remove::before {
     content: '– ';
 }
-#SearchResult {
+#SearchResults {
     list-style-type: square;
     margin-left: 0.8em;
 }
-button {
-    cursor: pointer;
-    background-color: chocolate;
-    font-family: rubik,helvetica,arial,sans-serif;
-    font-weight: bold;
-    line-height: 1.5;
-    border-radius: 3px;
-    color: white;
-    border: none;
-    text-transform: uppercase;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    padding: 7px 15px;
-    margin: 1.5em 0;
+#SearchResults a {
+    color: #f2c6a6;
 }
