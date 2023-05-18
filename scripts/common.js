@@ -26,3 +26,8 @@ $("#SearchInput").on("input", function () {
         $("#SearchResults p").html("No recipe matched your search.")
     }
 });
+
+$("#SearchResults").on("click", ".editRecipe", () => {
+    $("#Search").hide();
+    $("#Editor").show();
+});

@@ -3,8 +3,8 @@
 
 <head>
     <title>Crafting Table Recipe Editor</title>
-    <link rel="icon" type="image/x-icon" href="/images/crafting_table.ico" />
-    <link rel="stylesheet" href="/styles/common.css" />
+    <link rel="icon" type="image/x-icon" href="images/crafting_table.ico" />
+    <link rel="stylesheet" href="styles/common.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
@@ -16,7 +16,7 @@
             </header>
             <section>
                 <div id="Input">
-                    <div id="Instruction">How To Use</div><br>
+                    <div class="PageTitle">How To Use</div><br>
                     <div class="step">Step 1: Go to <a href="https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data" target="_blank">https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data</a></div>
                     <div class="step">Step 2: Copy the code inside Module Code</div>
                     <div class="step">Step 3: Paste the code inside the input</div>
@@ -24,11 +24,11 @@
                     <button id="Confirm">Confirm</button>
                 </div>
                 <div id="Search" style="display: none;">
-                    <div id="PageTitle">Crafting Recipes Editor Main Page</div>
+                    <div class="PageTitle">Crafting Recipes Editor Main Page</div>
                     <div id="TotalRecipes">
                         <p>
                             <span>Recipes Count: 0</span>
-                            <span class = "edit-count">(0)</span>
+                            <span class="edit-count">(0)</span>
                         </p>
                     </div>
                     <div id="SearchRow">
@@ -51,8 +51,52 @@
                         <p>No recipe matched your search.</p>
                     </ul>
                 </div>
-                <div id="Editor">
-
+                <div id="Editor" style="display: none;">
+                    <div class="PageTitle">Recipe Editor</div><br>
+                    <div class="ui-Crafting_Table">
+                        <div class="ui-input">
+                            <div class="ui-row">
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                            </div>
+                            <div class="ui-row">
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                            </div>
+                            <div class="ui-row">
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                                <span class="invslot"></span>
+                            </div>
+                        </div>
+                        <span class="ui-arrow">
+                        </span>
+                        <span class="ui-output">
+                            <span class="invslot invslot-large"></span>
+                        </span>
+                    </div>
+                    <table class="attributes">
+                        <tr>
+                            <th></th>
+                            <th>Slots</th>
+                            <th>Items</th>
+                            <th>Amounts</th>
+                            <td><button>ADD</button></td>
+                        </tr>
+                        <tr>
+                            <th>1.</th>
+                            <th><input></th>
+                            <th><input></th>
+                            <th><input></th>
+                            <td><button>✖</button></td>
+                        </tr>
+                    </table>
+                    <div class="output">
+                        <div>Output:</div>
+                        <textarea readonly>testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest</textarea>
+                    </div>
                 </div>
                 <div id="Result">
 
@@ -64,8 +108,8 @@
         </div>
     </div>
 
-    <script src="/scripts/code_parse.js"></script>
-    <script src="/scripts/common.js"></script>
+    <script src="scripts/code_parse.js"></script>
+    <script src="scripts/common.js"></script>
 </body>
 
 </html>

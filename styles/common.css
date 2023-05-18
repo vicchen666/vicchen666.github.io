@@ -1,6 +1,7 @@
 body {
     background-color: #2d1606;
     display: block;
+    background-image: url("../images/crafting_table1.png");
 }
 body, ul, p {
     font-family: rubik,helvetica,arial,sans-serif;
@@ -57,7 +58,8 @@ button {
     display: flex;
     flex-direction: column;
     max-height: calc(100% - 100px);
-    min-width: 800px;
+    max-width: calc(100% - 100px);
+    min-width: calc(20% + 500px);
     background-color: #b35919;
     color:white;
 }
@@ -83,8 +85,9 @@ button {
 #Code {
     margin: 0.5em 0.5em 0 0;
 }
+
 /* #Search */
-#PageTitle, #Instruction{
+.PageTitle {
     float: left;
     font-size: 1.3em;
     font-weight: bold;
@@ -146,4 +149,60 @@ button {
 }
 #SearchResults a {
     color: #f2c6a6;
+}
+
+/*Editor*/
+.ui-Crafting_Table {
+    display: flex;
+    background-color: #C6C6C6;
+    border: 2px solid;
+    border-color: #DBDBDB #5B5B5B #DBDBDB #5B5B5B;
+    width: fit-content;
+    align-items: center;
+    gap: 4px;
+    border-radius: 3px;
+    padding: 8px;
+    margin: 20px auto;
+}
+.ui-row {
+    display: flex;
+}
+.invslot {
+    display: inline-block;
+    background: #8b8b8b no-repeat center center / 32px 32px;
+    border: 2px solid;
+    border-color: #373737 #FFF #FFF #373737;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    line-height: 1;
+    text-align: left;
+    box-sizing: content-box;
+}
+.invslot-large {
+    padding: 8px;
+}
+.ui-arrow::before {
+    content: url(../images/Arrow.png);
+    display: flex;
+}
+.attributes {
+    margin: auto;
+    text-align: center;
+}
+table button {
+    margin: 0;
+}
+.output {
+    margin: 10px 10px 0 0;
+    display: flex;
+}
+.output {
+    font-weight: bold;
+    font-size: 1.3em;
+}
+.output textarea {
+    margin-left: 10px;
+    width: 50%;
+    resize: none;
 }
