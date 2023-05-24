@@ -1,8 +1,8 @@
 let code = "";
 let names = [], slots = [], items = [], amounts = [];
 
-$("#Confirm").click(() => {
-    code = $("#Code").val();
+$("#Input").on("click", "#CodeConfirm", () => {
+    code = $("#CodeInput").val();
     if (code.includes("return")) {
         [names, slots, items, amounts] = parse(code);
         $("#Input").hide();
@@ -30,4 +30,17 @@ $("#SearchInput").on("input", function () {
 $("#SearchResults").on("click", ".editRecipe", () => {
     $("#Search").hide();
     $("#Editor").show();
+});
+
+$("#Editor").on("click", "#Cancel, #Save", () => {
+    $("#Editor").hide();
+    $("#Search").show();
+});
+
+$(".attributes").on("click", ".addattribute", function() {
+    $(this).parents("table").append("<tr><th>" + $(this).parents("table").children("tbody").children("tr").length + ".</th><th><input></th><th><input></th><th><input></th><td><button class=\"removeattribute\">✖</button></td></tr>");
+});
+
+$(".attributes").on("click", ".removeattribute", function() {
+    $(this).parents("tr").remove();
 });

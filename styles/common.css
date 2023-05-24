@@ -82,7 +82,7 @@ button {
 .step {
     margin-top: 0.5em;
 }
-#Code {
+#CodeInput {
     margin: 0.5em 0.5em 0 0;
 }
 
@@ -152,6 +152,9 @@ button {
 }
 
 /*Editor*/
+#Cancel {
+    background-color: transparent;
+}
 .ui-Crafting_Table {
     display: flex;
     background-color: #C6C6C6;
@@ -193,16 +196,32 @@ button {
 table button {
     margin: 0;
 }
-.output {
-    margin: 10px 10px 0 0;
+.left-arrow , .right-arrow {
+    height: 40px;
+    width: 20px;
+}
+.left-arrow path, .right-arrow path {
+    fill: chocolate;
+}
+#Pages {
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 0 10px;
+}
+.input {
+    align-items: center;
+}
+.input, .output {
     display: flex;
 }
-.output {
+.input div, .output div {
     font-weight: bold;
     font-size: 1.3em;
 }
-.output textarea {
-    margin-left: 10px;
+.output textarea, .input input {
+    margin: 0 10px;
     width: 50%;
     resize: none;
 }
+
+

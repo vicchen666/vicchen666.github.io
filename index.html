@@ -20,8 +20,8 @@
                     <div class="step">Step 1: Go to <a href="https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data" target="_blank">https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data</a></div>
                     <div class="step">Step 2: Copy the code inside Module Code</div>
                     <div class="step">Step 3: Paste the code inside the input</div>
-                    <input id="Code" maxlength="100000">
-                    <button id="Confirm">Confirm</button>
+                    <input id="CodeInput" maxlength="100000">
+                    <button id="CodeConfirm">Confirm</button>
                 </div>
                 <div id="Search" style="display: none;">
                     <div class="PageTitle">Crafting Recipes Editor Main Page</div>
@@ -53,6 +53,11 @@
                 </div>
                 <div id="Editor" style="display: none;">
                     <div class="PageTitle">Recipe Editor</div><br>
+                    <div class="input">
+                        <div>Input:</div>
+                        <input id="RecipeInput" maxlength="100000">
+                        <button id="RecipeConfirm">Confirm</button>
+                    </div>
                     <div class="ui-Crafting_Table">
                         <div class="ui-input">
                             <div class="ui-row">
@@ -83,20 +88,33 @@
                             <th>Slots</th>
                             <th>Items</th>
                             <th>Amounts</th>
-                            <td><button>ADD</button></td>
+                            <td><button class="addattribute">ADD</button></td>
                         </tr>
                         <tr>
                             <th>1.</th>
                             <th><input></th>
                             <th><input></th>
                             <th><input></th>
-                            <td><button>✖</button></td>
+                            <td><button class="removeattribute">✖</button></td>
                         </tr>
                     </table>
+                    <br>
+                    <div style="display: flex; justify-content: right; align-items: center;">
+                        <svg class="left-arrow">
+                            <path d="M20 0 L0 20 L20 40 Z" />
+                        </svg>
+                        <div id="Pages">1 / 1</div>
+                        <svg class="right-arrow">
+                            <path d="M0 0 L20 20 L0 40 Z" />
+                        </svg>
+                    </div>
+                    <br>
                     <div class="output">
                         <div>Output:</div>
-                        <textarea readonly>testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest</textarea>
+                        <textarea readonly></textarea>
                     </div>
+                    <button id ="Save">Save</button>
+                    <button id="Cancel">Cancel</button>
                 </div>
                 <div id="Result">
 

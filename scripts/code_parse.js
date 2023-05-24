@@ -11,9 +11,9 @@ String.prototype.lastCharOf = function (regexp, fromIndex) {  // only for single
 
 function parse(code) {
     let names = [], slots = [], items = [], amounts = [];
-    code = code.slice(code.indexOf("return") + 8, -2);  // use ['.'] = {' . "., ."'}, only
-    code = code.split(/[,]?\t/);
-    code = code.filter(recipe => recipe !== " ");
+    code = code.slice(code.indexOf("return") + 8, code.indexOf(", }") + 1);  // use ['.'] = {' . "., ."'}, only
+    code = code.split(/ \t/);
+    code = code.filter(recipe => recipe !== "");
     code.forEach(recipe => {
         names.push(recipe.match(/(?<=\[')[^,\]]+(?=('\]|,))/)[0]);  // names = ["name1", "name2", "name3", ...]
         if (recipe.includes("//")) {
