@@ -29,6 +29,7 @@ $("#SearchInput").on("input", function () {
 
 $("#SearchResults").on("click", ".editRecipe", () => {
     $("#Search").hide();
+    $("#Pages").html("1 / " + $("#Editor .page").length);
     $("#Editor").show();
 });
 
@@ -37,10 +38,48 @@ $("#Editor").on("click", "#Cancel, #Save", () => {
     $("#Search").show();
 });
 
-$(".attributes").on("click", ".addattribute", function() {
-    $(this).parents("table").append("<tr><th>" + $(this).parents("table").children("tbody").children("tr").length + ".</th><th><input></th><th><input></th><th><input></th><td><button class=\"removeattribute\">✖</button></td></tr>");
+$(".attributes").on("click", ".addattribute", function() {  // add an attribute: slots, item, amount
+    $(this).parents("tbody").children(":first").after("<tr><th>1.</th><th><input></th><th><input></th><th><input></th><td><button class=\"removeattribute\">✖</button></td></tr>");
+    for (let i = 1; i < $(this).parents("tbody").children("tr").length; i++) {
+        $(this).parents("tbody").children(":nth(" + i + ")").children(":first").html(i + ".");
+    }
 });
 
-$(".attributes").on("click", ".removeattribute", function() {
-    $(this).parents("tr").remove();
+$(".attributes").on("click", ".removeattribute", function() {  // remove an attribute: slots, item, amount
+    if ($(this).parents("tbody").children("tr").length !== 2) {
+        let tbody = $(this).parents("tbody");
+        $(this).parents("tr").remove();
+        for (let i = 1; i < tbody.children("tr").length; i++) {
+            tbody.children(":nth(" + i + ")").children(":first").html(i + ".");
+        }
+    }
+});
+
+$("#Editor").on("click", ".left-arrow", function() {
+    let page = $("#Editor .page").index($(".page:not(:hidden)"));
+    if (page === 0) {
+        $("#Editor .page:first").hide();
+        $("#Editor .page:last").show();
+        $("#Pages").html($("#Editor .page").length + " / " + $("#Editor .page").length);
+    } else {
+        $("#Editor .page:nth(" + (page) + ")").hide();
+        $("#Editor .page:nth(" + (page - 1) + ")").show();
+        $("#Pages").html(page + " / " + $("#Editor .page").length);
+    }
+    
+});
+
+$("#Editor").on("click", ".right-arrow", function() {
+    let page = $("#Editor .page").index($(".page:not(:hidden)"));
+    console.log(page)
+    if ($("#Editor .page").length === page + 1) {
+        $("#Editor .page:last").hide();
+        $("#Editor .page:first").show();
+        $("#Pages").html("1 / " + $("#Editor .page").length);
+    } else {
+        $("#Editor .page:nth(" + (page) + ")").hide();
+        $("#Editor .page:nth(" + (page + 1) + ")").show();
+        $("#Pages").html((page + 2) + " / " + $("#Editor .page").length);
+    }
+    
 });
