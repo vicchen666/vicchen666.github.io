@@ -15,19 +15,32 @@ $("#SearchInput").on("input", function () {
     $("#SearchResults li").remove();
     for (let i = 0; i < names.length; i++) {
         if (names[i].toLowerCase().search(search.toLowerCase()) !== -1) {
-            $("#SearchResults p").before($("<li/>").append($("<a/>").attr("href", "https://hypixel-skyblock.fandom.com/wiki/" + names[i].replace(/\((.+\))|\\/,"")).attr("target", "_blank").html(names[i].replace("\\",""))).append(" (").append($("<a/>").addClass("editRecipe").html("edit")).append(" • ").append($("<span/>").addClass("previewRecipe").html("preview")).append(" • ").append($("<a/>").addClass("removeRecipe").html("remove")).append(")"));
+            $("#SearchResults p").before($("<li/>").append($("<a/>").attr("href", "https://hypixel-skyblock.fandom.com/wiki/" + names[i].replace(/\((.+\))|\\/,"")).attr("title", names[i].replace("\\","")).attr("target", "_blank").html(names[i].replace("\\",""))).append(" (").append($("<a/>").addClass("editRecipe").html("edit")).append(" • ").append($("<span/>").addClass("previewRecipe").html("preview")).append(" • ").append($("<a/>").addClass("removeRecipe").html("remove")).append(")"));
         }
     }
     if ($("#SearchResults li").length > 1) {
-        $("#SearchResults p").html("Total: " + $("#SearchResults li").length + " results.")
+        $("#SearchResults p").html("Total: " + $("#SearchResults li").length + " results.");
     } else if (($("#SearchResults li").length === 1)) {
-        $("#SearchResults p").html("Total: 1 result.")
+        $("#SearchResults p").html("Total: 1 result.");
     } else {
-        $("#SearchResults p").html("No recipe matched your search.")
+        $("#SearchResults p").html("No recipe matched your search.");
     }
 });
 
-$("#SearchResults").on("click", ".editRecipe", () => {
+$("#SearchResults").on("click", ".editRecipe", function() {
+    let page = "", editrecipe = names.indexOf($(this).parent().children("a:first").html().replace("'", "\\\\'"));
+    console.log(editrecipe)
+    for (let i = 0; i < slots[editrecipe].length; i++) {
+        page = "<div class=\"page\"><div class=\"ui-Crafting_Table\"><div class=\"ui-input\"><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div></div><span class=\"ui-arrow\"></span><span class=\"ui-output\"><span class=\"invslot invslot-large\"><span class=\"invslot-item\"></span></span></span></div><table class=\"Attributes\"><tr><th></th><th>Slots</th><th>Items</th><th>Amounts</th><th><button class=\"addAttribute\">ADD</button></th></tr>";
+        for (let j = 0; j < slots[editrecipe][i].length; j++) {
+            page = page + "<tr><td>" + (j + 1) + ".</td><td><input value=\"" + slots[editrecipe][i][j] + "\"></td><td><input value=\"" + items[editrecipe][i][j].replace("\\", "") + "\"></td><td><input value=\"" + amounts[editrecipe][i][j] + "\"></td><td><button class=\"removeAttribute\">✖</button></td></tr>";
+        }
+        page = page + "<tr><td>" + (slots[editrecipe][i].length + 1) + ".</td><td><input value=\"0\"></td><td><input value=\"" + items[editrecipe][i][slots[editrecipe][i].length].replace("\\", "") + "\"></td><td><input value=\"" + amounts[editrecipe][i][slots[editrecipe][i].length] + "\"></td><td><button class=\"removeAttribute\">✖</button></td></tr>";
+        page = page + "</table></div>"
+        $("#Editor br:nth(1)").before(page);
+    }
+    $("#Editor .page").hide();
+    $("#Editor .page:first").show();
     $("#Search").hide();
     $("#Pages").html("1 / " + $("#Editor .page").length);
     $("#Editor").show();
@@ -38,19 +51,40 @@ $("#Editor").on("click", "#Cancel, #Save", () => {
     $("#Search").show();
 });
 
-$(".attributes").on("click", ".addattribute", function() {  // add an attribute: slots, item, amount
-    $(this).parents("tbody").children(":first").after("<tr><th>1.</th><th><input></th><th><input></th><th><input></th><td><button class=\"removeattribute\">✖</button></td></tr>");
+$("#Editor").on("click", ".addAttribute", function() {  // add an attribute: slots, item, amount
+    $(this).parents("tbody").children(":first").after("<tr><td>1.</td><td><input></td><td><input></td><td><input value=\"1\"></td><td><button class=\"removeAttribute\">✖</button></td></tr>");
     for (let i = 1; i < $(this).parents("tbody").children("tr").length; i++) {
         $(this).parents("tbody").children(":nth(" + i + ")").children(":first").html(i + ".");
     }
 });
 
-$(".attributes").on("click", ".removeattribute", function() {  // remove an attribute: slots, item, amount
+$("#Editor").on("click", ".removeAttribute", function() {  // remove an attribute: slots, item, amount
     if ($(this).parents("tbody").children("tr").length !== 2) {
         let tbody = $(this).parents("tbody");
         $(this).parents("tr").remove();
         for (let i = 1; i < tbody.children("tr").length; i++) {
             tbody.children(":nth(" + i + ")").children(":first").html(i + ".");
+        }
+    }
+});
+
+$("#Editor").on("click", "#AddPage", () => {
+    $("#Editor .page:not(:hidden)").after("<div class=\"page\"><div class=\"ui-Crafting_Table\"><div class=\"ui-input\"><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div><div class=\"ui-row\"><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span><span class=\"invslot\"><span class=\"invslot-item\"></span></span></div></div><span class=\"ui-arrow\"></span><span class=\"ui-output\"><span class=\"invslot invslot-large\"><span class=\"invslot-item\"></span></span></span></div><table class=\"Attributes\"><tr><th></th><th>Slots</th><th>Items</th><th>Amounts</th><th><button class=\"addAttribute\">ADD</button></th></tr><tr><td>1.</td><td><input></td><td><input></td><td><input value=\"1\"></td><td><button class=\"removeAttribute\">✖</button></td></tr></table></div>");
+    $("#Editor .page:nth(" + ($("#Editor .page").index($(".page:not(:hidden)"))) + ")").hide();
+    $("#Pages").html(($("#Editor .page").index($(".page:not(:hidden)")) + 1) + " / " + $("#Editor .page").length);
+});
+
+$("#Editor").on("click", "#RemovePage", () => {
+    if ($("#Editor .page").length !== 1) {
+        let page = $("#Editor .page").index($(".page:not(:hidden)"));
+        if (page === 0) {
+            $("#Editor .page:first").remove();
+            $("#Editor .page:first").show();
+            $("#Pages").html("1 / " + $("#Editor .page").length);
+        } else {
+            $("#Editor .page:nth(" + (page) + ")").remove();
+            $("#Editor .page:nth(" + (page - 1) + ")").show();
+            $("#Pages").html(($("#Editor .page").index($(".page:not(:hidden)")) + 1) + " / " + $("#Editor .page").length);
         }
     }
 });
@@ -71,7 +105,6 @@ $("#Editor").on("click", ".left-arrow", function() {
 
 $("#Editor").on("click", ".right-arrow", function() {
     let page = $("#Editor .page").index($(".page:not(:hidden)"));
-    console.log(page)
     if ($("#Editor .page").length === page + 1) {
         $("#Editor .page:last").hide();
         $("#Editor .page:first").show();
@@ -81,5 +114,4 @@ $("#Editor").on("click", ".right-arrow", function() {
         $("#Editor .page:nth(" + (page + 1) + ")").show();
         $("#Pages").html((page + 2) + " / " + $("#Editor .page").length);
     }
-    
 });

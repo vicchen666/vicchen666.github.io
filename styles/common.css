@@ -1,10 +1,14 @@
+@font-face {
+    font-family: minecraft;
+    src: url(minecraft.woff2);
+}
 body {
     background-color: #2d1606;
     display: block;
     background-image: url("../images/crafting_table1.png");
 }
 body, ul, p {
-    font-family: rubik,helvetica,arial,sans-serif;
+    font-family: rubik, helvetica, arial, sans-serif;
     list-style-type: none;
     border: 0;
     margin: 0;
@@ -27,7 +31,7 @@ a:hover {
 button {
     cursor: pointer;
     background-color: chocolate;
-    font-family: rubik,helvetica,arial,sans-serif;
+    font-family: rubik, helvetica, arial, sans-serif;
     font-weight: bold;
     line-height: 1.5;
     border-radius: 3px;
@@ -185,16 +189,55 @@ button {
 .invslot-large {
     padding: 8px;
 }
+.invslot-item {
+    position: relative;
+    display: block;
+    background-origin: content-box;
+    background-clip: content-box;
+    width: 32px;
+    height: 32px;
+    top: -2px;
+    left: -2px;
+    padding: 2px;
+}
+.invslot-item:hover::before {
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    height: 32px;
+    width: 32px;
+    content: "";
+    background-position: center center;
+    pointer-events: none;
+    z-index: 3;
+}
+.invslot-stacksize {
+    position: absolute;
+    margin-right: 2px;
+    margin-bottom: 2px;
+    right: -2;
+    bottom: 0;
+    font-family: minecraft, rubik, serif, sans-serif;
+    font-weight: normal;
+    font-size: 15px;
+    text-align: right;
+    color: #FFF;
+    text-shadow: 1.5px 1.5px 0 #3F3F3F;
+    pointer-events: none;
+    z-index: 2;
+}
 .ui-arrow::before {
     content: url(../images/Arrow.png);
     display: flex;
 }
-.attributes {
+.Attributes {
     margin: auto;
     text-align: center;
 }
 table button {
     margin: 0;
+}
+#AddPage, #RemovePage {
+    margin: 0 10px 0 0;
 }
 .left-arrow , .right-arrow {
     height: 40px;
@@ -220,7 +263,6 @@ table button {
 }
 .output textarea, .input input {
     margin: 0 10px;
-    width: 50%;
     resize: none;
 }
 

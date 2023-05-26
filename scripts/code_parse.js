@@ -121,7 +121,7 @@ function parse(code) {
                 }
             } else {
                 for (i = 0; i < slots[slots.length - 1].length; i++) {
-                    items[items.length - 1][i].push(output_items[0]);
+                    items[items.length - 1][i].push(output_items);
                 }
             }
 
