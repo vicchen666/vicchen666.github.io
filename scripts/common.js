@@ -15,7 +15,7 @@ $("#SearchInput").on("input", function () {
     $("#SearchResults li").remove();
     for (let i = 0; i < names.length; i++) {
         if (names[i].toLowerCase().search(search.toLowerCase()) !== -1) {
-            $("#SearchResults p").before($("<li/>").append($("<a/>").attr("href", "https://hypixel-skyblock.fandom.com/wiki/" + names[i].replace(/\((.+\))|\\/,"")).attr("title", names[i].replace("\\","")).attr("target", "_blank").html(names[i].replace("\\",""))).append(" (").append($("<a/>").addClass("editRecipe").html("edit")).append(" • ").append($("<span/>").addClass("previewRecipe").html("preview")).append(" • ").append($("<a/>").addClass("removeRecipe").html("remove")).append(")"));
+            $("#SearchResults p").before($("<li/>").append($("<a/>").attr("href", "https://hypixel-skyblock.fandom.com/wiki/" + names[i].replace(/\((.+\))|\\/, "")).attr("title", names[i].replace("\\", "")).attr("target", "_blank").html(names[i].replace("\\", ""))).append(" (").append($("<a/>").addClass("editRecipe").html("edit")).append(" • ").append($("<span/>").addClass("previewRecipe").html("preview")).append(" • ").append($("<a/>").addClass("removeRecipe").html("remove")).append(")"));
         }
     }
     if ($("#SearchResults li").length > 1) {
@@ -151,9 +151,13 @@ function update_crafting_table() {
                         invslot = $("#Editor .page:not(:hidden) .ui-row:eq(" + ~~((+slot - 1)/3) +") .invslot:eq(" + ((+slot - 1) % 3) + ") .invslot-item")
                     }
                     invslot.children("*").remove()
-                    invslot.append("<a href=\"https://hypixel-skyblock.fandom.com/wiki/" + item + "\" target=\"_blank\"><div title=\"" + item + "\" style=\"font-size: 32px; text-align: center;\">" + item[0] + "</div></a>")
+                    if (item[0] !== "{") {
+                        invslot.append("<a href=\"https://hypixel-skyblock.fandom.com/wiki/" + item.replace(/\(.+\)/, "") + "\" target=\"_blank\"><div title=\"" + item + "\" style=\"font-size: 32px; text-align: center;\">" + item[0] + "</div></a>")
+                    } else {
+                        invslot.append("<a href=\"https://hypixel-skyblock.fandom.com/wiki/" + item.replace(/\(.+\)/, "") + "\" target=\"_blank\"><div title=\"" + item + "\" style=\"font-size: 32px; text-align: center;\">" + item[1] + "</div></a>")
+                    }
                     if (amount !== "1") {
-                        invslot.append("<span class=\"invslot-stacksize\">" + amount + "</span>")
+                    invslot.append("<span class=\"invslot-stacksize\">" + amount + "</span>")
                     }
                 }
             });
