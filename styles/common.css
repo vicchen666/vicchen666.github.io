@@ -214,7 +214,7 @@ button {
     position: absolute;
     margin-right: 2px;
     margin-bottom: 2px;
-    right: -2;
+    right: -2px;
     bottom: 0;
     font-family: minecraft, rubik, serif, sans-serif;
     font-weight: normal;
