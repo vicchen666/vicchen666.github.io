@@ -10,13 +10,23 @@ $("#main-sidebar").on("click", "svg", () => {
     }
 })
 window.addEventListener("hashchange", function() {
-    // Code to run when the hash part of the URL changes
     var newHash = window.location.hash;
     console.log("Hash changed to: " + newHash);
-    // Check if the new hash is "#fossil_finder"
     if (newHash === "#fossil_finder") {
-        // Perform your action here
+        $("#fossil-finder").show()
+        fossil_finder()
         console.log("URL changed to #fossil_finder");
         // You can replace this console log with any action you want to perform
     }
 });
+
+function fossil_finder() {
+    chest = $("#fossil-finder section .ui-chest")
+    chest.append("<div class=\"ui-header\">Fossil Excavator</div>")
+    for (i=0; i<6; i++) {
+        chest.append("<div class=\"ui-row\"></div>")
+    }
+    for (i=0; i<9; i++) {
+        chest.children(".ui-row").append("<div class=\"invslot\"><div class=\"invslot-item\"></div></div>")
+    }
+}

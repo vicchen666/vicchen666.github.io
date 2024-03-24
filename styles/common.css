@@ -9,6 +9,7 @@ body {
     display: block;
     margin: 0;
     background-image: url("../images/crafting_table1.png");
+    user-select: none;
 }
 #main-sidebar {
     width: 180px;
@@ -21,7 +22,6 @@ body {
   
 #main-sidebar a {
     color: #ffffff;
-    user-select: none;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
@@ -50,9 +50,63 @@ body {
 }
 .editor section {
     display: flex;
-}
-.editor section div {
-    height: 100px;
-    margin: 10px;
+    justify-content: center;
 }
 
+/* ui */
+.ui {
+    background-color: #C6C6C6;
+    border: 3px solid;
+    border-color: #DBDBDB #5B5B5B #5B5B5B #DBDBDB;
+    border-radius: 4.5px;
+    margin: 18px;
+    padding: 12px;
+    width: fit-content;
+    text-align: left;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+.ui-header {
+    margin: -6px 6px 6px 6px;
+    display: block;
+    font-size: 23px;
+    line-height: 1.2;
+    color: #2B2D2F;
+    letter-spacing: .3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ui-row {
+    display: flex;
+}
+.invslot {
+    display: inline-block;
+    background: #8b8b8b no-repeat center center / 48px 48px;
+    border: 3px solid;
+    border-color: #373737 #FFF #FFF #373737;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+    line-height: 1.5;
+    text-align: left;
+    vertical-align: bottom;
+    box-sizing: content-box;
+}
+.invslot-item {
+    position: relative;
+    display: block;
+    background-origin: content-box;
+    background-clip: content-box;
+    width: 48px;
+    height: 48px;
+    top: -3px;
+    left: -3px;
+    padding: 3px;
+}
+.invslot-item:hover::before {
+    content: "";
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    height: 48px;
+    width: 48px;
+}
