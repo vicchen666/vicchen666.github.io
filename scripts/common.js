@@ -13,7 +13,6 @@ window.addEventListener("hashchange", function() {
     // Code to run when the hash part of the URL changes
     var newHash = window.location.hash;
     console.log("Hash changed to: " + newHash);
-    
     // Check if the new hash is "#fossil_finder"
     if (newHash === "#fossil_finder") {
         // Perform your action here
