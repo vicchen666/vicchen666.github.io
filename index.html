@@ -9,222 +9,24 @@
 </head>
 
 <body>
-    <div id="Container">
-        <div id="CraftingRecipesEditor">
-            <header>
-                <h3>Crafting Recipes Editor</h3>
-            </header>
-            <section>
-                <div id="Input">
-                    <div class="PageTitle">How To Use</div><br>
-                    <div class="step">Step 1: Go to <a href="https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data" target="_blank">https://hypixel-skyblock.fandom.com/wiki/Module:Crafting/Data</a></div>
-                    <div class="step">Step 2: Copy the code inside Module Code</div>
-                    <div class="step">Step 3: Paste the code inside the input</div>
-                    <input id="CodeInput" maxlength="100000">
-                    <button id="CodeConfirm">Confirm</button>
-                </div>
-                <div id="Search" style="display: none;">
-                    <div class="PageTitle">Crafting Recipes Editor Main Page</div>
-                    <div id="TotalRecipes">
-                        <p>
-                            <span>Recipes Count: 0</span>
-                            <span class="edit-count">(0)</span>
-                        </p>
-                    </div>
-                    <div id="SearchRow">
-                        <div id="SearchLabel">Search Existing Recipe: </div>
-                        <div>
-                            <input id="SearchInput">
-                            <span style="margin: 0 1em; font-weight: bold; text-transform: uppercase;">or</span>
-                            <button id="AddNew">Add New Recipe</button>
-                        </div>
-                    </div>
-                    <ul id="ActionLog">
-                        <li class="actions-none">No changes were made</li>
-                        <!-- <li class="actions-add">Add</li> 
-                        <li class="actions-modify">Modify</li> 
-                        <li class="actions-remove">Remove</li> -->
-                    </ul>
-                    <br>
-                    <span style="font-weight: bold;">Search Results: </span>
-                    <ul id="SearchResults">
-                        <p>No recipe matched your search.</p>
-                    </ul>
-                </div>
-                <div id="Editor" style="display: none;">
-                    <div class="PageTitle">Recipe Editor</div><br>
-                    <div class="input">
-                        <div>Input:</div>
-                        <input id="RecipeInput" style="width: 50%;" maxlength="100000">
-                        <button id="RecipeConfirm">Confirm</button>
-                    </div>
-                    <!-- <div class="page">
-                        <div class="ui-Crafting_Table">
-                            <div class="ui-input">
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="ui-arrow">
-                            </span>
-                            <span class="ui-output">
-                                <span class="invslot invslot-large">
-                                    <span class="invslot-item"></span>
-                                </span>
-                            </span>
-                        </div>
-                        <table class="Attributes">
-                            <tr>
-                                <th></th>
-                                <th>Slots</th>
-                                <th>Items</th>
-                                <th>Amounts</th>
-                                <th><button class="addAttribute">ADD</button></th>
-                            </tr>
-                            <tr>
-                                <td>1.</td>
-                                <td><input></td>
-                                <td><input></td>
-                                <td><input></td>
-                                <td><button class="removeAttribute">✖</button></td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="page" style="display: none;">
-                        <div class="ui-Crafting_Table">
-                            <div class="ui-input">
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item">
-                                            <a href="https://hypixel-skyblock.fandom.com/wiki/Lil' Pad" target="_blank">
-                                                <div title="Lil' Pad" style="font-size: 32px; text-align: center;">L</div>
-                                            </a>
-                                            <span class="invslot-stacksize">16</span>
-                                        </span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item">
-                                            <div style="font-size: 16px;">2</div>
-                                        </span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                                <div class="ui-row">
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                    <span class="invslot">
-                                        <span class="invslot-item"></span>
-                                    </span>
-                                </div>
-                            </div>
-                            <span class="ui-arrow">
-                            </span>
-                            <span class="ui-output">
-                                <span class="invslot invslot-large">
-                                    <span class="invslot-item"></span>
-                                </span>
-                            </span>
-                        </div>
-                        <table class="Attributes">
-                            <tr>
-                                <th></th>
-                                <th>Slots</th>
-                                <th>Items</th>
-                                <th>Amounts</th>
-                                <th><button class="addAttribute">ADD</button></th>
-                            </tr>
-                            <tr>
-                                <td>1.</td>
-                                <td><input></td>
-                                <td><input></td>
-                                <td><input></td>
-                                <td><button class="removeAttribute">✖</button></td>
-                            </tr>
-                        </table>
-                    </div> -->
-                    <br>
-                    <div style="display: flex; justify-content: right; align-items: center;">
-                        <button id="AddPage">ADD</button>
-                        <button id="RemovePage">REMOVE</button>
-                        <svg class="left-arrow">
-                            <path d="M20 0 L0 20 L20 40 Z" />
-                        </svg>
-                        <div id="Pages">1 / 1</div>
-                        <svg class="right-arrow">
-                            <path d="M0 0 L20 20 L0 40 Z" />
-                        </svg>
-                    </div>
-                    <div class="input">
-                        <div>ID:</div>
-                        <input id="RecipeID" maxlength="100000">
-                    </div>
-                    <br>
-                    <div class="output">
-                        <div>Output:</div>
-                        <textarea style="width: 50%;" readonly></textarea>
-                    </div>
-                    <button id ="Save">Save</button>
-                    <button id="Cancel">Cancel</button>
-                </div>
-                <div id="Result">
-
-                </div>
-            </section>
-            <footer>
-                <h3>By vicchenMC</h3>
-            </footer>
-        </div>
+    <div id="main-sidebar">
+        <svg width="80" height="70" style="cursor: pointer;">
+            <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: #ffffff;"/>
+            <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: #ffffff;"/>
+            <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: #ffffff;"/>
+        </svg>
+        <a href="#fossil_finder">Fossil Finder</a>
     </div>
-
     <script src="scripts/code_parse.js"></script>
     <script src="scripts/common.js"></script>
+    <div id="main-container">
+        <div id="#fossil-finder" class="editor">
+            <header><div>Fossil Finder</div></header>
+            <section><div class="ui-chest">
+
+            </div></section>
+        </div>
+    </div>
 </body>
 
 </html>

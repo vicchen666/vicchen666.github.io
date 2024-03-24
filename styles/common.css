@@ -3,267 +3,55 @@
     src: url(minecraft.woff2);
 }
 body {
+    font-family: minecraft;
+    color: #ffffff;
     background-color: #2d1606;
     display: block;
+    margin: 0;
     background-image: url("../images/crafting_table1.png");
 }
-body, ul, p {
-    font-family: rubik, helvetica, arial, sans-serif;
-    list-style-type: none;
-    border: 0;
-    margin: 0;
-    padding: 0;
-}
-h3 {
-    display: block;
-    font-weight: bold;
-    font-size: 1.3em;
-    margin: 0;
-}
-a {
-    color: #f2c6a6;
-    text-decoration: none;
-    cursor: pointer;
-}
-a:hover {
-    text-decoration: underline;
-}
-button {
-    cursor: pointer;
-    background-color: chocolate;
-    font-family: rubik, helvetica, arial, sans-serif;
-    font-weight: bold;
-    line-height: 1.5;
-    border-radius: 3px;
-    color: white;
-    border: none;
-    text-transform: uppercase;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    padding: 7px 15px;
-    margin: 1.5em 0;
-}
-#Container{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#main-sidebar {
+    width: 180px;
+    background-color: #f1f1f166;
     position: fixed;
-    font-size: 14px;
-    line-height: 22px;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    
-}
-#CraftingRecipesEditor {
-    border-radius: 3px;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    max-height: calc(100% - 100px);
-    max-width: calc(100% - 100px);
-    min-width: calc(20% + 500px);
+  }
+  
+#main-sidebar a {
+    color: #ffffff;
+    user-select: none;
+    font-size: 30px;
+    line-height: 40px;
+    padding: 30px;
+    text-decoration: none;
+  }
+#main-container {
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-left: 180px;
+}
+.editor {
+    min-width: 800px;
     background-color: #b35919;
-    color:white;
 }
-#CraftingRecipesEditor > header, #CraftingRecipesEditor > footer {
+.editor header {
     display: flex;
-    padding: 12px 20px;
+    align-items: center;
+    justify-content: center;
     background-color: hsla(0, 0%, 75%, 0.3);
-    min-height: 22px;
 }
-#CraftingRecipesEditor > footer {
-    flex-direction: row-reverse;
+.editor header div {
+    margin: 20px;
+    font-size: 50px;
 }
-#CraftingRecipesEditor > section {
-    min-width: 100px;
-    overflow-y: auto;
-    padding: 20px;
-}
-
-/* Input */
-.step {
-    margin-top: 0.5em;
-}
-#CodeInput {
-    margin: 0.5em 0.5em 0 0;
-}
-
-/* #Search */
-.PageTitle {
-    float: left;
-    font-size: 1.3em;
-    font-weight: bold;
-}
-#TotalRecipes p {
-    font-style: italic;
-    float: right;
-    margin: 0;
-}
-.edit-count {
-    color: gray;
-    margin-left: 7px;
-    font-weight: bold;
-}
-#SearchRow {
-    clear: both;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-#SearchInput {
-    margin-left: 1em;
-}
-#ActionLog {
-    margin-left: 0.8em;
-    font-style: italic;
-}
-.actions-none {
-    color: #ababab;
-}
-.actions-add, .actions-modify, .actions-remove {
-    font-weight: bold;
-    font-size: 13px;
-}
-.actions-add::before, .actions-modify::before, .actions-remove::before {
-    margin-right: 1.5em;
-}
-.actions-add {
-    color: lime;
-}
-.actions-add::before {
-    content: '+ ';
-}
-.actions-modify {
-    color: #DAA520;
-}
-.actions-modify::before {
-    content: '≠ ';
-}
-.actions-remove {
-    color: red;
-}
-.actions-remove::before {
-    content: '– ';
-}
-#SearchResults {
-    list-style-type: square;
-    margin-left: 0.8em;
-}
-#SearchResults a {
-    color: #f2c6a6;
-}
-
-/*Editor*/
-#Cancel {
-    background-color: transparent;
-}
-.ui-Crafting_Table {
-    display: flex;
-    background-color: #C6C6C6;
-    border: 2px solid;
-    border-color: #DBDBDB #5B5B5B #DBDBDB #5B5B5B;
-    width: fit-content;
-    align-items: center;
-    gap: 4px;
-    border-radius: 3px;
-    padding: 8px;
-    margin: 20px auto;
-}
-.ui-row {
+.editor section {
     display: flex;
 }
-.invslot {
-    display: inline-block;
-    background: #8b8b8b no-repeat center center / 32px 32px;
-    border: 2px solid;
-    border-color: #373737 #FFF #FFF #373737;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    line-height: 1;
-    text-align: left;
-    box-sizing: content-box;
+.editor section div {
+    height: 100px;
+    margin: 10px;
 }
-.invslot-large {
-    padding: 8px;
-}
-.invslot-item {
-    position: relative;
-    display: block;
-    background-origin: content-box;
-    background-clip: content-box;
-    width: 32px;
-    height: 32px;
-    top: -2px;
-    left: -2px;
-    padding: 2px;
-}
-.invslot-item:hover::before {
-    background-color: rgba(255, 255, 255, 0.5);
-    position: absolute;
-    height: 32px;
-    width: 32px;
-    content: "";
-    background-position: center center;
-    pointer-events: none;
-    z-index: 3;
-}
-.invslot-stacksize {
-    position: absolute;
-    margin-right: 2px;
-    margin-bottom: 2px;
-    right: -2px;
-    bottom: 0;
-    font-family: minecraft, rubik, serif, sans-serif;
-    font-weight: normal;
-    font-size: 15px;
-    text-align: right;
-    color: #FFF;
-    text-shadow: 1.5px 1.5px 0 #3F3F3F;
-    pointer-events: none;
-    z-index: 2;
-}
-.ui-arrow::before {
-    content: url(../images/Arrow.png);
-    display: flex;
-}
-.Attributes {
-    margin: auto;
-    text-align: center;
-}
-table button {
-    margin: 0;
-}
-#AddPage, #RemovePage {
-    margin: 0 10px 0 0;
-}
-.left-arrow , .right-arrow {
-    height: 40px;
-    width: 20px;
-}
-.left-arrow path, .right-arrow path {
-    fill: chocolate;
-}
-#Pages {
-    font-weight: bold;
-    font-size: 1.3em;
-    margin: 0 10px;
-}
-.input {
-    align-items: center;
-}
-.input, .output {
-    display: flex;
-}
-.input div, .output div {
-    font-weight: bold;
-    font-size: 1.3em;
-}
-.output textarea, .input input {
-    margin: 0 10px;
-    resize: none;
-}
-
-
