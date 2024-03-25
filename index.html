@@ -15,18 +15,20 @@
             <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: #ffffff;"/>
             <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: #ffffff;"/>
         </svg>
-        <a href="#fossil_finder">Fossil Finder</a>
-        <a href="">None</a>
+        <div onclick="fossil_finder()">Fossil Finder</div>
+        <div onclick="none()">None</div>
     </div>
-    <script src="scripts/code_parse.js"></script>
-    <script src="scripts/common.js"></script>
     <div id="main-container">
-        <div id="fossil-finder" class="editor" style="display: none;">
+        <div id="fossil-finder" class="editor invisible">
             <header><div>Fossil Finder</div></header>
             <section><div class="ui ui-chest">
             </div></section>
         </div>
     </div>
+
+    <script src="scripts/common.js"></script>
+    <script src="scripts/fossil_finder.js"></script>
+    
 </body>
 
 </html>

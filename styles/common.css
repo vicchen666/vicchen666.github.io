@@ -4,6 +4,7 @@
 }
 body {
     font-family: minecraft;
+    font-size: 20px;
     color: #ffffff;
     background-color: #2d1606;
     display: block;
@@ -11,6 +12,22 @@ body {
     background-image: url("../images/crafting_table1.png");
     user-select: none;
 }
+button {
+    font-family: minecraft;
+    cursor: pointer;
+    background-color: chocolate;
+    line-height: 1.5;
+    border-radius: 3px;
+    color: white;
+    border: none;
+    font-size: 20px;
+    padding: 7px 15px;
+    margin: 1.5em 0;
+}
+.invisible {
+    display: none;
+}
+/* main */
 #main-sidebar {
     width: 180px;
     background-color: #f1f1f166;
@@ -18,15 +35,15 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-  }
-  
-#main-sidebar a {
+}  
+#main-sidebar div {
+    cursor: pointer;
     color: #ffffff;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
     text-decoration: none;
-  }
+}
 #main-container {
     height: 100vh;
     align-items: center;
@@ -48,10 +65,6 @@ body {
     margin: 20px;
     font-size: 50px;
 }
-.editor section {
-    display: flex;
-    justify-content: center;
-}
 
 /* ui */
 .ui {
@@ -59,7 +72,7 @@ body {
     border: 3px solid;
     border-color: #DBDBDB #5B5B5B #5B5B5B #DBDBDB;
     border-radius: 4.5px;
-    margin: 18px;
+    margin: 18px auto;
     padding: 12px;
     width: fit-content;
     text-align: left;
@@ -95,6 +108,7 @@ body {
 .invslot-item {
     position: relative;
     display: block;
+    background-size: 48px 48px;
     background-origin: content-box;
     background-clip: content-box;
     width: 48px;

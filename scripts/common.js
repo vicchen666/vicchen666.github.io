@@ -1,32 +1,21 @@
+$(function() {
+    $(document).mousemove(function(event) {
+        mouseX = event.pageX;
+        mouseY = event.pageY;
+    });
+});
 $("#main-sidebar").on("click", "svg", () => {
-    if ($("#main-sidebar a").is(":visible")) {
-        $("#main-sidebar a").hide()
-        $("#main-sidebar").css("background-color", "#00000000")
-        $("#main-container").css("margin-left", "0")
-    } else {
-        $("#main-sidebar a").show()
+    if ($("#main-sidebar div").hasClass("invisible")) {
+        $("#main-sidebar div").removeClass("invisible")
         $("#main-sidebar").css("background-color", "#f1f1f166")
         $("#main-container").css("margin-left", "180px")
-    }
-})
-window.addEventListener("hashchange", function() {
-    var newHash = window.location.hash;
-    console.log("Hash changed to: " + newHash);
-    if (newHash === "#fossil_finder") {
-        $("#fossil-finder").show()
-        fossil_finder()
-        console.log("URL changed to #fossil_finder");
-        // You can replace this console log with any action you want to perform
+    } else {
+        $("#main-sidebar div").addClass("invisible")
+        $("#main-sidebar").css("background-color", "#00000000")
+        $("#main-container").css("margin-left", "0")
     }
 });
 
-function fossil_finder() {
-    chest = $("#fossil-finder section .ui-chest")
-    chest.append("<div class=\"ui-header\">Fossil Excavator</div>")
-    for (i=0; i<6; i++) {
-        chest.append("<div class=\"ui-row\"></div>")
-    }
-    for (i=0; i<9; i++) {
-        chest.children(".ui-row").append("<div class=\"invslot\"><div class=\"invslot-item\"></div></div>")
-    }
+function none() {
+    $("#main-container").children().addClass("invisible")
 }
