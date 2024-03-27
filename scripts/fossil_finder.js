@@ -6,6 +6,10 @@
         $("#fossil-finder").removeClass("invisible");
         fossil_finder_next_place(0);
     }
+    function fossil_finder_reset() {
+        $("#fossil-finder-excavator .invslot-item").css("background-image", "url('images/inventory slots/brown_stained_glass_pane.png')").empty();
+        fossil_finder_next_place(0);
+    }
     function fossil_finder_next_place(mode, reveal=false) {
         $("#fossil-finder-excavator > .ui-row > .invslot > .invslot-item").filter(function () {
             return $(this).css("background-image").indexOf("lime_stained_glass_pane.png") !== -1;
@@ -130,7 +134,7 @@
                         $("#fossil-finder-excavator > .ui-row:eq(" + next_slot[0] + ") > .invslot:eq(" + next_slot[1] + ") > .invslot-item").css("background-image", "url('images/inventory slots/lime_stained_glass_pane.png')").append('<div style="display: grid; height: 48px;width: 48px;"><div style="font-size: 15px; justify-self: center;align-self: center;">' + Math.round(max_value / fossil * 100) + '%</div></div>');
                     }
                     if (fossil === 1 && max_value) {
-                        $("#fossil-finder > section > div:eq(2)").prepend('<button id="fossil-finder-reveal" style="margin-right: 10px;">Reveal</button>');
+                        $("#fossil-finder > section > div:eq(2)").prepend('<button id="fossil-finder-reveal" onclick="fossil_finder_next_place(0, true)" style="margin-right: 10px;">Reveal</button>');
                     }
                 }
             }
@@ -179,12 +183,5 @@
             
         }
         $("#fossil-finder-selection").addClass("invisible");
-    });
-    $("#fossil-finder").on("click", "#fossil-finder-reset", () => {
-        $("#fossil-finder-excavator .invslot-item").css("background-image", "url('images/inventory slots/brown_stained_glass_pane.png')").empty();
-        fossil_finder_next_place(0);
-    });
-    $("#fossil-finder").on("click", "#fossil-finder-reveal", () => {
-        fossil_finder_next_place(0, true);
     });
 }

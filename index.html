@@ -10,15 +10,23 @@
 
 <body>
     <div id="main-sidebar">
-        <svg width="80" height="70" style="cursor: pointer;">
-            <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: #ffffff;"/>
-            <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: #ffffff;"/>
-            <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: #ffffff;"/>
-        </svg>
+        <div style="display: flex;">
+            <svg onclick="" width="80" height="70" style="cursor: pointer;">
+                <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: white;"/>
+            </svg>
+            <svg onclick="home()" width="100" height="70" style="cursor: pointer;">
+                <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+            </svg>
+        </div>
         <div onclick="fossil_finder()">Fossil Finder</div>
-        <div onclick="none()">None</div>
     </div>
     <div id="main-container">
+        <div id="home" class="editor">
+            <header><div>Skyblock tools</div></header>
+            <section style="padding: 10px;"></section>
+        </div>
         <div id="fossil-finder" class="editor invisible">
             <header><div>Fossil Finder</div></header>
             <section style="padding: 10px;">
@@ -27,7 +35,7 @@
                 </div>
                 <div id="fossil-finder-selection" class="ui ui-chest invisible" style="position: absolute;"></div>
                 <div style="display: flex; align-items: center; justify-content: right;">
-                    <button id="fossil-finder-reset">Reset</button>
+                    <button id="fossil-finder-reset" onclick="fossil_finder_reset()">Reset</button>
                     <div style="padding: 10px;">Possible Fossils: 0</div>
                 </div>
                 <div style="display: flex; align-items: center; margin-top: 10px;">

@@ -35,7 +35,7 @@ button {
     display: flex;
     flex-direction: column;
 }  
-#main-sidebar div {
+#main-sidebar div:not(:first-child) {
     cursor: pointer;
     color: #ffffff;
     font-size: 30px;
