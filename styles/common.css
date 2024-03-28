@@ -26,6 +26,7 @@ button {
 .invisible {
     display: none;
 }
+
 /* main */
 #main-sidebar {
     width: 180px;
@@ -51,7 +52,7 @@ button {
     margin-left: 180px;
 }
 .editor {
-    min-width: 800px;
+    width: 800px;
     background-color: #b35919;
 }
 .editor header {
@@ -122,4 +123,10 @@ button {
     position: absolute;
     height: 48px;
     width: 48px;
+}
+
+/* fossil finder */
+
+#fossil-finder-reveal {
+    margin-right: 10px;
 }

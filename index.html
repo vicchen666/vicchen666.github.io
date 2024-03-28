@@ -11,7 +11,7 @@
 <body>
     <div id="main-sidebar">
         <div style="display: flex;">
-            <svg onclick="" width="80" height="70" style="cursor: pointer;">
+            <svg onclick="hide_sidebar()" width="80" height="70" style="cursor: pointer;">
                 <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: white;"/>
                 <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: white;"/>
                 <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: white;"/>
@@ -24,8 +24,17 @@
     </div>
     <div id="main-container">
         <div id="home" class="editor">
-            <header><div>Skyblock tools</div></header>
-            <section style="padding: 10px;"></section>
+            <header><div>Skyblock Tools</div></header>
+            <section style="padding: 10px; line-height: 40px;">
+                <div style="font-size: px;">Welcome to Skyblock Tools!<br>
+                    Explore our helpful tools:<br>
+                    <br>
+                    ● Fossil Finder<br>
+                    Locate fossils in the excavator.<br>
+                    <br>
+                    Hope you find something useful here!<br>
+                </div>
+            </section>
         </div>
         <div id="fossil-finder" class="editor invisible">
             <header><div>Fossil Finder</div></header>
@@ -34,13 +43,9 @@
                     <div class="ui-header">Fossil Excavator</div>
                 </div>
                 <div id="fossil-finder-selection" class="ui ui-chest invisible" style="position: absolute;"></div>
-                <div style="display: flex; align-items: center; justify-content: right;">
-                    <button id="fossil-finder-reset" onclick="fossil_finder_reset()">Reset</button>
-                    <div style="padding: 10px;">Possible Fossils: 0</div>
-                </div>
-                <div style="display: flex; align-items: center; margin-top: 10px;">
-                    <div style="padding: 10px;">Mode: </div>
-                    <button id="fossil-finder-mode">Find Next Place</button>
+                <button id="fossil-finder-reset" onclick="fossil_finder_reset()">Reset</button>
+                <div style="display: flex; float: right;">
+                    <div style="margin: 10px;">Possible Fossils: 0</div>
                 </div>
             </section>
         </div>
