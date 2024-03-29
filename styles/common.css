@@ -130,3 +130,8 @@ button {
 #fossil-finder-reveal {
     margin-right: 10px;
 }
+#fossil-finder-progress {
+    margin: 10px;
+    width: 70px; 
+    font-size: 30px;
+}

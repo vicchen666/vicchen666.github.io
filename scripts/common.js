@@ -7,7 +7,7 @@ let mouseX, mouseY;
             mouseY = event.pageY;
         });
     });
-    $("#main-sidebar").on("click", "svg:eq(0)", () => {
+    function hide_sidebar() {
         if ($("#main-sidebar > div").hasClass("invisible")) {
             $("#main-sidebar > div").removeClass("invisible");
             $("#main-sidebar > div > svg:eq(1)").removeClass("invisible");
@@ -19,10 +19,10 @@ let mouseX, mouseY;
             $("#main-sidebar").css("background-color", "#00000000");
             $("#main-container").css("margin-left", "0");
         }
-    });
-    $("#main-sidebar").on("click", "svg:eq(1)", () => {
+    }
+    function home() {
         $("#main-container").children().addClass("invisible");
         $("#home").removeClass("invisible");
-    });
+    }
 
 }
