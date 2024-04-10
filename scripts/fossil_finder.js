@@ -15,7 +15,6 @@
     }
     function fossil_finder_progress_oninput(element) {
         let progress = $(element).val()
-        console.log(progress)
         if (progress === "") {
             fossil_count = null;
             fossil_finder_next_place(0);
@@ -168,20 +167,14 @@
                 for (let i of fossil_slots) {
                     fossil_excavator[i[0]][i[1]] = -1;
                 }
-                let next_helpful_slot, next_slot = [0, 0], max_helpful_value, max_value = -1;
+                let next_slot = [0, 0], max_value = 0;
                 for (let i=0; i<fossil_excavator.length; i++) {
                     for (let j=0; j<fossil_excavator[i].length; j++) {
-                        if (fossil_excavator[i][j] > max_value) {
-                            max_helpful_value = max_value;
-                            next_helpful_slot = [...next_slot];
-                            max_value = fossil_excavator[i][j];
+                        if (fossil_excavator[i][j] > 0 && (fossil_excavator[i][j] > max_value || max_value === fossil) && !(max_value > 0 && fossil_excavator[i][j] === fossil)) {
                             next_slot = [i, j];
+                            max_value = fossil_excavator[i][j];
                         }
                     }
-                }
-                if (max_value / fossil === 1 && max_helpful_value > 0) {
-                    max_value = max_helpful_value;
-                    next_slot = [...next_helpful_slot]
                 }
                 if (reveal) {
                     if (max_value) {
@@ -200,7 +193,6 @@
                 }
             }
         }
-        
     }
 
     window.onload = function() {
