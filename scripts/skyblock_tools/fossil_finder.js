@@ -122,7 +122,7 @@
             fossil_variant = [13, 8, 16, 14, 10, 13, 11, 12].map((v,i) => v === fossil_count ? fossil_variant[i] : null).filter(v => v !== null);
             fossil_patterns = [13, 8, 16, 14, 10, 13, 11, 12].map((v,i) => v === fossil_count ? fossil_patterns[i] : null).filter(v => v !== null);
         }
-        for (let i=0;i<fossil_patterns.length;i++) {
+        for (let i=0; i<fossil_patterns.length; i++) {
             let fossil_pattern = fossil_patterns[i]
             for (let transformation=0; transformation<4; transformation++) {
                 fossil_pattern = transform_pattern(fossil_pattern, fossil_variant[i][transformation]);

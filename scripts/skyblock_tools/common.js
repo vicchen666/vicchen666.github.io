@@ -20,9 +20,12 @@ let mouseX, mouseY;
             $("#main-container").css("margin-left", "0");
         }
     }
-    function home() {
+    function skyblock_tools() {
         $("#main-container").children().addClass("invisible");
         $("#home").removeClass("invisible");
+    }
+    function home() {
+        window.location.href = "https://vicchen666.github.io";
     }
 
 }

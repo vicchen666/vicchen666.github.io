@@ -3,10 +3,66 @@
 
 <head>
     <title>Skyblock Tools</title>
+    <link rel="icon" type="image/x-icon" href="images/crafting_table.ico" />
+    <link rel="stylesheet" href="styles/skyblock_tools/common.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
-    <div>hi</div>
+    <div id="main-sidebar">
+        <div style="display: flex;">
+            <svg onclick="hide_sidebar()" width="80" height="70" style="cursor: pointer;">
+                <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: white;"/>
+            </svg>
+            <svg onclick="home()" width="100" height="70" style="cursor: pointer;">
+                <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+            </svg>
+        </div>
+        <div onclick="skyblock_tools()">Tools</div>
+        <div onclick="fossil_finder()">Fossil Solver</div>
+    </div>
+    <div id="main-container">
+        <div id="home" class="editor">
+            <header><div>Skyblock Tools</div></header>
+            <section style="padding: 10px; line-height: 40px;">
+                <div style="font-size: 24px;">Welcome to Skyblock Tools!<br>
+                    Explore our helpful tools:<br>
+                    <br>
+                    ● Fossil Solver<br>
+                    Locate fossils in the excavator.<br>
+                    <br>
+                    <!-- ● Gemstone Calculator<br>
+                    Calculate things related to gemstone<br>
+                    <br> -->
+                    Hope you find something useful here!<br>
+                </div>
+            </section>
+        </div>
+        <div id="fossil-finder" class="editor invisible">
+            <header><div>Fossil Solver</div></header>
+            <section style="padding: 10px;">
+                <div id="fossil-finder-excavator" class="ui ui-chest">
+                    <div class="ui-header">Fossil Excavator</div>
+                </div>
+                <div id="fossil-finder-selection" class="ui ui-chest invisible" style="position: absolute;"></div>
+                <button id="fossil-finder-reset" onclick="fossil_finder_reset()">Reset</button>
+                <div style="display: flex; float: right;">
+                    <div style="margin: 10px;">Possible Fossils: 0</div>
+                </div>
+                <div style="display: flex; align-items: center; float: right;">
+                    <div>Fossil Excavation Progress:</div>
+                    <input id="fossil-finder-progress" type="number" min="1" max="99" oninput="fossil_finder_progress_oninput(this)">
+                    <div>%</div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="scripts/skyblock_tools/common.js"></script>
+    <script src="scripts/skyblock_tools/fossil_finder.js"></script>
+    
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 @font-face {
     font-family: minecraft;
-    src: url(minecraft.woff2);
+    src: url(../minecraft.woff2);
 }
 body {
     font-family: minecraft;
@@ -9,7 +9,7 @@ body {
     background-color: #2d1606;
     display: block;
     margin: 0;
-    background-image: url("../images/crafting_table1.png");
+    background-image: url("../../images/crafting_table1.png");
     user-select: none;
 }
 button {
