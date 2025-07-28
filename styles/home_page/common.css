@@ -20,6 +20,22 @@ button {
     padding: 7px 15px;
     margin: 15px;
 }
+.a-button {
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    background-color: rgb(35, 50, 84);
+    line-height: 1.5;
+    border-radius: 3px;
+    border: 1px solid darkgray;
+    font-size: 40px;
+    padding: 7px 15px;
+    margin: 15px;
+}
+a {
+    display: block;
+}
 .invisible {
     display: none;
 }
@@ -49,7 +65,7 @@ button {
     width: 900px;
     font-size: 30px;
 }
-.back_to_home {
+.back-to-home {
     cursor: pointer;
     position: absolute;
     top: 120px;

@@ -1,0 +1,101 @@
+body {
+    height: 100vh;
+    font-size: 20px;
+    color: white;
+    background-color: rgb(15, 23, 42);
+    display: flex;
+    margin: 0;
+    user-select: none;
+    font-family: Arial, Helvetica, sans-serif;
+}
+button {
+    color: white;
+    cursor: pointer;
+    background-color: rgb(35, 50, 84);
+    line-height: 1.5;
+    border-radius: 3px;
+    border: 1px solid darkgray;
+    font-size: 30px;
+    padding: 7px 15px;
+    margin: 15px;
+}
+.a-icon {
+    line-height: 0;
+}
+.invisible {
+    display: none;
+}
+
+/* main */
+#main-sidebar {
+    background-color: #f1f1f166;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+#main-sidebar > div:first-child {
+    display: flex;
+    justify-content: space-between;
+}
+#main-sidebar > div:nth-child(2) > div {
+    cursor: pointer;
+    color: #ffffff;
+    font-size: 30px;
+    line-height: 40px;
+    padding: 30px;
+    text-decoration: none;
+}
+#main-container {
+    height: 100vh;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+/* editor */
+.editor {
+    width: 800px;
+    max-height: 500px;
+    background-color: #0e415b;
+}
+.editor > header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: hsla(0, 0%, 75%, 0.3);
+}
+.editor > header > div {
+    margin: 20px;
+    font-size: 50px;
+}
+.editor > section {
+    font-size: 24px;
+}
+
+/* loot luck */
+#loot-luck > section > div {
+    display: flex;
+    font-size: 30px;
+}
+#loot-luck > section > div > div:first-child {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: min-content;
+}
+#loot-luck > section > div > div:first-child > * {
+    margin: 10px;
+}
+#loot-luck > section > div > div:first-child > input {
+    width: 150px;
+    height: fit-content;
+    align-self: center;
+    font-size: 30px;
+}
+#loot-luck > section > div > div:nth-child(2) > div:first-child {
+    display: flex;
+    align-items: center;
+}
+#loot-luck > section > div > div:nth-child(2) > div:not(:first-child) {
+    margin-left: 15px;
+}

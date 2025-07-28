@@ -23,6 +23,9 @@ button {
     font-size: 20px;
     padding: 7px 15px;
 }
+.a-icon {
+    line-height: 0;
+}
 .invisible {
     display: none;
 }
@@ -35,8 +38,12 @@ button {
     height: 100vh;
     display: flex;
     flex-direction: column;
-}  
-#main-sidebar div:not(:first-child) {
+}
+#main-sidebar > div:first-child {
+    display: flex;
+    justify-content: space-between;
+}
+#main-sidebar > div:not(:first-child) {
     cursor: pointer;
     color: #ffffff;
     font-size: 30px;
@@ -55,13 +62,13 @@ button {
     width: 800px;
     background-color: #b35919;
 }
-.editor header {
+.editor > header {
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: hsla(0, 0%, 75%, 0.3);
 }
-.editor header div {
+.editor > header > div {
     margin: 20px;
     font-size: 50px;
 }
@@ -126,7 +133,6 @@ button {
 }
 
 /* fossil finder */
-
 #fossil-finder-reveal {
     margin-right: 10px;
 }

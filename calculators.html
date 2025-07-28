@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calculators</title>
+    <link rel="icon" type="image/x-icon" href="images/calculator.ico" />
+    <link rel="stylesheet" href="styles/calculators/common.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="main-sidebar">
+        <div>
+            <svg id="button-toggle-sidebar" width="80" height="70" style="cursor: pointer;">
+                <rect width="60" height="10" x="10" y="10" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="30" rx="4" ry="4" style="fill: white;"/>
+                <rect width="60" height="10" x="10" y="50" rx="4" ry="4" style="fill: white;"/>
+            </svg>
+            <a class="a-icon" href="index.html">
+                <svg id="button-home" width="85" height="70" style="cursor: pointer;">
+                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+                </svg>
+            </a>
+        </div>
+        <div>
+            <div id="button-calculators-main">List</div>
+            <div id="button-calculators-loot-luck">Loot Luck</div>
+        </div>
+    </div>
+    <div id="main-container">
+        <div id="main" class="editor">
+            <header><div>Calculators</div></header>
+            <section style="padding: 10px; line-height: 40px;">
+                <div>
+                    Hello!<br>
+                    Here's some calculators you may find useful:<br>
+                    <br>
+                    ● Loot Luck<br>
+                    Probability of achieving a certain amount of successes in a series of trials with two possible outcomes.<br>
+                    <br>
+                </div>
+            </section>
+        </div>
+        <div id="loot-luck" class="editor invisible">
+            <header><div>Loot Luck</div></header>
+            <section style="padding: 10px;">
+                <div>
+                    <div>
+                        <div>Trials</div>
+                        <input id="input-loot-luck-trials" type="number" min="1">
+                        <div>Successes</div>
+                        <input id="input-loot-luck-successes" type="number" min="0">
+                        <div>Success Chance (%)</div>
+                        <input id="input-loot-luck-chance" type="number" min="0" max="100">
+                    </div>
+                    <div>
+                        <div>
+                            <button id="input-loot-luck-calculate">Calculate</button>
+                            <div></div>
+                        </div>
+                        <div>Percentile Rank: </div>
+                        <div>Exact Chance: </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="scripts/calculators/common.js"></script>
+    <script src="scripts/calculators/loot_luck.js"></script>
+    
+</body>
+
+</html>
