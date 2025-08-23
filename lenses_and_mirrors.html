@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Calculators</title>
+    <link rel="icon" type="image/x-icon" href="images/calculator.ico" />
+    <link rel="stylesheet" href="styles/lenses_and_mirrors/common.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div id="main-banner">
+        <a class="a-icon" href="index.html">
+            <svg id="button-home" width="85" height="70" style="cursor: pointer;">
+                <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+            </svg>
+        </a>
+        <div>Lenses and Mirrors</div>
+        <button>Download</button>
+    </div>
+
+    <div style="flex-grow: 1; position: relative; overflow: hidden;">
+        <div id="main-sidebar">
+            <div>Convex Lenses</div>
+            <div></div>
+            <div>Concave Lenses</div>
+            <div></div>
+            <div>Convex Mirrors</div>
+            <div></div>
+            <div>Concave Mirrors</div>
+            <div></div>
+            <div>Point Sources</div>
+            <div></div>
+            <div>Parallel Sources</div>
+        </div>
+
+        <div id="main-canvas">
+            <canvas style="width: 100%; height: 100%;"></canvas>
+        </div>
+
+        <!-- <div id="components">
+            <div style="width: 30px; height: 60px; border: 1px solid darkgray;">
+                hi
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <svg width="85" height="70" style="cursor: pointer;">
+                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+                </svg>
+                <svg width="85" height="70" style="cursor: pointer;">
+                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+                </svg>
+                <svg width="85" height="70" style="cursor: pointer;">
+                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+                </svg>
+                <svg width="85" height="70" style="cursor: pointer;">
+                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
+                </svg>
+            </div>
+        </div> -->
+    </div>
+
+    <script src="scripts/lenses_and_mirrors/light_control.js"></script>
+
+</body>
