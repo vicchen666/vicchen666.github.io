@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Calculators</title>
+    <title>Lense And Mirrors</title>
     <link rel="icon" type="image/x-icon" href="images/calculator.ico" />
     <link rel="stylesheet" href="styles/lenses_and_mirrors/common.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -16,49 +16,63 @@
             </svg>
         </a>
         <div>Lenses and Mirrors</div>
-        <button>Download</button>
+        <button>Save</button>
     </div>
 
     <div style="flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-sidebar">
-            <div>Convex Lenses</div>
-            <div></div>
-            <div>Concave Lenses</div>
-            <div></div>
-            <div>Convex Mirrors</div>
-            <div></div>
-            <div>Concave Mirrors</div>
-            <div></div>
-            <div>Point Sources</div>
-            <div></div>
-            <div>Parallel Sources</div>
+            <div style="display: flex;">
+                <div class="tab" style="border-width: 0 1px 1px 0;">a</div>
+                <div class="tab">b</div>
+            </div>
+            <div class="invisible">
+                <div>Convex Lens</div>
+                <div>Concave Lens</div>
+                <div>Convex Mirror</div>
+                <div>Concave Mirror</div>
+                <div>Point Source</div>
+                <div>Parallel Source</div>
+            </div>
+            <div>
+                <div>Convex Lenses</div>
+            </div>
         </div>
 
         <div id="main-canvas">
             <canvas style="width: 100%; height: 100%;"></canvas>
         </div>
 
-        <!-- <div id="components">
-            <div style="width: 30px; height: 60px; border: 1px solid darkgray;">
-                hi
+        <div id="component-settings" class="invisible">
+            <div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
+                <div>
+                    <span>Name: </span>
+                    <input></input>
+                </div>
             </div>
-            <div style="display: flex; flex-direction: column;">
-                <svg width="85" height="70" style="cursor: pointer;">
-                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
-                </svg>
-                <svg width="85" height="70" style="cursor: pointer;">
-                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
-                </svg>
-                <svg width="85" height="70" style="cursor: pointer;">
-                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
-                </svg>
-                <svg width="85" height="70" style="cursor: pointer;">
-                    <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
-                </svg>
-            </div>
-        </div> -->
+        </div>
     </div>
 
     <script src="scripts/lenses_and_mirrors/light_control.js"></script>
+    <script src="scripts/lenses_and_mirrors/common.js"></script>
 
 </body>

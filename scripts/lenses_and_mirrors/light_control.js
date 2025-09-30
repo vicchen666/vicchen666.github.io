@@ -1,8 +1,11 @@
+let animation;
 {
     const TAU = Math.PI * 2;
     const canvas = $("#main-canvas canvas")[0];
     const ctx = canvas.getContext("2d");
-
+    ctx.origin = [0, 0];
+    ctx.size = 1;
+    let x, y;
     /**
      * @type {[{
      *     type: "point" | "parallel",
@@ -27,9 +30,9 @@
      * For parallel sources, `size` is the diameter
      */
     const light_sources = [
-        // {type: "point", position: [100, 100], density: 30, unit_vector: [1, 0]},
-        // {type: "parallel", position: [200, 700], density: 10, unit_vector: [Math.cos(4/7 * TAU), Math.sin(4/7 * TAU)], size: 300},
-        {type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300}
+        {type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
+        // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
+        // {type: "point", position: [1500, 350], density: 30, unit_vector: [1, 0]},
     ];
 
     /**
@@ -50,13 +53,11 @@
      * For curved lenses and mirrors, `focal_length` is the distance between the center and a focus
      */
     const optical_elements = [
-        // {type: "lens", position: [400, 400], unit_vector: [Math.cos(2/4 * TAU), Math.sin(2/4 * TAU)], focal_length: 200, size: 300},
-        // {type: "flat_mirror", position: [400, 100], unit_vector: [Math.cos(2/4 * TAU), Math.sin(2/4 * TAU)], focal_length: -200, size: 300},
-
         {type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
-        {type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 200, size: 400},
+        {type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
         {type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
         {type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
+        {type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
 
         // {type: "mirror", position: [400, 400], unit_vector: [Math.cos(2/4 * TAU), Math.sin(2/4 * TAU)], focal_length: 400, size: 300},
         // {type: "mirror", position: [325, 400 + 75 * Math.sqrt(3)], unit_vector: [Math.cos(1/6 * TAU), Math.sin(1/6 * TAU)], focal_length: 400, size: 300},
@@ -112,23 +113,16 @@
     /** 
      * Draws the canvas
      */
-    function draw_canvas() {
-        canvas.height = canvas.clientHeight;
-        canvas.width = canvas.clientWidth;
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round";
-        const light_path = simulate_light(3000);
+    function set_canvas(adjust_size=false) {
+        if (adjust_size) {
+           canvas.height = canvas.clientHeight;
+            canvas.width = canvas.clientWidth; 
+        }
+        ctx.setTransform(
+            ctx.size, 0, 0, ctx.size,
+            -ctx.origin[0], -ctx.origin[1]
+        );
 
-        const fill_length = 20, sep_length = 10;
-        let phase = 0;
-        clearInterval(animation);
-        animation = setInterval(() => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            draw_light(fill_length, sep_length, phase, light_path);
-            draw_components();
-
-            phase = (phase + 1) % (fill_length + sep_length);
-        }, 10);
     }
 
     function simulate_light(max_distance=700) {
@@ -174,7 +168,7 @@
                     const result = lineq2(light_rays[i].unit_vector, vec_scale(optical_elements[j].unit_vector, -1), vec_sub(optical_elements[j].position, light_rays[i].start_position));
                     if (result !== "infinite" && result !== "none") {
                         if (result[0] > 1e-10 && result[0] < distance && result[0] < max_distance - total_distance) {
-                            if (optical_elements[j].type === "mirror" || optical_elements[j].type === "flat_mirror") {
+                            if (optical_elements[j].type === "mirror" || optical_elements[j].type === "flat_mirror" || optical_elements[j].type === "barrier") {
                                 const normal = [-optical_elements[j].unit_vector[1], optical_elements[j].unit_vector[0]];
                                 const dot_sign = Math.sign(vec_dot(light_rays[i].unit_vector, normal));
                                 if (dot_sign < 0) {
@@ -198,6 +192,12 @@
                 const element = optical_elements[nearest_optical_element];
                 let result = lineq2(light_rays[i].unit_vector, vec_scale(element.unit_vector, -1), vec_sub(element.position, light_rays[i].start_position));
                 light_rays[i].start_position = vec_add(light_rays[i].start_position, vec_scale(light_rays[i].unit_vector, result[0]));
+
+                if (element.type === "barrier") {
+                    light_path[i].push([light_rays[i].start_position]);
+                    break;
+                }
+
                 const normal = [-element.unit_vector[1], element.unit_vector[0]];
                 const dot_sign = Math.sign(vec_dot(light_rays[i].unit_vector, normal));
 
@@ -222,8 +222,10 @@
     }
 
     function draw_light(fill_length, sep_length, phase, light_path) {
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
         ctx.strokeStyle = "yellow";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2 / ctx.size;
 
         for (let i=0;i<light_path.length;i++) {
             let point = light_path[i][0][0];
@@ -232,8 +234,6 @@
             total_distance = t;
 
             for (let j=0;j<light_path[i].length-1;j++) {
-                
-                // console.log(light_path[j], light_path[j+1]);
                 segment_length = vec_len(vec_sub(light_path[i][j + 1][0], light_path[i][j][0]));
                 while (true) {
                     ctx.beginPath();
@@ -259,26 +259,29 @@
     }
 
     function draw_components() {
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
         ctx.strokeStyle = "white";
-        ctx.lineWidth = 3;
+        ctx.fillStyle = "white";
+        ctx.lineWidth = 3 / ctx.size;
         for (let i=0; i<optical_elements.length; i++) {
             const top = vec_add(optical_elements[i].position, vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2));
             const bottom = vec_sub(optical_elements[i].position, vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2));
             ctx.beginPath();
-            ctx.moveTo(...optical_elements[i].position);
-            ctx.lineTo(...top);
-            ctx.moveTo(...optical_elements[i].position);
+            // ctx.moveTo(...optical_elements[i].position);
+            // ctx.lineTo(...top);
+            // ctx.moveTo(...optical_elements[i].position);
+            // ctx.lineTo(...bottom);
+            ctx.moveTo(...top);
             ctx.lineTo(...bottom);
             const focal_sign = Math.sign(optical_elements[i].focal_length);
             switch (optical_elements[i].type) {
                 case "lens":
-                    ctx.moveTo(...top);
-                    ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90 - focal_sign * 60)));
-                    ctx.moveTo(...top);
+                    ctx.moveTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90 - focal_sign * 60)));
+                    ctx.lineTo(...top);
                     ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90 + focal_sign * 60)));
-                    ctx.moveTo(...bottom);
-                    ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90 + focal_sign * 60)));
-                    ctx.moveTo(...bottom);
+                    ctx.moveTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90 + focal_sign * 60)));
+                    ctx.lineTo(...bottom);
                     ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90 - focal_sign * 60)));
                     break;
                 case "mirror":
@@ -292,6 +295,16 @@
                     ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90)));
                     ctx.moveTo(...bottom);
                     ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90)));
+                    break;
+                case "barrier":
+                    ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 15), 90)));
+                    ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 15), 90)));
+                    ctx.lineTo(...top);
+                    ctx.fill();
+                    ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90)));
+                    ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90)));
+                    ctx.lineTo(...bottom);
+                    break;
             }
             ctx.stroke();
         }
@@ -321,10 +334,49 @@
         }
     }
 
-    let animation;
-    draw_canvas();
+    let light_path = simulate_light(3000);
+    window.update_canvas = function(fill_length, sep_length) {
+        if (animation) clearInterval(animation);
+        set_canvas(true);
+        let phase = 0;
+        animation = setInterval(() => {
+            ctx.clearRect(...vec_scale(ctx.origin, 1 / ctx.size), canvas.width / ctx.size, canvas.height / ctx.size);
+            draw_light(fill_length, sep_length, phase, light_path);
+            draw_components();
 
+            phase = (phase + 1) % (fill_length + sep_length);
+        }, 10);
+    }
+    update_canvas(20, 10);
+
+    let grabbing_canvas = false;
+    canvas.addEventListener("wheel", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const canvas_point = vec_sub([e.clientX, e.clientY], [rect.left, rect.top]);
+        const origin = vec_sub(vec_scale(vec_add(ctx.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
+        ctx.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
+        ctx.origin = origin;
+        set_canvas();
+    });
+    canvas.addEventListener("mousedown", (e) => {
+        grabbing_canvas = true;
+        x = e.clientX;
+        y = e.clientY;
+    });
+    window.addEventListener("mousemove", (e) => {
+        if (!grabbing_canvas) return;
+        ctx.origin = vec_add(ctx.origin, [x - e.clientX, y - e.clientY]);
+        ctx.translate(...vec_scale([e.clientX - x, e.clientY - y], 1 / ctx.size));
+        x = e.clientX;
+        y = e.clientY;
+        set_canvas();
+    });
+    window.addEventListener("mouseup", () => {
+        if (grabbing_canvas) {
+            grabbing_canvas = false;
+        }
+    });
     window.addEventListener("resize", () => {
-        draw_canvas();
+        set_canvas(true);
     })
 }

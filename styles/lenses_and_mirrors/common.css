@@ -20,6 +20,11 @@ button {
     padding: 7px 15px;
     margin: 15px;
 }
+input {
+    background: rgb(23 47 92);
+    color: white;
+    border: 1px solid white;
+}
 .a-button {
     text-align: center;
     text-decoration: none;
@@ -52,6 +57,8 @@ a {
 }
 #main-sidebar {
     position: absolute;
+    display: flex;
+    flex-direction: column;
     width: 300px;
     top: 0;
     bottom: 0;
@@ -61,25 +68,51 @@ a {
 #main-sidebar > div {
     font-size: 36px;
 }
+#main-sidebar > div:nth-child(1) > div:nth-child(1) {
+    cursor: pointer;
+}
+#main-sidebar > div:nth-child(n + 2) {
+    padding: 10px;
+}
+#main-sidebar > div:nth-child(2) > div {
+    padding-left: 3px;
+    cursor: pointer;
+}
+#main-sidebar > div:nth-child(2) > div:hover {
+    border: 2px solid darkgray;
+}
+#main-sidebar > div:nth-child(3) > div {
+    padding-left: 3px;
+}
+#main-sidebar > div:nth-child(3) > div:hover {
+    color: gold;
+}
 #main-canvas {
     position: absolute;
     inset: 0 0 0 300px;
 }
 
-#components {
+.tab {
+    flex-grow: 1;
+    border-color: darkgray;
+    border-style: solid;
+    border-width: 0;
+}
+        
+#component-settings {
     position: absolute;
-    display: flex;
+    background-color: rgb(23 47 92);
+    width: calc(max-content + 10px);
     right: 0;
     top: 0;
     bottom: 0;
-    align-items: center;
-    transition: transform 0.5s ease-in-out;
+    padding: 10px;
 }
-
-#components > div {
-    background-color: rgb(23 47 92);
+#component-settings > div {
+    display: flex;
+    flex-direction: column;
 }
-
-#components:hover {
-    transform: translateX(85px);
+#component-settings > div > div {
+    display: flex;
+    justify-content: space-between;
 }
