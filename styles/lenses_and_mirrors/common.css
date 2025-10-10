@@ -85,7 +85,7 @@ a {
     padding-left: 3px;
 }
 #main-sidebar > div:nth-child(3) > div:hover {
-    color: gold;
+    color: lime;
 }
 #main-canvas {
     position: absolute;
