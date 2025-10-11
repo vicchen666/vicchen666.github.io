@@ -115,6 +115,15 @@ let c;
             this.phase = 0;
             this.fill_length = 20;
             this.sep_length = 10;
+            this.max_distance = 3000;
+            this.elements_settings = {
+                "lens": ["name", "position", "rotation", "focal_length", "size"],
+                "mirror": ["name", "position", "rotation", "focal_length", "size"],
+                "flat_mirror": ["name", "position", "rotation", "size"],
+                "barrier": ["name", "position", "rotation", "size"],
+                "point": ["name", "position", "rotation", "size", "density"],
+                "parallel": ["name", "position", "rotation", "density"],
+            }
             this.light_sources = [
                 {id:0, type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
                 // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
@@ -123,20 +132,20 @@ let c;
                 {id:1, type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
                 {id:2, type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
                 {id:3, type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
-                {id:4, type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
+                {id:4, type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], focal_length:50, size: 300},
                 {id:5, type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
             ];
             this.selected_element = {selected:-1, hovered:-1};
-            this.update_light_path(3000);
+            this.update_light_path(this.max_distance);
             this.set_canvas(true);
             this.draw();
         }
 
         add_element(type, element) {
-            if (type === 0) {
-                this.light_sources.push(element);
-            } else {
+            if (type === "optical_element") {
                 this.optical_elements.push(element);
+            } else {
+                this.light_sources.push(element);
             }
         }
 
@@ -144,8 +153,8 @@ let c;
 
         }
 
-        update_light_path(max_distance) {
-            this.light_path = this.simulate_light(this.light_sources, this.optical_elements, max_distance);
+        update_light_path() {
+            this.light_path = this.simulate_light(this.light_sources, this.optical_elements, this.max_distance);
         }
 
         draw() {
@@ -312,6 +321,13 @@ let c;
             for (let i=0; i<optical_elements.length; i++) {
                 draw_optical_elements(i);
             }
+
+            ctx.strokeStyle = "white";
+            ctx.fillStyle = "white";
+            for (let i=0; i<light_sources.length; i++) {
+                draw_light_sources(i);
+            }
+
             let element_index = optical_elements.findIndex(e => e.id === selected_element.hovered);
             if (element_index !== -1) {
                 ctx.strokeStyle = "lime";
@@ -323,6 +339,19 @@ let c;
                 ctx.strokeStyle = "limegreen";
                 ctx.fillStyle = "limegreen";
                 draw_optical_elements(element_index, true);
+            }
+
+            element_index = light_sources.findIndex(e => e.id === selected_element.hovered);
+            if (element_index !== -1) {
+                ctx.strokeStyle = "lime";
+                ctx.fillStyle = "lime";
+                draw_light_sources(element_index, true);
+            }
+            element_index = light_sources.findIndex(e => e.id === selected_element.selected);
+            if (element_index !== -1) {
+                ctx.strokeStyle = "limegreen";
+                ctx.fillStyle = "limegreen";
+                draw_light_sources(element_index, true);
             }
 
             function draw_optical_elements(i, cover=false) {
@@ -376,25 +405,6 @@ let c;
                 }
                 ctx.stroke();
             }
-
-            ctx.strokeStyle = "white";
-            ctx.fillStyle = "white";
-            for (let i=0; i<light_sources.length; i++) {
-                draw_light_sources(i);
-            }
-            element_index = light_sources.findIndex(e => e.id === selected_element.hovered);
-            if (element_index !== -1) {
-                ctx.strokeStyle = "lime";
-                ctx.fillStyle = "lime";
-                draw_light_sources(element_index, true);
-            }
-            element_index = light_sources.findIndex(e => e.id === selected_element.selected);
-            if (element_index !== -1) {
-                ctx.strokeStyle = "limegreen";
-                ctx.fillStyle = "limegreen";
-                draw_light_sources(element_index, true);
-            }
-
             function draw_light_sources(i, cover=false) {
                 if (cover) {
                     ctx.save();
@@ -433,7 +443,7 @@ let c;
     c = new CanvasControl();
 
     let grabbing_canvas = false;
-    canvas.addEventListener("wheel", (e) => {
+    canvas.addEventListener("wheel", e => {
         const rect = canvas.getBoundingClientRect();
         const canvas_point = vec_sub([e.clientX, e.clientY], [rect.left, rect.top]);
         const origin = vec_sub(vec_scale(vec_add(ctx.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
@@ -441,12 +451,12 @@ let c;
         ctx.origin = origin;
         c.set_canvas();
     });
-    canvas.addEventListener("mousedown", (e) => {
+    canvas.addEventListener("mousedown", e => {
         grabbing_canvas = true;
         x = e.clientX;
         y = e.clientY;
     });
-    window.addEventListener("mousemove", (e) => {
+    window.addEventListener("mousemove", e => {
         if (!grabbing_canvas) return;
         ctx.origin = vec_add(ctx.origin, [x - e.clientX, y - e.clientY]);
         ctx.translate(...vec_scale([e.clientX - x, e.clientY - y], 1 / ctx.size));

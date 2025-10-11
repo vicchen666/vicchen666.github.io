@@ -21,9 +21,15 @@ button {
     margin: 15px;
 }
 input {
-    background: rgb(23 47 92);
+    background-color: rgb(23 47 92);
     color: white;
     border: 1px solid white;
+}
+select {
+    background-color: rgb(23 47 92);
+    color: white;
+    border: 1px solid white;
+    width: fit-content;
 }
 .a-button {
     text-align: center;
@@ -99,20 +105,39 @@ a {
     border-width: 0;
 }
         
-#component-settings {
+#element-settings {
     position: absolute;
     background-color: rgb(23 47 92);
-    width: calc(max-content + 10px);
     right: 0;
     top: 0;
     bottom: 0;
     padding: 10px;
+    border-left: 1px solid darkgray;
+    font-size: 30px;
 }
-#component-settings > div {
+#element-settings * {
+    font-size: 30px;
+}
+#element-settings > div {
     display: flex;
     flex-direction: column;
 }
-#component-settings > div > div {
-    display: flex;
-    justify-content: space-between;
+#element-settings > div > * {
+    margin-bottom: 10px;
+}
+#element-settings > div > div:nth-child(3) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: min-content;
+}
+#element-settings > div > div:nth-child(3) > * {
+    margin: 10px;
+}
+#element-settings > div > div:nth-child(3) > input {
+    max-width: 200px;
+    height: fit-content;
+    align-self: center;
+}
+#element-settings > div > div:nth-child(3) > div {
+    text-align: right;
 }
