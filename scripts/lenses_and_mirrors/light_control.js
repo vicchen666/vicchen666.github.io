@@ -1,34 +1,12 @@
 let c;
+const TAU = Math.PI * 2;
+const canvas = $("#main-canvas canvas")[0];
+const ctx = canvas.getContext("2d");
 {
-    const TAU = Math.PI * 2;
-    const canvas = $("#main-canvas canvas")[0];
-    const ctx = canvas.getContext("2d");
     ctx.origin = [0, 0];
     ctx.size = 1;
     let x, y;
-    /**
-     * @type {[{
-     *     type: "point" | "parallel",
-     *     position: [number, number],
-     *     density: number,
-     *     unit_vector: [number, number],
-     *     size?: number
-     * }]}
-     * 
-     * List of light sources, including point sources and parallel sources
-     * 
-     * For parallel sources, `position` is the center
-     * 
-     * `density` is
-     * - for point sources, the number of equidistant rays
-     * - for parallel sources, theoretically the number of rays per 100 units. The actual total number of rays is the ceiling of the theoretical number of rays
-     * 
-     * `unit_vector` is
-     * - for point sources, the direction of one of the rays
-     * - for parallel sources, the direction perpendicular and counter-clockwise to the direction of rays
-     * 
-     * For parallel sources, `size` is the diameter
-     */
+    
     const light_sources = [
         {type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
         // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
@@ -121,36 +99,34 @@ let c;
                 "mirror": ["name", "position", "rotation", "focal_length", "size"],
                 "flat_mirror": ["name", "position", "rotation", "size"],
                 "barrier": ["name", "position", "rotation", "size"],
-                "point": ["name", "position", "rotation", "size", "density"],
-                "parallel": ["name", "position", "rotation", "density"],
+                "point": ["name", "position", "rotation", "density"],
+                "parallel": ["name", "position", "rotation", "size", "density"],
             }
-            this.light_sources = [
-                {id:0, type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
-                // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
-            ];
-            this.optical_elements = [
-                {id:1, type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
-                {id:2, type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
-                {id:3, type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
-                {id:4, type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], focal_length:50, size: 300},
-                {id:5, type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
-            ];
+            this.light_sources = [];
+            this.optical_elements = [];
+            // this.light_sources = [
+            //     {id:0, type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
+            //     // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
+            // ];
+            // this.optical_elements = [
+            //     {id:1, type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
+            //     {id:2, type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
+            //     {id:3, type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
+            //     {id:4, type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], focal_length:50, size: 300},
+            //     {id:5, type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
+            // ];
             this.selected_element = {selected:-1, hovered:-1};
-            this.update_light_path(this.max_distance);
+            this.update_light_path();
             this.set_canvas(true);
             this.draw();
         }
 
         add_element(type, element) {
-            if (type === "optical_element") {
-                this.optical_elements.push(element);
-            } else {
-                this.light_sources.push(element);
-            }
+            this[type].push(element);
         }
 
-        remove_element() {
-
+        remove_element(type, index) {
+            this[type].splice(index, 1);
         }
 
         update_light_path() {
@@ -357,21 +333,34 @@ let c;
             function draw_optical_elements(i, cover=false) {
                 const top = vec_add(optical_elements[i].position, vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2));
                 const bottom = vec_sub(optical_elements[i].position, vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2));
+                const focal_sign = Math.sign(optical_elements[i].focal_length);
                 if (cover) {
                     ctx.save();
-                    ctx.globalCompositeOperation = "destination-out";
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+                    // ctx.globalCompositeOperation = "destination-out";
+                    // ctx.globalCompositeOperation = "source-atop";
+                    ctx.globalCompositeOperation = "lighter";
                     ctx.beginPath();
-                    ctx.moveTo(...vec_add(optical_elements[i].position, vec_add(vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2 + 10), vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90))));
-                    ctx.lineTo(...vec_add(optical_elements[i].position, vec_add(vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2 + 10), vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90))));
-                    ctx.lineTo(...vec_add(optical_elements[i].position, vec_add(vec_scale(optical_elements[i].unit_vector, -optical_elements[i].size / 2 - 10), vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90))));
-                    ctx.lineTo(...vec_add(optical_elements[i].position, vec_add(vec_scale(optical_elements[i].unit_vector, -optical_elements[i].size / 2 - 10), vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), 90))));
+                    let rect = {};
+                    if ((optical_elements[i].type === "lens" && focal_sign < 0) || (optical_elements[i].type === "mirror" && focal_sign > 0)){
+                        rect = {center: optical_elements[i].position, width_vecter: vec_rotate(vec_scale(optical_elements[i].unit_vector, 40), 90), height_vecter: vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2 + 50)};
+                    } else if (optical_elements[i].type === "barrier") {
+                        rect = {center: vec_add(optical_elements[i].position, vec_rotate(vec_scale(optical_elements[i].unit_vector, 15), 90)), width_vecter: vec_rotate(vec_scale(optical_elements[i].unit_vector, 40), 90), height_vecter: vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2 + 10)};
+                    } else {
+                        rect = {center: optical_elements[i].position, width_vecter: vec_rotate(vec_scale(optical_elements[i].unit_vector, 40), 90), height_vecter: vec_scale(optical_elements[i].unit_vector, optical_elements[i].size / 2 + 10)};
+                    }
+                    ctx.moveTo(...vec_sub(vec_sub(rect.center, rect.width_vecter), rect.height_vecter));
+                    ctx.lineTo(...vec_sub(vec_add(rect.center, rect.width_vecter), rect.height_vecter));
+                    ctx.lineTo(...vec_add(vec_add(rect.center, rect.width_vecter), rect.height_vecter));
+                    ctx.lineTo(...vec_add(vec_sub(rect.center, rect.width_vecter), rect.height_vecter));
                     ctx.fill();
                     ctx.restore();
                 }
+
                 ctx.beginPath();
                 ctx.moveTo(...top);
                 ctx.lineTo(...bottom);
-                const focal_sign = Math.sign(optical_elements[i].focal_length);
                 switch (optical_elements[i].type) {
                     case "lens":
                         ctx.moveTo(...vec_add(top, vec_rotate(vec_scale(optical_elements[i].unit_vector, 30), -90 - focal_sign * 60)));
@@ -408,15 +397,29 @@ let c;
             function draw_light_sources(i, cover=false) {
                 if (cover) {
                     ctx.save();
-                    ctx.globalCompositeOperation = "destination-out";
+                    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+                    // ctx.globalCompositeOperation = "destination-out";
+                    // ctx.globalCompositeOperation = "source-atop";
+                    ctx.globalCompositeOperation = "lighter";
                     ctx.beginPath();
-                    ctx.moveTo(...vec_add(light_sources[i].position, vec_add(vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2 + 10), vec_rotate(vec_scale(light_sources[i].unit_vector, 30), 90))));
-                    ctx.lineTo(...vec_add(light_sources[i].position, vec_add(vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2 + 10), vec_rotate(vec_scale(light_sources[i].unit_vector, 30), -90))));
-                    ctx.lineTo(...vec_add(light_sources[i].position, vec_add(vec_scale(light_sources[i].unit_vector, -light_sources[i].size / 2 - 10), vec_rotate(vec_scale(light_sources[i].unit_vector, 30), -90))));
-                    ctx.lineTo(...vec_add(light_sources[i].position, vec_add(vec_scale(light_sources[i].unit_vector, -light_sources[i].size / 2 - 10), vec_rotate(vec_scale(light_sources[i].unit_vector, 30), 90))));
+                    let rect = {};
+                    if (light_sources[i].type === "point"){
+                        ctx.moveTo(...vec_add(light_sources[i].position, [30, 0]));
+                        ctx.arc(...light_sources[i].position, 30, 0, TAU);
+                    } else {
+                        rect = {center: light_sources[i].position, width_vecter: vec_rotate(vec_scale(light_sources[i].unit_vector, 40), 90), height_vecter: vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2 + 10)};
+                    }
+                    if (light_sources[i].type !== "point") {
+                        ctx.moveTo(...vec_sub(vec_sub(rect.center, rect.width_vecter), rect.height_vecter));
+                        ctx.lineTo(...vec_sub(vec_add(rect.center, rect.width_vecter), rect.height_vecter));
+                        ctx.lineTo(...vec_add(vec_add(rect.center, rect.width_vecter), rect.height_vecter));
+                        ctx.lineTo(...vec_add(vec_sub(rect.center, rect.width_vecter), rect.height_vecter));
+                    }
                     ctx.fill();
                     ctx.restore();
                 }
+
                 ctx.beginPath();
                 switch (light_sources[i].type) {
                     case "point":
@@ -459,7 +462,7 @@ let c;
     window.addEventListener("mousemove", e => {
         if (!grabbing_canvas) return;
         ctx.origin = vec_add(ctx.origin, [x - e.clientX, y - e.clientY]);
-        ctx.translate(...vec_scale([e.clientX - x, e.clientY - y], 1 / ctx.size));
+        // ctx.translate(...vec_scale([e.clientX - x, e.clientY - y], 1 / ctx.size));
         x = e.clientX;
         y = e.clientY;
         c.set_canvas();
