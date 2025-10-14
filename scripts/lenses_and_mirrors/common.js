@@ -55,6 +55,7 @@
             c.selected_element.selected = -1;
             $(this).css("color","");
             $("#element-settings").addClass("invisible");
+            move_general_settings_icon("invisible");
         } else {
             c.selected_element.selected = +$(this).data("id");
             $(this).siblings().css("color","");
@@ -77,7 +78,6 @@
         const light_sources = ["Point Source", "Parallel Source"];
         const settings = $("#element-settings").children("div");
         const element = c[type][index];
-        $("#element-settings").removeClass("invisible");
         settings.text("");
         if (type === "optical_elements") {
             settings.append($("<div>").data({"type": type, "index": index}).css("font-size", "40px").text("Optical Element"));
@@ -141,6 +141,8 @@
             }
         }
         settings.append($("<button>").addClass("delete").attr("title", "Click to delete (or press Delete key)").text("Delete"));
+        $("#element-settings").removeClass("invisible");
+        move_general_settings_icon("visible");
     }
 
     $("#element-settings > div").on("change", "> select", function() {
@@ -246,6 +248,38 @@
         }
         c.selected_element.selected = -1;
         $("#element-settings").addClass("invisible");
+        move_general_settings_icon("invisible");
         c.update_light_path();
     }
+
+    $("#general-settings-icon").on("click", function() {
+        $("#general-settings").toggleClass("invisible");
+    });
+
+    function move_general_settings_icon(state) {
+        if (state === "visible") {
+            $("#general-settings-frame").css("right", $("#element-settings").outerWidth() + 10);
+        } else {
+            $("#general-settings-frame").css("right", 10);
+        }
+    }
+
+    $("#general-settings-grid > input").on("change", function() {
+        if ($(this).data("setting_type") === "ray_appearance") {
+            if (+$(this).val() < 0) {
+                $(this).val(c[$(this).data("setting")]);
+                return;
+            }
+            if ($(this).data("setting") === "fill_length" && +$(this).val() === 0 && +$(this).val() + c.sep_length === 0) {
+                $(this).val(c[$(this).data("setting")]);
+                return;
+            }
+            if ($(this).data("setting") === "seplength" && +$(this).val() === 0 && +$(this).val() + c.fill_length === 0) {
+                $(this).val(c[$(this).data("setting")]);
+                return;
+            }
+            c[$(this).data("setting")] = +$(this).val();
+            c.update_light_path();
+        }
+    });
 }
