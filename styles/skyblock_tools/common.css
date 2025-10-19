@@ -7,7 +7,7 @@ body {
     font-size: 20px;
     color: #ffffff;
     background-color: #2d1606;
-    display: block;
+    display: flex;
     margin: 0;
     background-image: url("../../images/crafting_table1.png");
     user-select: none;
@@ -23,8 +23,17 @@ button {
     font-size: 20px;
     padding: 7px 15px;
 }
-.a-icon {
-    line-height: 0;
+img {
+    display: block;
+}
+.icon-button {
+    height: 70px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+    &:hover {
+        filter: url(/skyblock_tools.html#filter-hover);
+    }
 }
 .invisible {
     display: none;
@@ -32,31 +41,33 @@ button {
 
 /* main */
 #main-sidebar {
-    width: 180px;
+    width: min-content;
     background-color: #f1f1f166;
-    position: fixed;
     height: 100vh;
     display: flex;
     flex-direction: column;
 }
-#main-sidebar > div:first-child {
+#main-sidebar > :first-child {
     display: flex;
     justify-content: space-between;
 }
-#main-sidebar > div:not(:first-child) {
+#main-sidebar > :nth-child(2) > div {
     cursor: pointer;
     color: #ffffff;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
     text-decoration: none;
+    &:hover {
+        color: lightgray;
+    }
 }
 #main-container {
     height: 100vh;
+    flex-grow: 1;
     align-items: center;
     justify-content: center;
     display: flex;
-    margin-left: 180px;
 }
 .editor {
     width: 800px;

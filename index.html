@@ -3,12 +3,21 @@
 
 <head>
     <title>My Home Page</title>
-    <link rel="icon" type="image/x-icon" href="images/skin.ico" />
+    <link rel="icon" type="image/x-icon" href="images/favicons/main_page.ico" />
     <link rel="stylesheet" href="styles/home_page/common.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
+    <svg width="0" height="0">
+        <filter id="filter-hover">
+            <feColorMatrix values=" 0.5 0   0   0 0
+                                    0   0.5 0   0 0
+                                    0   0   0.5 0 0
+                                    0   0   0   1 0"/>
+        </filter>
+    </svg>
+
     <div id="main-banner">My Home Page</div>
 
     <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
@@ -19,23 +28,19 @@
         </div>
 
         <div id="projects" class="invisible">
-            <svg class="back-to-home" width="60" height="60">
-                <path d="M0 30 l30 -30 v20 h30 v20 h-30 v20 z" fill="white"/>
-            </svg>
+            <img src="images/svg_icons/arrow_left.svg" class="back-to-home icon-button">
             <div>
                 <a class="a-button" href="skyblock_tools.html">Skyblock Tools</a>
                 <div>Just some skyblock tools</div>
                 <a class="a-button" href="calculators.html">Calculators</a>
                 <div>Calculate everything you want</div>
-                <a class="a-button" href="lenses_and_mirrors.html">Lenses And Mirrors</a>
-                <div>Simulate light rays interacting with optical elements (WIP)</div>
+                <a class="a-button" href="lenses_and_mirrors.html">Lenses and Mirrors</a>
+                <div>Simulate light rays interacting with optical elements</div>
             </div>
         </div>
 
         <div id="about" class="invisible" style="font-size: 30px;">
-            <svg class="back-to-home" width="60" height="60">
-                <path d="M0 30 l30 -30 v20 h30 v20 h-30 v20 z" fill="white"/>
-            </svg>
+            <img src="images/svg_icons/arrow_left.svg" class="back-to-home icon-button">
             <span>
                 A player addicted to Hypixel Skyblock.<br>
                 But I also like to play modded Minecraft, Terraria, Stonehearth.<br>

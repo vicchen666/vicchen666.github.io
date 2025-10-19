@@ -2,30 +2,45 @@
 <html>
 
 <head>
-    <title>Lenses And Mirrors</title>
-    <link rel="icon" type="image/x-icon" href="images/calculator.ico" />
+    <title>Lenses and Mirrors</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicons/lenses_and_mirrors.svg" />
     <link rel="stylesheet" href="styles/lenses_and_mirrors/common.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
+    <svg width="0" height="0">
+        <filter id="filter-hover">
+            <feColorMatrix values=" 0.5 0   0   0 0
+                                    0   0.5 0   0 0
+                                    0   0   0.5 0 0
+                                    0   0   0   1 0"/>
+        </filter>
+    </svg>
+
     <div id="main-banner">
-        <a class="a-icon" href="index.html">
-            <svg id="button-home" width="85" height="70" style="cursor: pointer;">
-                <path d="M10 35 h8 q2 0 2 2 v21 q0 2 2 2 h11 q2 0 2 -2 v-11 q0 -2 2 -2 h11 q2 0 2 2 v11 q0 2 2 2 h11 q2 0 2 -2 v-21 q0 -2 2 -2 h8 l-32.5 -25 z" fill="white"/>
-            </svg>
+        <a href="index.html">
+            <img id="button-home" class="icon-button" src="images/svg_icons/home.svg" title="Home Page">
         </a>
         <div>Lenses and Mirrors</div>
-        <button>Save</button>
+        <div style="display: flex;">
+            <img id="button-download" class="icon-button" src="images/svg_icons/download.svg" title="Download project">
+            <img id="button-upload" class="icon-button" src="images/svg_icons/upload.svg" title="Upload a project file from your computer">
+            <input id="input-upload" class="invisible" type="file" accept=".json">
+        </div>
     </div>
 
     <div style="flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-sidebar">
             <div style="display: flex;">
-                <div class="tab" style="border-width: 0 1px 1px 0;">a</div>
-                <div class="tab">b</div>
+                <div class="tab clickable" style="border-width: 0 1px 1px 0;">
+                    <img src="images/svg_icons/plus.svg" style="height: 30px;">
+                </div>
+                <div class="tab">
+                    <img src="images/svg_icons/3_lines.svg" style="height: 40px;">
+                </div>
             </div>
-            <div class="invisible">
+            <div id="element-add" class="invisible scrollbar">
                 <div data-type="optical_elements">Convex Lens</div>
                 <div data-type="optical_elements">Concave Lens</div>
                 <div data-type="optical_elements">Convex Mirror</div>
@@ -35,14 +50,7 @@
                 <div data-type="light_sources">Point Source</div>
                 <div data-type="light_sources">Parallel Source</div>
             </div>
-            <div>
-                <!-- <div data-id=0>test</div>
-                <div data-id=1>test</div>
-                <div data-id=2>test</div>
-                <div data-id=3>test</div>
-                <div data-id=4>test</div>
-                <div data-id=5>test</div> -->
-            </div>
+            <div id="element-list" class="scrollbar"></div>
         </div>
 
         <div id="main-canvas">
@@ -50,23 +58,24 @@
         </div>
 
         <div id="general-settings-frame">
-            <img id="general-settings-icon" src="images/svg icons/gear.svg">
+            <img id="general-settings-icon" src="images/svg_icons/gear.svg">
             <div id="general-settings" class="invisible">
-                <div id="general-settings-grid">
-                    <div>Max Distance</div>
-                    <input type="number" step="any" data-setting="max_distance" data-setting_type="ray_appearance" value="3000">
-                    <div>Fill Length</div>
-                    <input type="number" step="any" data-setting="fill_length" data-setting_type="ray_appearance" value="20">
-                    <div>Seperate Length</div>
-                    <input type="number" step="any" data-setting="sep_length" data-setting_type="ray_appearance" value="10">
+                <div style="font-size: 30px;">General Settings</div>
+                <div>
+                    <div style="font-size: 24px;">Ray Rendering</div>
+                    <div class="general-settings-grid" data-setting_type="ray_rendering">
+                        <div>Max&nbsp;Ray Length</div>
+                        <input type="number" step="any" data-setting="max_distance" value="3000">
+                        <div>Solid Length</div>
+                        <input type="number" step="any" data-setting="fill_length" value="20">
+                        <div>Gap Length</div>
+                        <input type="number" step="any" data-setting="sep_length" value="10">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div id="element-settings" class="invisible">
-            <div>
-            </div>
-        </div>
+        <div id="element-settings" class="invisible scrollbar"></div>
     </div>
 
     <script src="scripts/lenses_and_mirrors/light_control.js"></script>

@@ -7,7 +7,7 @@ let mouseX, mouseY;
             mouseY = event.pageY;
         });
     });
-    function hide_sidebar() {
+    $("#button-toggle-sidebar").on("click", () => {
         if ($("#main-sidebar > div").hasClass("invisible")) {
             $("#main-sidebar > div").removeClass("invisible");
             $("#main-sidebar > div > a").removeClass("invisible");
@@ -19,9 +19,13 @@ let mouseX, mouseY;
             $("#main-sidebar").css("background-color", "#00000000");
             $("#main-container").css("margin-left", "0");
         }
-    }
-    function skyblock_tools() {
+    });
+    $("#button-skyblock-tools-main").on("click", () => {
         $("#main-container").children().addClass("invisible");
         $("#home").removeClass("invisible");
-    }
+    });
+    $("#button-skyblock-tools-fossil-finder").on("click", () => {
+        $("#main-container").children().addClass("invisible");
+        $("#fossil-finder").removeClass("invisible");
+    });
 }

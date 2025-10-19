@@ -11,16 +11,28 @@ body {
 button {
     color: white;
     cursor: pointer;
-    background-color: rgb(35, 50, 84);
+    background-color: rgb(23, 47, 92);
     line-height: 1.5;
     border-radius: 3px;
     border: 1px solid darkgray;
     font-size: 30px;
     padding: 7px 15px;
     margin: 15px;
+    &:hover {
+        background-color: rgb(36, 58, 99);
+    }
 }
-.a-icon {
-    line-height: 0;
+img {
+    display: block;
+}
+.icon-button {
+    height: 70px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+    &:hover {
+        filter: url(/calculators.html#filter-hover);
+    }
 }
 .invisible {
     display: none;
@@ -28,22 +40,26 @@ button {
 
 /* main */
 #main-sidebar {
+    width: min-content;
     background-color: #f1f1f166;
     height: 100vh;
     display: flex;
     flex-direction: column;
 }
-#main-sidebar > div:first-child {
+#main-sidebar > :first-child {
     display: flex;
     justify-content: space-between;
 }
-#main-sidebar > div:nth-child(2) > div {
+#main-sidebar > :nth-child(2) > div {
     cursor: pointer;
     color: #ffffff;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
     text-decoration: none;
+    &:hover {
+        color: lightgray;
+    }
 }
 #main-container {
     height: 100vh;
@@ -98,4 +114,15 @@ button {
 }
 #loot-luck > section > div > div:nth-child(2) > div:not(:first-child) {
     margin-left: 15px;
+}
+
+/* misc */
+#button-toggle-sidebar, #button-home {
+    height: 70px;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 10px;
+    &:hover {
+        filter: url(/calculators.html#filter-hover);
+    }
 }

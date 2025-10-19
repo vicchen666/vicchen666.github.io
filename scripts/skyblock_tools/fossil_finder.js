@@ -2,12 +2,8 @@
     let select_slot;
     let fossil_count = null;
 
-    function fossil_finder() {
-        $("#main-container").children().addClass("invisible");
-        $("#fossil-finder").removeClass("invisible");
-    }
     function fossil_finder_reset() {
-        $("#fossil-finder-excavator .invslot-item").css("background-image", "url('images/inventory slots/brown_stained_glass_pane.png')").empty();
+        $("#fossil-finder-excavator .invslot-item").css("background-image", "url('images/inventory_slots/brown_stained_glass_pane.png')").empty();
         $("#fossil-finder-selection").addClass("invisible")
         $("#fossil-finder-progress").val("")
         fossil_count = null;
@@ -70,7 +66,7 @@
     function fossil_finder_next_place(mode, reveal=false) {
         $("#fossil-finder-excavator > .ui-row > .invslot > .invslot-item").filter(function () {
             return $(this).css("background-image").indexOf("lime_stained_glass_pane.png") !== -1;
-        }).css("background-image", "url('images/inventory slots/brown_stained_glass_pane.png')").empty();
+        }).css("background-image", "url('images/inventory_slots/brown_stained_glass_pane.png')").empty();
         let fossil_excavator = Array.from({length: 6}, () => Array(9).fill(0));
         let fossil_patterns = [[[0,1,0,0,0,0], // claw fossil
                                 [1,1,1,1,0,0],
@@ -178,14 +174,14 @@
                 }
                 if (reveal) {
                     if (max_value) {
-                        $("#fossil-finder-excavator > .ui-row:eq(" + next_slot[0] + ") > .invslot:eq(" + next_slot[1] + ") > .invslot-item").css("background-image", "url('images/inventory slots/white_stained_glass_pane.png')");
+                        $("#fossil-finder-excavator > .ui-row:eq(" + next_slot[0] + ") > .invslot:eq(" + next_slot[1] + ") > .invslot-item").css("background-image", "url('images/inventory_slots/white_stained_glass_pane.png')");
                         fossil_finder_next_place(0, true);
                     } else {
                         $("#fossil-finder-reveal").remove();
                     }
                 } else {
                     if (max_value) {
-                        $("#fossil-finder-excavator > .ui-row:eq(" + next_slot[0] + ") > .invslot:eq(" + next_slot[1] + ") > .invslot-item").css("background-image", "url('images/inventory slots/lime_stained_glass_pane.png')").append('<div style="display: grid; height: 48px;width: 48px;"><div style="font-size: 15px; justify-self: center;align-self: center;">' + Math.round(max_value / fossil * 100) + '%</div></div>');
+                        $("#fossil-finder-excavator > .ui-row:eq(" + next_slot[0] + ") > .invslot:eq(" + next_slot[1] + ") > .invslot-item").css("background-image", "url('images/inventory_slots/lime_stained_glass_pane.png')").append('<div style="display: grid; height: 48px;width: 48px;"><div style="font-size: 15px; justify-self: center;align-self: center;">' + Math.round(max_value / fossil * 100) + '%</div></div>');
                     }
                     if (fossil === 1 && max_value) {
                         $("#fossil-finder > section > div:eq(2)").prepend('<button id="fossil-finder-reveal" onclick="fossil_finder_next_place(0, true)">Reveal</button>');
@@ -200,11 +196,11 @@
             $("#fossil-finder-excavator").append('<div class="ui-row"></div>');
         }
         for (let i=0; i<9; i++) {
-            $("#fossil-finder-excavator > .ui-row").append('<div class="invslot"><div class="invslot-item" style="background-image: url(\'images/inventory slots/brown_stained_glass_pane.png\'); cursor: pointer;"></div></div>');
+            $("#fossil-finder-excavator > .ui-row").append('<div class="invslot"><div class="invslot-item" style="background-image: url(\'images/inventory_slots/brown_stained_glass_pane.png\'); cursor: pointer;"></div></div>');
         }
         $("#fossil-finder-selection").append('<div class="ui-row"></div>');
         for (let i=0; i<3; i++) {
-            $("#fossil-finder-selection > .ui-row").append('<div class="invslot"><div class="invslot-item" style="background-image: url(\'images/inventory slots/brown_stained_glass_pane.png\'); cursor: pointer;"></div></div>');
+            $("#fossil-finder-selection > .ui-row").append('<div class="invslot"><div class="invslot-item" style="background-image: url(\'images/inventory_slots/brown_stained_glass_pane.png\'); cursor: pointer;"></div></div>');
         }
         fossil_finder_next_place(0);
     }
@@ -224,14 +220,14 @@
             return item !== slot_item;
         });
         for (let i=0; i<3; i++) {
-            $("#fossil-finder-selection > .ui-row > .invslot:eq(" + i + ") > .invslot-item").css("background-image", "url('images/inventory slots/" + select_list[i] + "')");
+            $("#fossil-finder-selection > .ui-row > .invslot:eq(" + i + ") > .invslot-item").css("background-image", "url('images/inventory_slots/" + select_list[i] + "')");
         }
     });
     $("#fossil-finder-selection").on("click", ".invslot", function() {
         if ($(this).children().css('background-image').split('/').pop().replace(/\"|\)/g, '') !== "barrier.png") {
             $("#fossil-finder-excavator > .ui-row > .invslot > .invslot-item").filter(function () {
                 return $(this).css("background-image").indexOf("lime_stained_glass_pane.png") !== -1;
-            }).css("background-image", "url('images/inventory slots/brown_stained_glass_pane.png')").empty();
+            }).css("background-image", "url('images/inventory_slots/brown_stained_glass_pane.png')").empty();
             select_slot.children().css('background-image', $(this).children().css('background-image'));
             $("#fossil-finder-progress").val("");
             fossil_finder_next_place(0);

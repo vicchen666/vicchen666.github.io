@@ -9,32 +9,33 @@ body {
     user-select: none;
     font-family: Arial, Helvetica, sans-serif;
 }
-button {
+img {
+    display: block;
+}
+button, .a-button {
     color: white;
     cursor: pointer;
-    background-color: rgb(35, 50, 84);
+    background-color: rgb(23, 47, 92);
     line-height: 1.5;
     border-radius: 3px;
     border: 1px solid darkgray;
     font-size: 40px;
     padding: 7px 15px;
     margin: 15px;
+    &:hover {
+        background-color: rgb(36, 58, 99);;
+    }
 }
 .a-button {
     text-align: center;
     text-decoration: none;
-    color: white;
-    cursor: pointer;
-    background-color: rgb(35, 50, 84);
-    line-height: 1.5;
-    border-radius: 3px;
-    border: 1px solid darkgray;
-    font-size: 40px;
-    padding: 7px 15px;
-    margin: 15px;
 }
-a {
-    display: block;
+.icon-button {
+    height: 100px;
+    cursor: pointer;
+    &:hover {
+        filter: url(/index.html#filter-hover);
+    }
 }
 .invisible {
     display: none;

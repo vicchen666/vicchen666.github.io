@@ -12,13 +12,16 @@ body {
 button {
     color: white;
     cursor: pointer;
-    background-color: rgb(35, 50, 84);
+    background-color: rgb(23 47 92);
     line-height: 1.5;
     border-radius: 3px;
     border: 1px solid darkgray;
     font-size: 40px;
     padding: 7px 15px;
     margin: 15px;
+    &:hover {
+        background-color: rgb(36 58 99);
+    }
 }
 input {
     background-color: rgb(23 47 92);
@@ -34,25 +37,17 @@ select {
 img {
     display: block;
 }
-.a-button {
-    text-align: center;
-    text-decoration: none;
-    color: white;
+.icon-button {
+    height: 70px;
     cursor: pointer;
-    background-color: rgb(35, 50, 84);
-    line-height: 1.5;
-    border-radius: 3px;
-    border: 1px solid darkgray;
-    font-size: 40px;
-    padding: 7px 15px;
-    margin: 15px;
-}
-a {
-    display: block;
+    &:hover {
+        filter: url(/lenses_and_mirrors.html#filter-hover);
+    }
 }
 .invisible {
-    display: none;
+    display: none !important;
 }
+
 
 /* main */
 #main-banner {
@@ -80,36 +75,28 @@ a {
 #main-sidebar > :nth-child(1) > :nth-child(1) {
     cursor: pointer;
 }
-#main-sidebar > div:nth-child(n + 2) {
+#main-sidebar > :nth-child(1) > .clickable:hover > img {
+    filter: url(/lenses_and_mirrors.html#filter-hover);
+}
+#main-sidebar > :nth-child(n + 2) {
     padding: 10px;
 }
-#main-sidebar > :nth-child(2) > div {
-    padding-left: 3px;
-    cursor: pointer;
-}
-#main-sidebar > :nth-child(2) > div:hover {
-    border: 2px solid darkgray;
-}
-#main-sidebar > :nth-child(3) > div {
-    padding-left: 3px;
-    cursor: pointer;
-}
-#main-sidebar > :nth-child(3) > div:hover {
-    color: lime;
-}
-
-.tab {
-    flex-grow: 1;
-    border-color: darkgray;
-    border-style: solid;
-    border-width: 0;
-}
-
 #main-canvas {
     position: absolute;
     inset: 0 0 0 300px;
 }
 
+.tab {
+    height: 40px;
+    flex-grow: 1;
+    justify-items: center;
+    align-content: center;
+    border-color: darkgray;
+    border-style: solid;
+    border-width: 0;
+}
+
+/* general-settings */
 #general-settings-frame {
     position: absolute;
     right: 10px;
@@ -120,11 +107,13 @@ a {
     float: right;
     cursor: pointer;
     transition: transform 0.3s ease;
-}
-#general-settings-icon:hover {
-    transform: rotate(90deg);
+    &:hover {
+        transform: rotate(90deg);
+    }
 }
 #general-settings {
+    display: flex;
+    flex-direction: column;
     background-color: rgb(23 47 92);
     margin-top: 55px;
     border: 1px solid darkgray;
@@ -133,24 +122,58 @@ a {
 #general-settings * {
     font-size: 20px;
 }
-#general-settings-grid {
+#general-settings > * {
+    margin-bottom: 5px;
+}
+#general-settings > :nth-child(n + 2){
+    border-top: 1px solid darkgray;
+    padding: 5px;
+}
+.general-settings-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: min-content;
 }
-#general-settings-grid > * {
+.general-settings-grid > * {
     margin: 5px;
 }
-#general-settings-grid > input {
+.general-settings-grid > input {
     max-width: 100px;
     height: fit-content;
     align-self: center;
 }
-#general-settings-grid > div {
+.general-settings-grid > div {
     text-align: right;
 }
 
+/* element */
+#element-add > div {
+    padding-left: 3px;
+    cursor: pointer;
+    &:hover {
+        border: 2px solid darkgray;
+    }
+}
+#element-list > div {
+    padding-left: 3px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    &:hover {
+        color: lime;
+    }
+}
+#element-center, #element-delete {
+    flex-grow: 1;
+}
+#element-delete {
+    color: crimson;
+}
+
+
+/* element-settings */
 #element-settings {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     background-color: rgb(23 47 92);
     right: 0;
@@ -163,16 +186,8 @@ a {
 #element-settings * {
     font-size: 30px;
 }
-#element-settings > div {
-    display: flex;
-    flex-direction: column;
-}
-#element-settings > div > * {
+#element-settings > * {
     margin-bottom: 10px;
-}
-#element-settings > div > button {
-    background-color: rgb(23 47 92);
-    color: crimson;
 }
 #element-settings-grid {
     display: grid;
@@ -189,4 +204,16 @@ a {
 }
 #element-settings-grid > div {
     text-align: right;
+}
+
+/* misc */
+#button-download, #button-upload {
+    margin-right: 10px;
+}
+#button-home {
+    margin-left: 10px;
+}
+.scrollbar {
+    overflow-y: auto;
+    scrollbar-color: white transparent;
 }

@@ -1,0 +1,20 @@
+<svg version="1.1" width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        path {
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 40;
+            fill: none;
+        }
+    </style>
+    <defs>
+        <mask id="shape" mask-type="luminance">
+            <rect width="500" height="500" rx="150" ry="150" fill="white"/>
+        </mask>
+    </defs>
+    <g mask="url(#shape)">
+        <rect id="background" width="500" height="500" fill="#0f172a"/>
+        <path d="M50,600 L170,170 L600,50 M-100,450 L330,330 L450,-100" stroke="yellow"/>
+        <path d="M50,150 V50 H150 M50,50 L450,450 M450,350 V450 H350" stroke="white"/>
+    </g>
+</svg>

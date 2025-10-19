@@ -3,44 +3,9 @@ const TAU = Math.PI * 2;
 const canvas = $("#main-canvas canvas")[0];
 const ctx = canvas.getContext("2d");
 {
-    ctx.origin = [0, 0];
+    ctx.origin = [-canvas.clientWidth / 2, -canvas.clientHeight / 2];
     ctx.size = 1;
     let x, y;
-    
-    const light_sources = [
-        {type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
-        // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
-        // {type: "point", position: [1500, 350], density: 30, unit_vector: [1, 0]},
-    ];
-
-    /**
-     * @type {[{
-     *     type: "lens" | "mirror" | "flat_mirror",
-     *     position: [number, number],
-     *     unit_vector: [number, number],
-     *     focal_length?: number,
-     *     size: number
-     * }]}
-     * 
-     * List of elements that interacts with light
-     * 
-     * `position` is the center
-     * 
-     * `unit_vector` is the direction perpendicular and counter-clockwise to the element's direction
-     * 
-     * For curved lenses and mirrors, `focal_length` is the distance between the center and a focus
-     */
-    const optical_elements = [
-        {type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
-        {type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
-        {type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
-        {type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
-        {type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
-
-        // {type: "mirror", position: [400, 400], unit_vector: [Math.cos(2/4 * TAU), Math.sin(2/4 * TAU)], focal_length: 400, size: 300},
-        // {type: "mirror", position: [325, 400 + 75 * Math.sqrt(3)], unit_vector: [Math.cos(1/6 * TAU), Math.sin(1/6 * TAU)], focal_length: 400, size: 300},
-        // {type: "mirror", position: [475, 400 + 75 * Math.sqrt(3)], unit_vector: [Math.cos(5/6 * TAU), Math.sin(5/6 * TAU)], focal_length: 400, size: 300},
-    ];
 
     /**
      * Solves a system of two linear equations in the form of ax+by=c. Parameters are provided in the form of arrays of two elements
@@ -95,26 +60,55 @@ const ctx = canvas.getContext("2d");
             this.sep_length = 10;
             this.max_distance = 3000;
             this.elements_settings = {
-                "lens": ["name", "position", "rotation", "focal_length", "size"],
-                "mirror": ["name", "position", "rotation", "focal_length", "size"],
-                "flat_mirror": ["name", "position", "rotation", "size"],
-                "barrier": ["name", "position", "rotation", "size"],
-                "point": ["name", "position", "rotation", "density"],
-                "parallel": ["name", "position", "rotation", "size", "density"],
+                lens: ["name", "position", "rotation", "focal_length", "size"],
+                mirror: ["name", "position", "rotation", "focal_length", "size"],
+                flat_mirror: ["name", "position", "rotation", "size"],
+                barrier: ["name", "position", "rotation", "size"],
+                point: ["name", "position", "rotation", "angle", "density"],
+                parallel: ["name", "position", "rotation", "size", "density"],
             }
+            /**
+             * @type {[{
+             *     type: "point" | "parallel",
+             *     position: [number, number],
+             *     density: number,
+             *     unit_vector: [number, number],
+             *     size?: number
+             * }]}
+             * 
+             * List of light sources, including point sources and parallel sources
+             * 
+             * For parallel sources, `position` is the center
+             * 
+             * `density` is
+             * - for point sources, the number of equidistant rays
+             * - for parallel sources, theoretically the number of rays per 100 units. The actual total number of rays is the ceiling of the theoretical number of rays
+             * 
+             * `unit_vector` is
+             * - for point sources, the direction at the center to the emitted rays
+             * - for parallel sources, the direction perpendicular and counter-clockwise to the direction of rays
+             * 
+             * For parallel sources, `size` is the diameter
+             */
             this.light_sources = [];
+            /**
+             * @type {[{
+             *     type: "lens" | "mirror" | "flat_mirror",
+             *     position: [number, number],
+             *     unit_vector: [number, number],
+             *     focal_length?: number,
+             *     size: number
+             * }]}
+             * 
+             * List of elements that interacts with light
+             * 
+             * `position` is the center
+             * 
+             * `unit_vector` is the direction perpendicular and counter-clockwise to the element's direction
+             * 
+             * For curved lenses and mirrors, `focal_length` is the distance between the center and a focus
+             */
             this.optical_elements = [];
-            // this.light_sources = [
-            //     {id:0, type: "parallel", position: [1500, 200], density: 10, unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], size: 300},
-            //     // {type: "point", position: [1500, 50], density: 30, unit_vector: [1, 0]},
-            // ];
-            // this.optical_elements = [
-            //     {id:1, type: "lens", position: [1000, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 200, size: 400},
-            //     {id:2, type: "lens", position: [500, 200], unit_vector: [Math.cos(2/7 * TAU), Math.sin(2/7 * TAU)], focal_length: 250, size: 400},
-            //     {id:3, type: "mirror", position: [100, 200], unit_vector: [Math.cos(1/4 * TAU), Math.sin(1/4 * TAU)], focal_length: 50, size: 300},
-            //     {id:4, type: "flat_mirror", position: [700, 800], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], focal_length:50, size: 300},
-            //     {id:5, type: "barrier", position: [300, 600], unit_vector: [Math.cos(0/4 * TAU), Math.sin(0/4 * TAU)], size: 300},
-            // ];
             this.selected_element = {selected:-1, hovered:-1};
             this.update_light_path();
             this.set_canvas(true);
@@ -167,16 +161,24 @@ const ctx = canvas.getContext("2d");
             let light_rays = [];
             // generate rays from sources
             light_sources.forEach(e => {
+                let num_rays;
                 switch (e.type) {
                     case "point":
-                        for (let i=0; i<e.density; i++) {
-                            light_rays.push({start_position: e.position, unit_vector: vec_rotate(e.unit_vector, 360 * i / e.density)});
+                        if (e.angle > 0) {
+                            const start_direction = vec_rotate(e.unit_vector, -e.angle / 2);
+                            num_rays = Math.ceil(e.angle / 360 * e.density) + 1; // number of rays
+                            for (let i=0; i<num_rays; i++) {
+                                if (e.angle == 360 && i == num_rays - 1) return;
+                                light_rays.push({start_position: e.position, unit_vector: vec_rotate(start_direction, e.angle / (num_rays - 1) * i)});
+                            }
+                        } else {
+                            light_rays.push({start_position: e.position, unit_vector: e.unit_vector});
                         }
                         break;
                     case "parallel":
                         const normal = [-e.unit_vector[1], e.unit_vector[0]]; // direction of rays
                         const top = vec_add(e.position, vec_scale(e.unit_vector, e.size / 2)); // the endpoint counter-clockwise to the ray direction
-                        const num_rays = Math.ceil(e.size / 100 * e.density) + 1; // number of rays
+                        num_rays = Math.ceil(e.size / 100 * e.density) + 1; // number of rays
                         for (let i=0; i<num_rays; i++) {
                             light_rays.push({start_position: vec_sub(top, vec_scale(e.unit_vector, e.size / (num_rays - 1) * i)), unit_vector: normal});
                         }
