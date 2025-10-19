@@ -78,15 +78,7 @@ img {
 #main-sidebar > :nth-child(1) > .clickable:hover > img {
     filter: url(/lenses_and_mirrors.html#filter-hover);
 }
-#main-sidebar > :nth-child(n + 2) {
-    padding: 10px;
-}
-#main-canvas {
-    position: absolute;
-    inset: 0 0 0 300px;
-}
-
-.tab {
+#main-sidebar > :nth-child(1) > .tab {
     height: 40px;
     flex-grow: 1;
     justify-items: center;
@@ -94,6 +86,13 @@ img {
     border-color: darkgray;
     border-style: solid;
     border-width: 0;
+}
+#main-sidebar > :nth-child(n + 2) {
+    padding: 10px;
+}
+#main-canvas {
+    position: absolute;
+    inset: 0 0 0 300px;
 }
 
 /* general-settings */
@@ -212,6 +211,16 @@ img {
 }
 #button-home {
     margin-left: 10px;
+}
+#message-box {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 50px;
+    left: 50%;
+    font-size: 30px;
+    padding: 10px;
+    transform: translateX(-50%);
 }
 .scrollbar {
     overflow-y: auto;

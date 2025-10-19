@@ -1,4 +1,10 @@
 {
+    window.addEventListener("beforeunload", e => {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+    });
+    
     $(".tab").on("click", function() {
         const index = $(this).index();
         $(this).css("border-width", "0"); 
@@ -357,9 +363,9 @@
             try {
                 const data = JSON.parse(e.target.result);
                 upload_project(data);
-                console.log(data);
             } catch (err) {
-                console.log("Invalid JSON file.");
+                console.log(err);
+                message("fail", "File upload failed! Invalid JSON file.");
             }
         }
         reader.readAsText(file);
@@ -396,10 +402,13 @@
                 c.element_id = id;
                 c.set_canvas();
                 c.update_light_path();
+                message("success", "File uploaded successfully!")
+            } else {
+                throw new Error("No version data");
             }
         } catch (err) {
             console.log(err);
-            console.log("Invalid JSON structure.");
+            message("fail", "File upload failed! Invalid JSON structure.");
         }
     }
 
@@ -407,5 +416,17 @@
         $("#general-settings input").each(function() {
             $(this).val(c[$(this).data("setting")]);
         });
+    }
+
+    function message(type, text) {
+        switch (type) {
+            case "success":
+                $("#message-box").css("background-color", "limegreen");
+                break;
+            case "fail":
+                $("#message-box").css("background-color", "crimson");
+                break;
+        }
+        $("#message-box").text(text).fadeIn(500).delay(3000).fadeOut(1000);
     }
 }
