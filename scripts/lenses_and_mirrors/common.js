@@ -25,7 +25,7 @@
     });
 
     $("#element-add > div").on("click", function() {
-        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((ctx.origin[0] + canvas.width / 2) / ctx.size), Math.round((ctx.origin[1] + canvas.height / 2) / ctx.size)], size: 400, rotation: 90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 10};
+        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] + canvas.height / 2) / c.size)], size: 400, rotation: 90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 10};
         switch($(this).index()) {
             case 1:
                 element.focal_length = -200;
@@ -241,7 +241,7 @@
     }).on("click", "#element-center", function() {
         const type = $(this).parent().siblings().first().data("type");
         const index = $(this).parent().siblings().first().data("index");
-        ctx.origin = [c[type][index].position[0] * ctx.size - canvas.width / 2, c[type][index].position[1] * ctx.size - canvas.height / 2];
+        c.origin = [c[type][index].position[0] * c.size - canvas.width / 2, c[type][index].position[1] * c.size - canvas.height / 2];
         c.set_canvas();
     }).on("click", "#element-delete", () => {
         delete_element();
@@ -321,8 +321,8 @@
             },
             misc: {
                 canvas: {
-                    origin: ctx.origin,
-                    scale: ctx.size
+                    origin: c.origin,
+                    scale: c.size
                 }
             }
         };
@@ -379,8 +379,8 @@
                 c.fill_length = ray_settings.solid_length;
                 c.sep_length= ray_settings.gap_length;
                 reload_general_settings();
-                ctx.origin = data.misc.canvas.origin;
-                ctx.size = data.misc.canvas.scale;
+                c.origin = data.misc.canvas.origin;
+                c.size = data.misc.canvas.scale;
 
                 $("#element-settings").addClass("invisible");
                 move_general_settings_icon("invisible");

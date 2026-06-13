@@ -3,57 +3,9 @@ const TAU = Math.PI * 2;
 const canvas = $("#main-canvas canvas")[0];
 const ctx = canvas.getContext("2d");
 {
-    ctx.origin = [-canvas.clientWidth / 2, -canvas.clientHeight / 2];
-    ctx.size = 1;
-    let x, y;
-
-    /**
-     * Solves a system of two linear equations in the form of ax+by=c. Parameters are provided in the form of arrays of two elements
-     * @returns "infinite", "none", or [x, y]
-     */
-    function lineq2(a, b, c) {
-        const delta = a[0] * b[1] - a[1] * b[0];
-        const delta_x = c[0] * b[1] - c[1] * b[0];
-        const delta_y = a[0] * c[1] - a[1] * c[0];
-        if (delta === 0) {
-            if (delta_x === 0) {
-                return "infinite";
-            } else {
-                return "none";
-            }
-        }
-        return [delta_x / delta, delta_y / delta];
-    }
-    function vec_add(a, b) {
-        return a.map((val, i) => val + b[i]);
-    }
-    function vec_sub(a, b) {
-        return a.map((val, i) => val - b[i]);
-    }
-    function vec_scale(v, s) {
-        return v.map(val => val * s);
-    }
-    function vec_dot(a, b) {
-        return a.map((val, i) => val * b[i]).reduce((result, val) => result + val);
-    }
-    function vec_len(v) {
-        return Math.sqrt(v.map(val => val ** 2).reduce((result, val) => result + val));
-    }
-    function vec_unit(v) {
-        return vec_scale(v, 1 / vec_len(v));
-    }
-    /**
-     * @description Returns a vector rotated counter-clockwise by `d` degrees
-     * @param {[number, number]} v The vector to be rotated
-     * @param {number} d The angle in degrees
-     * @returns The rotated vector
-     */
-    function vec_rotate(v, d) {
-        const rad = d * TAU / 360;
-        return [v[0] * Math.cos(rad) + v[1] * -Math.sin(rad), v[0] * Math.sin(rad) + v[1] * Math.cos(rad)];
-    }
-    class CanvasControl {
-        constructor() {
+    class CanvasControl extends CanvasControlBase {
+        constructor(options = {}) {
+            super(options);
             this.element_id = 0;
             this.phase = 0;
             this.fill_length = 20;
@@ -66,7 +18,7 @@ const ctx = canvas.getContext("2d");
                 barrier: ["name", "position", "rotation", "size"],
                 point: ["name", "position", "rotation", "angle", "density"],
                 parallel: ["name", "position", "rotation", "size", "density"],
-            }
+            };
             /**
              * @type {[{
              *     type: "point" | "parallel",
@@ -112,6 +64,7 @@ const ctx = canvas.getContext("2d");
             this.selected_element = {selected:-1, hovered:-1};
             this.update_light_path();
             this.set_canvas(true);
+            this.setup_listeners();
             this.draw();
         }
 
@@ -127,26 +80,11 @@ const ctx = canvas.getContext("2d");
             this.light_path = this.simulate_light(this.light_sources, this.optical_elements, this.max_distance);
         }
 
-        draw() {
-            if (this.animation) clearInterval(this.animation);
-            this.animation = setInterval(() => {
-                ctx.clearRect(...vec_scale(ctx.origin, 1 / ctx.size), canvas.width / ctx.size, canvas.height / ctx.size);
-                this.draw_light(this.fill_length, this.sep_length, this.phase, this.light_path);
-                this.draw_elements(this.light_sources, this.optical_elements, this.selected_element);
-
-                this.phase = (this.phase + 1) % (this.fill_length + this.sep_length);
-            }, 10);
-        }
-        
-        set_canvas(adjust_size=false) {
-            if (adjust_size) {
-                canvas.height = canvas.clientHeight;
-                canvas.width = canvas.clientWidth; 
-            }
-            ctx.setTransform(
-                ctx.size, 0, 0, ctx.size,
-                -ctx.origin[0], -ctx.origin[1]
-            );
+        render_frame() {
+            ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, canvas.height / this.size);
+            this.draw_light(this.fill_length, this.sep_length, this.phase, this.light_path);
+            this.draw_elements(this.light_sources, this.optical_elements, this.selected_element);
+            this.phase = (this.phase + 1) % (this.fill_length + this.sep_length);
         }
 
         simulate_light(light_sources, optical_elements, max_distance=700) {
@@ -243,7 +181,7 @@ const ctx = canvas.getContext("2d");
                         } else {
                             light_rays[i].unit_vector = vec_unit(vec_scale(vec_add(vec_scale(normal, -2 * element.focal_length * dot_sign), vec_sub(element.position, front_focus_point)), focal_sign));
                         }
-                    } else if (element.type = "flat_mirror") {
+                    } else if (element.type === "flat_mirror") {
                         light_rays[i].unit_vector = vec_add(light_rays[i].unit_vector, vec_scale(normal, -2 * vec_dot(light_rays[i].unit_vector, normal)));
                     }
 
@@ -257,7 +195,7 @@ const ctx = canvas.getContext("2d");
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
             ctx.strokeStyle = "yellow";
-            ctx.lineWidth = 2 / ctx.size;
+            ctx.lineWidth = 2 / this.size;
 
             for (let i=0;i<light_path.length;i++) {
                 let point = light_path[i][0][0];
@@ -295,7 +233,7 @@ const ctx = canvas.getContext("2d");
             ctx.fillStyle = "white";
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
-            ctx.lineWidth = 3 / ctx.size;
+            ctx.lineWidth = 3 / this.size;
             for (let i=0; i<optical_elements.length; i++) {
                 draw_optical_elements(i);
             }
@@ -446,35 +384,4 @@ const ctx = canvas.getContext("2d");
     }
 
     c = new CanvasControl();
-
-    let grabbing_canvas = false;
-    canvas.addEventListener("wheel", e => {
-        const rect = canvas.getBoundingClientRect();
-        const canvas_point = vec_sub([e.clientX, e.clientY], [rect.left, rect.top]);
-        const origin = vec_sub(vec_scale(vec_add(ctx.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
-        ctx.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
-        ctx.origin = origin;
-        c.set_canvas();
-    });
-    canvas.addEventListener("mousedown", e => {
-        grabbing_canvas = true;
-        x = e.clientX;
-        y = e.clientY;
-    });
-    window.addEventListener("mousemove", e => {
-        if (!grabbing_canvas) return;
-        ctx.origin = vec_add(ctx.origin, [x - e.clientX, y - e.clientY]);
-        // ctx.translate(...vec_scale([e.clientX - x, e.clientY - y], 1 / ctx.size));
-        x = e.clientX;
-        y = e.clientY;
-        c.set_canvas();
-    });
-    window.addEventListener("mouseup", () => {
-        if (grabbing_canvas) {
-            grabbing_canvas = false;
-        }
-    });
-    window.addEventListener("resize", () => {
-        c.set_canvas(true);
-    })
 }
