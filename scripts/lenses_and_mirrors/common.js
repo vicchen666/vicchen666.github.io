@@ -25,7 +25,7 @@
     });
 
     $("#element-add > div").on("click", function() {
-        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: 90, unit_vector: [0, 1], angle: 90, focal_length: 200, density: 10};
+        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
         switch($(this).index()) {
             case 1:
                 element.focal_length = -200;
@@ -45,9 +45,13 @@
                 break;
             case 6:
                 element.type = "point";
+                element.rotation = 0;
+                element.unit_vector = [1, 0];
                 break;
             case 7:
                 element.type = "parallel";
+                element.rotation = 0;
+                element.unit_vector = [1, 0];
                 break;
         }
 

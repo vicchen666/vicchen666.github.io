@@ -34,7 +34,7 @@ const ctx = canvas.getContext("2d");
              * 
              * `density` is
              * - for point sources, the number of equidistant rays
-             * - for parallel sources, theoretically the number of rays per 100 units. The actual total number of rays is the ceiling of the theoretical number of rays
+             * - for parallel sources, theoretically the number of rays per 1000 units. The actual total number of rays is the ceiling of the theoretical number of rays
              * 
              * `unit_vector` is
              * - for point sources, the direction at the center to the emitted rays
@@ -114,11 +114,10 @@ const ctx = canvas.getContext("2d");
                         }
                         break;
                     case "parallel":
-                        const normal = [-e.unit_vector[1], e.unit_vector[0]]; // direction of rays
-                        const top = vec_add(e.position, vec_scale(e.unit_vector, e.size / 2)); // the endpoint counter-clockwise to the ray direction
-                        num_rays = Math.ceil(e.size / 100 * e.density) + 1; // number of rays
+                        const top = vec_add(e.position, vec_scale(vec_rotate(e.unit_vector, 90), e.size / 2)); // the endpoint counter-clockwise to the ray direction
+                        num_rays = Math.ceil(e.size / 1000 * e.density) + 1; // number of rays
                         for (let i=0; i<num_rays; i++) {
-                            light_rays.push({start_position: vec_sub(top, vec_scale(e.unit_vector, e.size / (num_rays - 1) * i)), unit_vector: normal});
+                            light_rays.push({start_position: vec_sub(top, vec_scale(vec_rotate(e.unit_vector, 90), e.size / (num_rays - 1) * i)), unit_vector: e.unit_vector});
                         }
                         break;
                 }
@@ -348,7 +347,7 @@ const ctx = canvas.getContext("2d");
                         ctx.moveTo(...vec_add(light_sources[i].position, [30, 0]));
                         ctx.arc(...light_sources[i].position, 30, 0, TAU);
                     } else {
-                        rect = {center: light_sources[i].position, width_vecter: vec_rotate(vec_scale(light_sources[i].unit_vector, 40), 90), height_vecter: vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2 + 10)};
+                        rect = {center: light_sources[i].position, width_vecter: vec_scale(light_sources[i].unit_vector, 40), height_vecter: vec_rotate(vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2 + 10), 90)};
                     }
                     if (light_sources[i].type !== "point") {
                         ctx.moveTo(...vec_sub(vec_sub(rect.center, rect.width_vecter), rect.height_vecter));
@@ -368,12 +367,12 @@ const ctx = canvas.getContext("2d");
                         ctx.fill();
                         break;
                     case "parallel":
-                        const top = vec_add(light_sources[i].position, vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2));
-                        const bottom = vec_sub(light_sources[i].position, vec_scale(light_sources[i].unit_vector, light_sources[i].size / 2));
-                        ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(light_sources[i].unit_vector, 30), -30)));
+                        const top = vec_add(light_sources[i].position, vec_scale(vec_rotate(light_sources[i].unit_vector, 90), light_sources[i].size / 2));
+                        const bottom = vec_sub(light_sources[i].position, vec_scale(vec_rotate(light_sources[i].unit_vector, 90), light_sources[i].size / 2));
+                        ctx.lineTo(...vec_add(bottom, vec_rotate(vec_scale(light_sources[i].unit_vector, 30), 120)));
                         ctx.lineTo(...bottom);
                         ctx.lineTo(...top);
-                        ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(light_sources[i].unit_vector, 30), -150)));
+                        ctx.lineTo(...vec_add(top, vec_rotate(vec_scale(light_sources[i].unit_vector, 30), -120)));
                         ctx.closePath();
                         ctx.stroke();
                         ctx.fill();
