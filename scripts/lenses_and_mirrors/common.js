@@ -25,7 +25,7 @@
     });
 
     $("#element-add > div").on("click", function() {
-        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] + canvas.height / 2) / c.size)], size: 400, rotation: 90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 10};
+        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: 90, unit_vector: [0, 1], angle: 90, focal_length: 200, density: 10};
         switch($(this).index()) {
             case 1:
                 element.focal_length = -200;
@@ -125,7 +125,7 @@
                         settings_grid.append($("<div>").text("X"));
                         settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "x").val(value[0]));
                         settings_grid.append($("<div>").text("Y"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "y").val(-value[1]));
+                        settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "y").val(value[1]));
                         break;
                     case "rotation":
                         settings_grid.append($("<div>").text("Rotation (deg)"));
@@ -206,11 +206,11 @@
                 c[type][index].position[0] = +$(this).val();
                 break;
             case "y":
-                c[type][index].position[1] = -$(this).val();
+                c[type][index].position[1] = +$(this).val();
                 break;
             case "rotation":
                 c[type][index].rotation = $(this).val();
-                c[type][index].unit_vector = [Math.cos(+$(this).val() / 360 * TAU), Math.sin(-$(this).val() / 360 * TAU)];
+                c[type][index].unit_vector = [Math.cos(+$(this).val() / 360 * TAU), Math.sin(+$(this).val() / 360 * TAU)];
                 break;
             case "focal_length":
                 if ($(this).val() > 0) {
@@ -241,7 +241,7 @@
     }).on("click", "#element-center", function() {
         const type = $(this).parent().siblings().first().data("type");
         const index = $(this).parent().siblings().first().data("index");
-        c.origin = [c[type][index].position[0] * c.size - canvas.width / 2, c[type][index].position[1] * c.size - canvas.height / 2];
+        c.origin = [c[type][index].position[0] * c.size - canvas.width / 2, c[type][index].position[1] * c.size + canvas.height / 2];
         c.set_canvas();
     }).on("click", "#element-delete", () => {
         delete_element();

@@ -5,7 +5,7 @@ class CanvasControlBase {
         this.frame_interval = frame_interval;
         this.animation = null;
         this.grabbing_canvas = false;
-        this.origin = [-canvas.clientWidth / 2, -canvas.clientHeight / 2];
+        this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
         this.size = 1;
         this.mouse_x = 0;
         this.mouse_y = 0;
@@ -21,7 +21,7 @@ class CanvasControlBase {
 
     handle_wheel(e) {
         const rect = canvas.getBoundingClientRect();
-        const canvas_point = vec_sub([e.clientX, e.clientY], [rect.left, rect.top]);
+        const canvas_point = vec_sub([e.clientX, -e.clientY], [rect.left, -rect.top]);
         const origin = vec_sub(vec_scale(vec_add(this.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
         this.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
         this.origin = origin;
@@ -36,7 +36,7 @@ class CanvasControlBase {
 
     handle_mousemove(e) {
         if (!this.grabbing_canvas) return;
-        this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, this.mouse_y - e.clientY]);
+        this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
         this.mouse_y = e.clientY;
         this.set_canvas();
@@ -56,8 +56,8 @@ class CanvasControlBase {
             canvas.width = canvas.clientWidth;
         }
         ctx.setTransform(
-            this.size, 0, 0, this.size,
-            -this.origin[0], -this.origin[1]
+            this.size, 0, 0, -this.size,
+            -this.origin[0], this.origin[1]
         );
         this.render_frame();
     }
