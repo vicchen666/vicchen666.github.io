@@ -63,8 +63,8 @@ const ctx = canvas.getContext("2d");
             this.optical_elements = [];
             this.selected_element = {selected:-1, hovered:-1};
             this.update_light_path();
-            this.set_canvas(true);
             this.setup_listeners();
+            this.set_canvas(true);
             this.draw();
         }
 
