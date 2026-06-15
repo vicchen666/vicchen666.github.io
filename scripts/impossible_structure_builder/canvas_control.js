@@ -7,8 +7,8 @@ const ctx = canvas.getContext("2d");
         constructor(options = {animate: false}) {
             super(options);
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
-            // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
-            this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
+            this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
+            // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
             this.axes = this.axes.map(axis => vec_scale(axis, 20));
             this.outline_style = "yellow";
             this.vertex_fill_styles = ["white", "gray", "black"];
@@ -22,8 +22,9 @@ const ctx = canvas.getContext("2d");
             ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, -canvas.height / this.size);
             this.seal_cracks_line_width = 1 / this.size;
             // this.draw_beams();
-            this.display_all_possibilities();
-            this.display_penrose_triangle();
+            // this.display_all_possibilities();
+            // this.display_penrose_triangle();
+            this.display_impossible_cube();
         }
 
         display_all_possibilities() {
@@ -46,8 +47,6 @@ const ctx = canvas.getContext("2d");
             for (let i=0; i<63; i++) {
                 toggle_beams[i].forEach(beam => {
                     const v = new Vertex(vec_add(centers_vertices[i].position, vec_scale(this.axes[(beam - 1) % 3], beam > 3 ? -10 : 10)), this.axes);
-                    v.beams.add(beam < 4 ? -beam : beam - 3);
-                    centers_vertices[i].beams.add(-v.beams.values().next().value);
                     const b = new Beam(beam < 4 ? [v, centers_vertices[i]] : [centers_vertices[i], v], this.axes, (beam - 1) % 3 + 1);
                     beams.push(b);
                     vertices.push(v);
@@ -57,12 +56,13 @@ const ctx = canvas.getContext("2d");
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            // centers_vertices.forEach(v => v.draw_outline(this.outline_style));
-            // vertices.forEach(v => v.draw_outline(this.outline_style));
             centers_vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
             vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
-            // beams.forEach(b => b.draw_outline(this.outline_style));
             beams.forEach(b => b.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+
+            // centers_vertices.forEach(v => v.draw_outline(this.outline_style));
+            // vertices.forEach(v => v.draw_outline(this.outline_style));
+            // beams.forEach(b => b.draw_outline(this.outline_style));
         }
 
         display_penrose_triangle() {
@@ -72,51 +72,78 @@ const ctx = canvas.getContext("2d");
             vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 5)), this.axes));
             vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], -5)), this.axes));
 
-            vertices[0].beams.add(1).add(-2);
-            vertices[1].beams.add(-1).add(3);
-            vertices[2].beams.add(2).add(-3);
-
             beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
             beams.push(new Beam([vertices[0], vertices[2]], this.axes, 2));
             beams.push(new Beam([vertices[2], vertices[1]], this.axes, 3));
 
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
-            ctx.strokeStyle = "yellow";
             ctx.lineWidth = 2 / this.size;
+            
+            vertices.forEach(v => v.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+            beams.forEach(b => b.fill(this.beams_fill_styles, this.seal_cracks_line_width));
 
             // vertices.forEach(v => v.draw_outline(this.outline_style));
             // beams.forEach(b => b.draw_outline(this.outline_style));
-            vertices.forEach(v => v.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
-            beams.forEach(b => b.fill(this.beams_fill_styles, this.seal_cracks_line_width));
         }
 
-        draw_beams() {
-            ctx.lineJoin = "round";
-            ctx.lineCap = "round";
-            ctx.lineWidth = 2 / this.size;
-
-            // create v0 as center, v1 to v6 as the vertices around v0, and b1 as the beam from v0 to v1. The beams from v0 to v2, v3, v4, v5, v6 can be drawn by rotating b1 by 60, 120, 180, 240, 300 degrees respectively
-            // use for toggle 6 beams
+        display_impossible_cube() {
             let vertices = [];
             let beams = [];
             vertices.push(new Vertex([0, 0], this.axes));
             vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 3)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[2], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[1].position, vec_scale(this.axes[1], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[2], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[3].position, vec_scale(this.axes[0], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[4].position, vec_scale(this.axes[2], 10)), this.axes));
+
+            beams.push(new Beam([vertices[4], vertices[1]], this.axes, 2));
+            beams.push(new Beam([vertices[6], vertices[1]], this.axes, 3));
+            beams.push(new Beam([vertices[5], vertices[2]], this.axes, 3));
+            beams.push(new Beam([vertices[4], vertices[2]], this.axes, 1));
+            beams.push(new Beam([vertices[6], vertices[3]], this.axes, 1));
+            beams.push(new Beam([vertices[5], vertices[3]], this.axes, 2));
+            beams.push(new Beam([vertices[7], vertices[4]], this.axes, 3));
+            beams.push(new Beam([vertices[7], vertices[5]], this.axes, 1));
+            beams.push(new Beam([vertices[7], vertices[6]], this.axes, 2));
+            beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
+            beams.push(new Beam([vertices[2], vertices[0]], this.axes, 2));
+            beams.push(new Beam([vertices[3], vertices[0]], this.axes, 3));
+
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 2 / this.size;
+
+            beams.forEach(beam => beam.fill(this.beams_fill_styles, this.seal_cracks_line_width));
+            vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+
+            // beams.forEach(b => b.draw_outline(this.outline_style));
+            // vertices.forEach(v => v.draw_outline(this.outline_style));
+        }
+
+        draw_beams() {
+            let vertices = [];
+            let beams = [];
+            vertices.push(new Vertex([0, 0], this.axes));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10)), this.axes));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 1.5)), this.axes));
             vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[0], 10)), this.axes));
 
             beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
             beams.push(new Beam([vertices[2], vertices[0]], this.axes, 2));
             beams.push(new Beam([vertices[3], vertices[2]], this.axes, 1));
+            
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 2 / this.size;
 
-            vertices[0].beams.add(1).add(2);
-            vertices[1].beams.add(-1);
-            vertices[2].beams.add(1).add(-2);
-            vertices[3].beams.add(-1);
+            beams.forEach(beam => beam.fill(this.beams_fill_styles, this.seal_cracks_line_width));
+            vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
 
-            vertices.forEach(vertex => vertex.draw_outline(outline_color));
-            // vertices.forEach(vertex => vertex.fill(fill_styles));
-            beams.forEach(beam => beam.draw_outline(outline_color));
+            // vertices.forEach(vertex => vertex.draw_outline(this.outline_style));
+            // beams.forEach(beam => beam.draw_outline(this.outline_style));
         }
     }
 
@@ -270,6 +297,8 @@ const ctx = canvas.getContext("2d");
             this.vertices = vertices;
             this.axes = axes;
             this.direction = direction;
+            this.vertices[0].beams.add(-this.direction);
+            this.vertices[1].beams.add(this.direction);
         }
 
         draw_outline(stroke_style) {
