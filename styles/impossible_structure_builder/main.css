@@ -95,6 +95,32 @@ img {
     inset: 0 0 0 300px;
 }
 
+/* toolbar */
+#toolbar {
+    display: flex;
+    height: 70px;
+    justify-content: left;
+    align-items: center;
+    border-bottom: 1px solid darkgray;
+}
+.tool-button {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    border-radius: 10%;
+}
+.tool-button:not(.selected) {
+    border: 1px solid darkgray;
+    cursor: pointer;
+    &:hover {
+        filter: url(/impossible_structure_builder.html#filter-hover);
+    }
+}
+.tool-button.selected {
+    border: 2px solid green;
+    cursor: default;
+}
+
 /* general-settings */
 #general-settings-frame {
     position: absolute;

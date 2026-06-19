@@ -4,6 +4,7 @@ class CanvasControlBase {
         this.animate = animate;
         this.frame_interval = frame_interval;
         this.animation = null;
+        this.can_move_canvas = true;
         this.grabbing_canvas = false;
         this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
         this.size = 1;
@@ -19,6 +20,12 @@ class CanvasControlBase {
         window.addEventListener("resize", () => this.handle_resize());
     }
 
+    mouse_to_canvas(x, y) {
+        const rect = canvas.getBoundingClientRect();
+        const canvas_point = vec_scale(vec_add(c.origin, vec_sub([x, -y], [rect.left, -rect.top])), 1 / c.size);
+        return canvas_point.map(val => Math.round(val));
+    }
+
     handle_wheel(e) {
         const rect = canvas.getBoundingClientRect();
         const canvas_point = vec_sub([e.clientX, -e.clientY], [rect.left, -rect.top]);
@@ -29,12 +36,14 @@ class CanvasControlBase {
     }
 
     handle_mousedown(e) {
+        if (!this.can_move_canvas) return;
         this.grabbing_canvas = true;
         this.mouse_x = e.clientX;
         this.mouse_y = e.clientY;
     }
 
     handle_mousemove(e) {
+        this.hover_item(e);
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
@@ -48,6 +57,10 @@ class CanvasControlBase {
 
     handle_resize() {
         this.set_canvas(true);
+    }
+    
+    hover_item(e) {
+        // Implement by subclasses.
     }
 
     set_canvas(adjust_size=false) {

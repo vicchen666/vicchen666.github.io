@@ -6,32 +6,87 @@ const ctx = canvas.getContext("2d");
     class CanvasControl extends CanvasControlBase {
         constructor(options = {animate: false}) {
             super(options);
+            this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
-            this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
+            // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
             this.axes = this.axes.map(axis => vec_scale(axis, 20));
+            this.hovered_style = "rgba(173, 216, 230, 0.5)";
             this.outline_style = "yellow";
             this.vertex_fill_styles = ["white", "gray", "black"];
             this.beams_fill_styles = ["white", "gray", "black"];
+            this.vertices = {};
+            this.beams = {};
+            this.element_id = 0;
+            this.selected_element = {selected:-1, hovered:-1};
+            Beam.axes = this.axes;
+            Beam.outline_style = this.outline_style;
+            Beam.fill_styles = this.beams_fill_styles;
+            Vertex.hovered_style = this.hovered_style;
+            Vertex.axes = this.axes;
+            Vertex.outline_style = this.outline_style;
+            Vertex.fill_styles = this.vertex_fill_styles;
             this.setup_listeners();
             this.set_canvas(true);
             this.draw();
         }
 
+        hover_item(e) {
+            const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+            let nearest_id = -1;
+            let nearest_dist = Infinity;
+
+            Object.entries(this.vertices).forEach(([id, vertex]) => {
+                const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                if (dist < nearest_dist) {
+                    nearest_dist = dist;
+                    nearest_id = id;
+                }
+            });
+
+            let hover_dist = Math.max(...this.axes.map(axis => vec_len(axis))) * 2 ** .5;
+            if (nearest_id !== -1 && nearest_dist < hover_dist) {
+                this.selected_element.hovered = nearest_id;
+            } else {
+                this.selected_element.hovered = -1;
+            }
+            this.render_frame();
+        }
+
         render_frame() {
             ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, -canvas.height / this.size);
-            this.seal_cracks_line_width = 1 / this.size;
+            Beam.seal_cracks_line_width = 1 / this.size;
+            Vertex.seal_cracks_line_width = 1 / this.size;
+
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 2 / this.size;
+
+            Object.entries(this.beams).forEach(([id, beam]) => {
+                beam.fill();
+                if (beam.id === this.selected_element.hovered) {
+                    beam.draw_hovered();
+                }
+            });
+            Object.entries(this.vertices).forEach(([id, vertex]) => {
+                vertex.fill();
+                if (id === this.selected_element.hovered) {
+                    vertex.draw_hovered();
+                }
+            });
             // this.draw_beams();
+            // this.display_sierpinski(8);
             // this.display_all_possibilities();
             // this.display_penrose_triangle();
-            this.display_impossible_cube();
+            // this.display_impossible_cube();
         }
 
         display_all_possibilities() {
             let centers_vertices = [];
             for (let i=0; i<8; i++) {
                 for (let j=0; j<8; j++) {
-                    centers_vertices.push(new Vertex(vec_add(vec_scale([0, 1], i * 500), vec_scale([1, 0], j * 500)), this.axes));
+                    centers_vertices.push(new Vertex(vec_add(vec_scale([0, 1], i * 500), vec_scale([1, 0], j * 500))));
                 }
             }
             const toggle_beams = Array.from({ length: 2 ** 6 - 1 }, (_, i) => i + 1)
@@ -46,8 +101,8 @@ const ctx = canvas.getContext("2d");
 
             for (let i=0; i<63; i++) {
                 toggle_beams[i].forEach(beam => {
-                    const v = new Vertex(vec_add(centers_vertices[i].position, vec_scale(this.axes[(beam - 1) % 3], beam > 3 ? -10 : 10)), this.axes);
-                    const b = new Beam(beam < 4 ? [v, centers_vertices[i]] : [centers_vertices[i], v], this.axes, (beam - 1) % 3 + 1);
+                    const v = new Vertex(vec_add(centers_vertices[i].position, vec_scale(this.axes[(beam - 1) % 3], beam > 3 ? -10 : 10)));
+                    const b = new Beam(beam < 4 ? [v, centers_vertices[i]] : [centers_vertices[i], v], (beam - 1) % 3 + 1);
                     beams.push(b);
                     vertices.push(v);
                 });
@@ -56,106 +111,174 @@ const ctx = canvas.getContext("2d");
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            centers_vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
-            vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
-            beams.forEach(b => b.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+            centers_vertices.forEach(vertex => vertex.fill());
+            beams.forEach(beam => beam.fill());
+            vertices.forEach(vertex => vertex.fill());
 
-            // centers_vertices.forEach(v => v.draw_outline(this.outline_style));
-            // vertices.forEach(v => v.draw_outline(this.outline_style));
-            // beams.forEach(b => b.draw_outline(this.outline_style));
+            // centers_vertices.forEach(vertex => vertex.draw_outline());
+            // beams.forEach(beam => beam.draw_outline());
+            // vertices.forEach(vertex => vertex.draw_outline());
         }
 
         display_penrose_triangle() {
             let vertices = [];
             let beams = [];
-            vertices.push(new Vertex([-300, 0], this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 5)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], -5)), this.axes));
+            vertices.push(new Vertex([-300, 0]));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 5))));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], -5))));
 
-            beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
-            beams.push(new Beam([vertices[0], vertices[2]], this.axes, 2));
-            beams.push(new Beam([vertices[2], vertices[1]], this.axes, 3));
+            beams.push(new Beam([vertices[1], vertices[0]], 1));
+            beams.push(new Beam([vertices[0], vertices[2]], 2));
+            beams.push(new Beam([vertices[2], vertices[1]], 3));
 
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.lineWidth = 2 / this.size;
             
-            vertices.forEach(v => v.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
-            beams.forEach(b => b.fill(this.beams_fill_styles, this.seal_cracks_line_width));
+            beams.forEach(beam => beam.fill());
+            vertices.forEach(vertex => vertex.fill());
 
-            // vertices.forEach(v => v.draw_outline(this.outline_style));
-            // beams.forEach(b => b.draw_outline(this.outline_style));
+            // beams.forEach(beam => beam.draw_outline());
+            // vertices.forEach(vertex => vertex.draw_outline());
         }
 
         display_impossible_cube() {
             let vertices = [];
             let beams = [];
-            vertices.push(new Vertex([0, 0], this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[2], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[1].position, vec_scale(this.axes[1], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[2], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[3].position, vec_scale(this.axes[0], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[4].position, vec_scale(this.axes[2], 10)), this.axes));
 
-            beams.push(new Beam([vertices[4], vertices[1]], this.axes, 2));
-            beams.push(new Beam([vertices[6], vertices[1]], this.axes, 3));
-            beams.push(new Beam([vertices[5], vertices[2]], this.axes, 3));
-            beams.push(new Beam([vertices[4], vertices[2]], this.axes, 1));
-            beams.push(new Beam([vertices[6], vertices[3]], this.axes, 1));
-            beams.push(new Beam([vertices[5], vertices[3]], this.axes, 2));
-            beams.push(new Beam([vertices[7], vertices[4]], this.axes, 3));
-            beams.push(new Beam([vertices[7], vertices[5]], this.axes, 1));
-            beams.push(new Beam([vertices[7], vertices[6]], this.axes, 2));
-            beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
-            beams.push(new Beam([vertices[2], vertices[0]], this.axes, 2));
-            beams.push(new Beam([vertices[3], vertices[0]], this.axes, 3));
+            vertices.push(new Vertex([0, 0]));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10))));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 10))));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[2], 10))));
+            vertices.push(new Vertex(vec_add(vertices[1].position, vec_scale(this.axes[1], 10))));
+            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[2], 10))));
+            vertices.push(new Vertex(vec_add(vertices[3].position, vec_scale(this.axes[0], 10))));
+            vertices.push(new Vertex(vec_add(vertices[4].position, vec_scale(this.axes[2], 10))));
+
+            beams.push(new Beam([vertices[4], vertices[1]], 2));
+            beams.push(new Beam([vertices[6], vertices[1]], 3));
+            beams.push(new Beam([vertices[5], vertices[2]], 3));
+            beams.push(new Beam([vertices[4], vertices[2]], 1));
+            beams.push(new Beam([vertices[6], vertices[3]], 1));
+            beams.push(new Beam([vertices[5], vertices[3]], 2));
+            beams.push(new Beam([vertices[7], vertices[4]], 3));
+            beams.push(new Beam([vertices[7], vertices[5]], 1));
+            beams.push(new Beam([vertices[7], vertices[6]], 2));
+            beams.push(new Beam([vertices[1], vertices[0]], 1));
+            beams.push(new Beam([vertices[2], vertices[0]], 2));
+            beams.push(new Beam([vertices[3], vertices[0]], 3));
 
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            beams.forEach(beam => beam.fill(this.beams_fill_styles, this.seal_cracks_line_width));
-            vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+            beams.forEach(beam => beam.fill());
+            vertices.forEach(vertex => vertex.fill());
 
-            // beams.forEach(b => b.draw_outline(this.outline_style));
-            // vertices.forEach(v => v.draw_outline(this.outline_style));
+            // beams.forEach(beam => beam.draw_outline());
+            // vertices.forEach(vertex => vertex.draw_outline());
+        }
+
+        display_sierpinski(level) {
+            // Credit to NutronStar45 for the algorithm
+            let vertices = [new Vertex([0, 0])];
+            let vertexCount = 1;
+            let beams = [];
+
+            /**
+             * Generates a subtriangle.
+             * @param {number} sublevel Positive integer indicating the level of the triangle.
+             * @param {number} bottomLeft Index of the vertex at the bottom left.
+             * @param {number | null} bottomRight Index of the vertex at the bottom right, or `null` if not yet generated.
+             * @returns {[number, number]} Array containing the indices of the vertices at the bottom right and top.
+             */
+            let subtriangle = (sublevel, bottomLeft, bottomRight) => {
+                if (sublevel === 1) {
+                    // Generate vertices
+                    if (bottomRight === null) {
+                        bottomRight = vertexCount++;
+                        vertices.push(new Vertex(vec_add(vertices[bottomLeft].position, vec_scale(this.axes[0], 10))));
+                    }
+                    let top = vertexCount++;
+                    vertices.push(new Vertex(vec_add(vertices[bottomLeft].position, vec_scale(this.axes[1], -10))));
+
+                    // Generate beams
+                    beams.push(new Beam([vertices[bottomLeft], vertices[bottomRight]], 1));
+                    beams.push(new Beam([vertices[bottomLeft], vertices[top]], 2));
+                    beams.push(new Beam([vertices[bottomRight], vertices[top]], 3));
+
+                    return [bottomRight, top];
+                } else {
+                    // Bottom left subtriangle
+                    let [bottom, left] = subtriangle(sublevel - 1, bottomLeft, null);
+
+                    // Bottom right subtriangle
+                    let [bottomRightTemp, right] = subtriangle(sublevel - 1, bottom, bottomRight);
+                    if (bottomRight === null) bottomRight = bottomRightTemp;
+
+                    // Top subtriangle
+                    let top = subtriangle(sublevel - 1, left, right)[1];
+
+                    return [bottomRight, top];
+                }
+            }
+
+            subtriangle(level, 0, null);
+
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            ctx.lineWidth = 2 / this.size;
+
+            beams.forEach(beam => beam.fill());
+            vertices.forEach(vertex => vertex.fill());
+
+            // beams.forEach(beam => beam.draw_outline());
+            // vertices.forEach(vertex => vertex.draw_outline());
         }
 
         draw_beams() {
             let vertices = [];
             let beams = [];
-            vertices.push(new Vertex([0, 0], this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 1.5)), this.axes));
-            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[0], 10)), this.axes));
+            vertices.push(new Vertex([0, 0]));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10))));
+            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 1.5))));
+            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[0], 10))));
 
-            beams.push(new Beam([vertices[1], vertices[0]], this.axes, 1));
-            beams.push(new Beam([vertices[2], vertices[0]], this.axes, 2));
-            beams.push(new Beam([vertices[3], vertices[2]], this.axes, 1));
+            beams.push(new Beam([vertices[1], vertices[0]], 1));
+            beams.push(new Beam([vertices[2], vertices[0]], 2));
+            beams.push(new Beam([vertices[3], vertices[2]], 1));
             
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            beams.forEach(beam => beam.fill(this.beams_fill_styles, this.seal_cracks_line_width));
-            vertices.forEach(vertex => vertex.fill(this.vertex_fill_styles, this.seal_cracks_line_width));
+            beams.forEach(beam => beam.fill());
+            vertices.forEach(vertex => vertex.fill());
 
-            // vertices.forEach(vertex => vertex.draw_outline(this.outline_style));
-            // beams.forEach(beam => beam.draw_outline(this.outline_style));
+            // beams.forEach(beam => beam.draw_outline());
+            // vertices.forEach(vertex => vertex.draw_outline());
+        }
+
+        add_vertex(mouse_x, mouse_y) {
+            this.vertices[this.element_id++] = new Vertex(this.mouse_to_canvas(mouse_x, mouse_y));
+            this.render_frame();
         }
     }
 
     class Vertex {
-        constructor(position, axes) {
+        static axes;
+        static hovered_style;
+        static outline_style;
+        static fill_styles;
+        static seal_cracks_line_width;
+
+        constructor(position) {
             this.position = position;
-            this.axes = axes;
             this.beams = new Set();
             this.edges = new Set();
         }
 
-        draw_outline(stroke_style) {
+        draw_outline() {
             const add_edges_1 = () => {
                 this.beams.forEach(main_beam => {
                     const main_axis = Math.abs(main_beam);
@@ -246,28 +369,28 @@ const ctx = canvas.getContext("2d");
             // remove_edges();
             add_edges_2();
 
-            ctx.strokeStyle = stroke_style;
+            ctx.strokeStyle = Vertex.outline_style;
             ctx.beginPath();
             this.edges.forEach(edgeKey => {
                 const edge = edgeKey.split(",").map(Number);
                 let position = this.position;
                 for (let i=0; i<edge.length-1; i++) {
-                    	position = vec_sub(position, this.axes[edge[i] - 1]);
+                    	position = vec_sub(position, Vertex.axes[edge[i] - 1]);
                 }
                 ctx.moveTo(...position);
-                	const line_end = vec_sub(position, this.axes[edge[edge.length - 1] - 1]);
+                	const line_end = vec_sub(position, Vertex.axes[edge[edge.length - 1] - 1]);
                 ctx.lineTo(...line_end);
             });
             ctx.closePath();
             ctx.stroke();
         }
 
-        fill(fill_styles,seal_cracks_line_width) {
+        fill() {
             for (let i=0; i<3; i++) {
                 if (this.beams.has(i + 1)) continue;
-                const main_axis = this.axes[i];
-                const other_axes = this.axes.filter((_, j) => j !== i);
-                ctx.fillStyle = fill_styles[i];
+                const main_axis = Vertex.axes[i];
+                const other_axes = Vertex.axes.filter((_, j) => j !== i);
+                ctx.fillStyle = Vertex.fill_styles[i];
                 ctx.beginPath();
                 let position = this.position;
                 ctx.moveTo(...position);
@@ -284,26 +407,51 @@ const ctx = canvas.getContext("2d");
 
                 // Draw outline to prevent cracks
                 ctx.save();
-                ctx.strokeStyle = fill_styles[i];
-                ctx.lineWidth = seal_cracks_line_width;
+                ctx.strokeStyle = Vertex.fill_styles[i];
+                ctx.lineWidth = Vertex.seal_cracks_line_width;
                 ctx.stroke();
                 ctx.restore();
             }
         }
+
+        draw_hovered() {
+            ctx.fillStyle = Vertex.hovered_style;
+            ctx.beginPath();
+            let position = vec_sub(this.position, Vertex.axes[0]);
+            ctx.moveTo(...position);
+            position = vec_sub(position, Vertex.axes[1]);
+            ctx.lineTo(...position);
+            position = vec_add(position, Vertex.axes[0]);
+            ctx.lineTo(...position);
+            position = vec_sub(position, Vertex.axes[2]);
+            ctx.lineTo(...position);
+            position = vec_add(position, Vertex.axes[1]);
+            ctx.lineTo(...position);
+            position = vec_sub(position, Vertex.axes[0]);
+            ctx.lineTo(...position);
+            position = vec_add(position, Vertex.axes[2]);
+            ctx.closePath();
+            ctx.fill();
+        }
     }
 
     class Beam {
-        constructor(vertices, axes, direction) {
+        static axes;
+        static outline_style;
+        static fill_styles;
+        static seal_cracks_line_width;
+
+        constructor(vertices, direction) {
             this.vertices = vertices;
-            this.axes = axes;
             this.direction = direction;
+            if (vec_dot(vec_sub(this.vertices[0].position, this.vertices[1].position), Beam.axes[this.direction - 1]) < 0) this.vertices.reverse();
             this.vertices[0].beams.add(-this.direction);
             this.vertices[1].beams.add(this.direction);
         }
 
-        draw_outline(stroke_style) {
-            const main_axis = this.axes[this.direction - 1];
-            const other_axes = this.axes.filter((_, i) => i !== this.direction - 1);
+        draw_outline() {
+            const main_axis = Beam.axes[this.direction - 1];
+            const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
             let starts = [];
             starts[0] = this.vertices[0].position;
             starts[0] = vec_sub(starts[0], main_axis);
@@ -317,7 +465,7 @@ const ctx = canvas.getContext("2d");
             ends[1] = vec_sub(ends[0], other_axes[0]);
             ends[2] = vec_sub(ends[0], other_axes[1]);
 
-            ctx.strokeStyle = stroke_style;
+            ctx.strokeStyle = Beam.outline_style;
             for (let i=0; i<3; i++) {
                 ctx.beginPath();
                 ctx.moveTo(...starts[i]);
@@ -327,12 +475,12 @@ const ctx = canvas.getContext("2d");
             }
         }
 
-        fill(fill_styles, seal_cracks_line_width) {
-            const main_axis = this.axes[this.direction - 1];
+        fill() {
+            const main_axis = Beam.axes[this.direction - 1];
             const other_axes_index = [1, 2, 3].filter(axis => axis !== this.direction);
-            const other_axes = other_axes_index.map(i => this.axes[i - 1]);
+            const other_axes = other_axes_index.map(i => Beam.axes[i - 1]);
             for (let i=0; i<2; i++) {
-                ctx.fillStyle = fill_styles[other_axes_index[i] - 1];
+                ctx.fillStyle = Beam.fill_styles[other_axes_index[i] - 1];
                 ctx.beginPath();
                 let position = this.vertices[1].position;
                 ctx.moveTo(...position);
@@ -353,8 +501,8 @@ const ctx = canvas.getContext("2d");
 
                 // Draw outline to prevent cracks
                 ctx.save();
-                ctx.strokeStyle = fill_styles[other_axes_index[i] - 1];
-                ctx.lineWidth = seal_cracks_line_width;
+                ctx.strokeStyle = Beam.fill_styles[other_axes_index[i] - 1];
+                ctx.lineWidth = Beam.seal_cracks_line_width;
                 ctx.stroke();
                 ctx.restore();
             }
