@@ -5,25 +5,27 @@
     //     return "";
     // });
 
-    let selected_tool = "move-canvas";
-
     $("#toolbar").on("click", ".tool-button", function() {
-        selected_tool = $(this).data("tool");
-        $(this).addClass("selected");
-        $(this).siblings().removeClass("selected");
-    });
-
-    $("#main-canvas").on("mousedown", function(e) {
-        switch (selected_tool) {
+        c.selected_tool = $(this).data("tool");
+        c.can_move_canvas = false;
+        c.selected_element = { selected: [], hovered: -1, selected_axes: [], hovered_axis: -1 };
+        c.can_select_elements = new Set();
+        switch (c.selected_tool) {
             case "move":
-                // c.move_canvas(e.offsetX, e.offsetY);
+                c.can_move_canvas = true;
+                $("#main-canvas").css("cursor", "move");
                 break;
             case "add-vertex":
-                c.add_vertex(e.clientX, e.clientY);
+                $("#main-canvas").css("cursor", "pointer");
                 break;
             case "extend-beam":
-                c.extend_beam(e.offsetX, e.offsetY);
+                c.tool_status = "select_vertex";
+                c.can_select_elements.add("vertex");
+                $("#main-canvas").css("cursor", "pointer");
                 break;
         }
+        $(this).addClass("selected");
+        $(this).siblings().removeClass("selected");
+        c.render_frame();
     });
 }

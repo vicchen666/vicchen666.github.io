@@ -4,12 +4,14 @@ class CanvasControlBase {
         this.animate = animate;
         this.frame_interval = frame_interval;
         this.animation = null;
-        this.can_move_canvas = true;
+        this.selected_tool = "move";
         this.grabbing_canvas = false;
         this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
         this.size = 1;
         this.mouse_x = 0;
         this.mouse_y = 0;
+        this.can_select_elements = new Set();
+        this.selected_element = { selected: [], hovered: -1 };
     }
 
     setup_listeners() {
@@ -36,14 +38,29 @@ class CanvasControlBase {
     }
 
     handle_mousedown(e) {
-        if (!this.can_move_canvas) return;
-        this.grabbing_canvas = true;
-        this.mouse_x = e.clientX;
-        this.mouse_y = e.clientY;
+        this.handle_tool_mousedown(e);
+    }
+
+    handle_tool_mousedown(e) {
+        switch (this.selected_tool) {
+            case "move":
+                if (e.which === 1 || e.which === 2) {
+                    this.grabbing_canvas = true;
+                    this.mouse_x = e.clientX;
+                    this.mouse_y = e.clientY;
+                }
+                break;
+            default:
+                if (e.which === 2) {
+                    this.grabbing_canvas = true;
+                    this.mouse_x = e.clientX;
+                    this.mouse_y = e.clientY;
+                }
+        }
     }
 
     handle_mousemove(e) {
-        this.hover_item(e);
+        this.hover_item_from_canvas(e);
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
@@ -58,8 +75,8 @@ class CanvasControlBase {
     handle_resize() {
         this.set_canvas(true);
     }
-    
-    hover_item(e) {
+
+    hover_item_from_canvas(e) {
         // Implement by subclasses.
     }
 

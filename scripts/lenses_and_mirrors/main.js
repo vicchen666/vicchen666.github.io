@@ -61,20 +61,22 @@
     });
 
     $("#element-list").on("click", "> div", function() {
-        if (+$(this).data("id") === c.selected_element.selected) {
-            c.selected_element.selected = -1;
+        const elementId = +$(this).data("id");
+        const selectedId = c.selected_element.selected[0];
+        if (elementId === selectedId) {
+            c.selected_element.selected = [];
             $(this).css("color","");
             $("#element-settings").addClass("invisible");
             move_general_settings_icon("invisible");
         } else {
-            c.selected_element.selected = +$(this).data("id");
+            c.selected_element.selected = [elementId];
             $(this).siblings().css("color","");
             $(this).css("color","limegreen");
-            const index = c.optical_elements.findIndex(e => e.id === c.selected_element.selected);
+            const index = c.optical_elements.findIndex(e => e.id === elementId);
             if (index !== -1) {
                 reload_element_settings("optical_elements", index);
             } else {
-                reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === c.selected_element.selected));
+                reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === elementId));
             }
         }
     }).on("mouseenter", "> div", function () {
@@ -262,17 +264,24 @@
     });
 
     function delete_element() {
-        if (c.selected_element.selected === -1) return;
-        let index = c.optical_elements.findIndex(e => e.id === c.selected_element.selected);
-        if (index !== -1) {
-            $("#element-list > div").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
-            c.remove_element("optical_elements", index);
-        } else {
-            index = c.light_sources.findIndex(e => e.id === c.selected_element.selected);
-            $("#element-list > div").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
-            c.remove_element("light_sources", index);
-        }
-        c.selected_element.selected = -1;
+        const selectedIds = c.selected_element.selected;
+        if (!selectedIds.length) return;
+
+        selectedIds.slice().forEach(id => {
+            let index = c.optical_elements.findIndex(e => e.id === id);
+            if (index !== -1) {
+                $("#element-list > div").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
+                c.remove_element("optical_elements", index);
+            } else {
+                index = c.light_sources.findIndex(e => e.id === id);
+                if (index !== -1) {
+                    $("#element-list > div").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
+                    c.remove_element("light_sources", index);
+                }
+            }
+        });
+
+        c.selected_element.selected = [];
         $("#element-settings").addClass("invisible");
         move_general_settings_icon("invisible");
         c.update_light_path();
@@ -389,7 +398,7 @@
                 $("#element-settings").addClass("invisible");
                 move_general_settings_icon("invisible");
                 $("#element-list").text("");
-                c.selected_element = [-1, -1];
+                c.selected_element = { selected: [], hovered: -1 };
                 c.light_sources = [];
                 c.optical_elements = [];
                 let id = 0;
