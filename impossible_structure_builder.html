@@ -35,9 +35,48 @@
     </div>
 
     <div id="toolbar">
-        <div id="tool-move" class="tool-button selected" data-tool="move" title="Move: Click and drag to move the canvas"></div>
-        <div id="tool-add-vertex" class="tool-button" data-tool="add-vertex" title="Add Vertex: Click to add a vertex"></div>
-        <div id="tool-extend-beam" class="tool-button" data-tool="extend-beam" title="Extend Beam: Select a vertex and choose an axis to extend the beam"></div>
+        <div class="toolbar-item">
+            <div class="tool-button selected" data-tool="move">
+                <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
+            </div>
+            <div class="tool-submenu invisible">
+                <div class="tool-submenu-button" data-tool="move" title="Click and drag to move the canvas">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
+                    <div>Move</div>
+                </div>
+            </div>
+        </div>
+        <div class="toolbar-item">
+            <div class="tool-button" data-tool="add-vertex-click">
+                <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
+            </div>
+            <div class="tool-submenu invisible">
+                <div class="tool-submenu-button" data-tool="add-vertex-click" title="Click to add a vertex">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
+                    <div>Add Vertex</div>
+                </div>
+                <div class="tool-submenu-button" data-tool="add-vertex-coordinates" title="Click to add a vertex at a specific location">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_coordinates.svg">
+                    <div>Add Vertex at Coordinates</div>
+                </div>
+            </div>
+        </div>
+        <div class="toolbar-item">
+            <div class="tool-button" data-tool="extend-beam-vertex">
+                <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
+            </div>
+            <div class="tool-submenu invisible">
+                <div class="tool-submenu-button" data-tool="extend-beam-vertex" title="Select a vertex and click to extend the beam">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
+                    <div>Extend Beam with New Vertex</div>
+                </div>
+                <div class="tool-submenu-button" data-tool="extend-beam-length" title="Select a vertex and enter a length to extend the beam">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_length.svg">
+                    <div>Extend Beam with Length</div>
+                </div>
+            </div>
+            
+        </div>
     </div>
     <div style="flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-canvas">

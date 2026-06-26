@@ -61,6 +61,7 @@ class CanvasControlBase {
 
     handle_mousemove(e) {
         this.hover_item_from_canvas(e);
+        this.use_tool(e);
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
@@ -77,6 +78,10 @@ class CanvasControlBase {
     }
 
     hover_item_from_canvas(e) {
+        // Implement by subclasses.
+    }
+
+    use_tool(e) {
         // Implement by subclasses.
     }
 

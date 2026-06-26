@@ -63,6 +63,9 @@ const ctx = canvas.getContext("2d");
                 this.selected_element.hovered = -1;
                 this.render_frame();
             }
+        }
+
+        use_tool(e) {
             if (this.can_select_elements.has("axis")) {
                 const vertex_position = this.vertices[this.selected_element.selected[this.selected_element.selected.length - 1]].position;
                 const unit_axes = this.axes.map(axis => vec_unit(axis));
@@ -84,21 +87,12 @@ const ctx = canvas.getContext("2d");
 
             Object.entries(this.beams).forEach(([id, beam]) => {
                 beam.fill();
-                if (beam.id === this.selected_element.hovered) {
-                    beam.draw_hovered();
-                } else if (this.selected_element.selected.includes(id)) {
-                    beam.draw_selected();
-                }
             });
             Object.entries(this.vertices).forEach(([id, vertex]) => {
                 vertex.fill();
-                if (id === this.selected_element.hovered) {
-                    vertex.draw_hovered();
-                } else if (this.selected_element.selected.includes(id)) {
-                    vertex.draw_selected();
-                }
             });
-            this.draw_tool_axes();
+
+            this.draw_tools();
             // this.draw_beams();
             // this.display_sierpinski(8);
             // this.display_all_possibilities();
@@ -109,11 +103,11 @@ const ctx = canvas.getContext("2d");
         handle_tool_mousedown(e) {
             super.handle_tool_mousedown(e);
             switch (this.selected_tool) {
-                case "add-vertex":
+                case "add-vertex-click":
                     if (e.which !== 1) return;
                     this.add_vertex(e.clientX, e.clientY);
                     break;
-                case "extend-beam":
+                case "extend-beam-vertex":
                     switch (this.tool_status) {
                         case "select_vertex":
                             if (e.which !== 1) return;
@@ -316,26 +310,48 @@ const ctx = canvas.getContext("2d");
             // vertices.forEach(vertex => vertex.draw_outline());
         }
 
-        draw_tool_axes() {
-            if (this.selected_element.hovered_axis !== -1) {
-                ctx.strokeStyle = this.axis_hovered_style;
-                let position = this.vertices[this.selected_element.selected[this.selected_element.selected.length - 1]].position;
-                const unit_axis = vec_unit(this.axes[this.selected_element.hovered_axis - 1]);
-                position = vec_add(position, vec_scale(unit_axis, 100));
+        draw_tools() {
+            const draw_tool_axes = () => {
+                if (this.selected_element.hovered_axis !== -1) {
+                    ctx.strokeStyle = this.axis_hovered_style;
+                    let position = this.vertices[this.selected_element.selected[this.selected_element.selected.length - 1]].position;
+                    const unit_axis = vec_unit(this.axes[this.selected_element.hovered_axis - 1]);
+                    position = vec_add(position, vec_scale(unit_axis, 100));
 
-                ctx.beginPath();
-                ctx.moveTo(...position);
-                position = vec_add(position, vec_scale(unit_axis, 100));
-                ctx.lineTo(...position);
-                ctx.lineTo(...vec_add(position, vec_rotate(vec_scale(unit_axis, 30), 150)));
-                ctx.lineTo(...position);
-                ctx.lineTo(...vec_add(position, vec_rotate(vec_scale(unit_axis, 30), -150)));
-                ctx.save();
-                ctx.lineWidth = 10 / this.size;
-                ctx.stroke();
-                ctx.restore();
+                    ctx.beginPath();
+                    ctx.moveTo(...position);
+                    position = vec_add(position, vec_scale(unit_axis, 100));
+                    ctx.lineTo(...position);
+                    ctx.lineTo(...vec_add(position, vec_rotate(vec_scale(unit_axis, 30), 150)));
+                    ctx.lineTo(...position);
+                    ctx.lineTo(...vec_add(position, vec_rotate(vec_scale(unit_axis, 30), -150)));
+                    ctx.save();
+                    ctx.lineWidth = 10 / this.size;
+                    ctx.stroke();
+                    ctx.restore();
+                }
             }
+
+            Object.entries(this.beams).forEach(([id, beam]) => {
+                if (id === this.selected_element.hovered) {
+                    beam.draw_hovered();
+                } else if (this.selected_element.selected.includes(id)) {
+                    beam.draw_selected();
+                }
+            })
+            Object.entries(this.vertices).forEach(([id, vertex]) => {
+                if (id === this.selected_element.hovered) {
+                    vertex.draw_hovered();
+                } else if (this.selected_element.selected.includes(id)) {
+                    vertex.draw_selected();
+                }
+            });
+
+            draw_tool_axes();
+
         }
+
+
 
         add_vertex(mouse_x, mouse_y) {
             this.vertices[this.element_id++] = new Vertex(this.mouse_to_canvas(mouse_x, mouse_y));

@@ -58,6 +58,8 @@ img {
     background-color: rgb(35, 50, 84);
     border-bottom: 1px solid darkgray;
     font-size: 50px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 #main-sidebar {
     position: absolute;

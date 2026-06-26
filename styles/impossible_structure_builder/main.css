@@ -58,6 +58,8 @@ img {
     background-color: rgb(35, 50, 84);
     border-bottom: 1px solid darkgray;
     font-size: 50px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 #main-sidebar {
     position: absolute;
@@ -103,22 +105,55 @@ img {
     align-items: center;
     border-bottom: 1px solid darkgray;
 }
-.tool-button {
-    width: 50px;
-    height: 50px;
+.toolbar-item {
+    position: relative;
     margin-left: 10px;
+}
+.tool-button {
     border-radius: 10%;
+    padding: 5px;
 }
 .tool-button:not(.selected) {
     border: 1px solid darkgray;
     cursor: pointer;
     &:hover {
-        filter: url(/impossible_structure_builder.html#filter-hover);
+        border: 1px solid lime;
     }
 }
 .tool-button.selected {
     border: 2px solid green;
     cursor: default;
+}
+.tool-icon {
+    width: 40px;
+    height: 40px;
+}
+.tool-submenu {
+    z-index: 1;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(23 47 92);
+    border: 1px solid darkgray;
+    border-radius: 3px;
+    padding: 10px;
+}
+.tool-submenu-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    white-space: nowrap;
+    &:hover {
+        filter: url(/impossible_structure_builder.html#filter-hover);
+    }
+}
+.tool-submenu-button > img {
+    height: 40px;
+    margin-right: 10px;
 }
 
 /* general-settings */
