@@ -62,14 +62,14 @@
 
     $("#element-list").on("click", "> div", function() {
         const elementId = +$(this).data("id");
-        const selectedId = c.selected_element.selected[0];
+        const selectedId = c.selected_elements.selected[0];
         if (elementId === selectedId) {
-            c.selected_element.selected = [];
+            c.selected_elements.selected = [];
             $(this).css("color","");
             $("#element-settings").addClass("invisible");
             move_general_settings_icon("invisible");
         } else {
-            c.selected_element.selected = [elementId];
+            c.selected_elements.selected = [elementId];
             $(this).siblings().css("color","");
             $(this).css("color","limegreen");
             const index = c.optical_elements.findIndex(e => e.id === elementId);
@@ -80,9 +80,9 @@
             }
         }
     }).on("mouseenter", "> div", function () {
-        c.selected_element.hovered = +$(this).data("id");
+        c.selected_elements.hovered = +$(this).data("id");
     }).on("mouseleave", "> div", function() {
-        c.selected_element.hovered = -1;
+        c.selected_elements.hovered = -1;
     });
 
     function reload_element_settings(type, index) {
@@ -264,7 +264,7 @@
     });
 
     function delete_element() {
-        const selectedIds = c.selected_element.selected;
+        const selectedIds = c.selected_elements.selected;
         if (!selectedIds.length) return;
 
         selectedIds.slice().forEach(id => {
@@ -281,7 +281,7 @@
             }
         });
 
-        c.selected_element.selected = [];
+        c.selected_elements.selected = [];
         $("#element-settings").addClass("invisible");
         move_general_settings_icon("invisible");
         c.update_light_path();
@@ -398,7 +398,7 @@
                 $("#element-settings").addClass("invisible");
                 move_general_settings_icon("invisible");
                 $("#element-list").text("");
-                c.selected_element = { selected: [], hovered: -1 };
+                c.selected_elements = { selected: [], hovered: -1 };
                 c.light_sources = [];
                 c.optical_elements = [];
                 let id = 0;

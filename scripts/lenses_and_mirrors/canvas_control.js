@@ -82,7 +82,7 @@ const ctx = canvas.getContext("2d");
         render_frame() {
             ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, -canvas.height / this.size);
             this.draw_light(this.fill_length, this.sep_length, this.phase, this.light_path);
-            this.draw_elements(this.light_sources, this.optical_elements, this.selected_element);
+            this.draw_elements(this.light_sources, this.optical_elements, this.selected_elements);
             this.phase = (this.phase + 1) % (this.fill_length + this.sep_length);
         }
 
@@ -226,7 +226,7 @@ const ctx = canvas.getContext("2d");
             }
         }
 
-        draw_elements(light_sources, optical_elements, selected_element) {
+        draw_elements(light_sources, optical_elements, selected_elements) {
             ctx.strokeStyle = "white";
             ctx.fillStyle = "white";
             ctx.lineJoin = "round";
@@ -242,26 +242,26 @@ const ctx = canvas.getContext("2d");
                 draw_light_sources(i);
             }
 
-            let element_index = optical_elements.findIndex(e => e.id === selected_element.hovered);
+            let element_index = optical_elements.findIndex(e => e.id === selected_elements.hovered);
             if (element_index !== -1) {
                 ctx.strokeStyle = "lime";
                 ctx.fillStyle = "lime";
                 draw_optical_elements(element_index, true);
             }
-            element_index = optical_elements.findIndex(e => e.id === selected_element.selected);
+            element_index = optical_elements.findIndex(e => e.id === selected_elements.selected);
             if (element_index !== -1) {
                 ctx.strokeStyle = "limegreen";
                 ctx.fillStyle = "limegreen";
                 draw_optical_elements(element_index, true);
             }
 
-            element_index = light_sources.findIndex(e => e.id === selected_element.hovered);
+            element_index = light_sources.findIndex(e => e.id === selected_elements.hovered);
             if (element_index !== -1) {
                 ctx.strokeStyle = "lime";
                 ctx.fillStyle = "lime";
                 draw_light_sources(element_index, true);
             }
-            element_index = light_sources.findIndex(e => e.id === selected_element.selected);
+            element_index = light_sources.findIndex(e => e.id === selected_elements.selected);
             if (element_index !== -1) {
                 ctx.strokeStyle = "limegreen";
                 ctx.fillStyle = "limegreen";

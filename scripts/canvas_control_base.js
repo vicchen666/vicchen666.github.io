@@ -4,14 +4,14 @@ class CanvasControlBase {
         this.animate = animate;
         this.frame_interval = frame_interval;
         this.animation = null;
-        this.selected_tool = "move";
+        this.tool_status = { tool: "move", status: "idle", can_select_elements: new Set([]), create_element: null };
         this.grabbing_canvas = false;
         this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
         this.size = 1;
         this.mouse_x = 0;
         this.mouse_y = 0;
-        this.can_select_elements = new Set();
-        this.selected_element = { selected: [], hovered: -1 };
+        this.selected_elements = { selected: [], hovered: -1 };
+        this.preview_elements = {};
     }
 
     setup_listeners() {
@@ -25,7 +25,7 @@ class CanvasControlBase {
     mouse_to_canvas(x, y) {
         const rect = canvas.getBoundingClientRect();
         const canvas_point = vec_scale(vec_add(c.origin, vec_sub([x, -y], [rect.left, -rect.top])), 1 / c.size);
-        return canvas_point.map(val => Math.round(val));
+        return canvas_point;
     }
 
     handle_wheel(e) {
@@ -38,11 +38,11 @@ class CanvasControlBase {
     }
 
     handle_mousedown(e) {
-        this.handle_tool_mousedown(e);
+        this.handle_tool_use(e);
     }
 
-    handle_tool_mousedown(e) {
-        switch (this.selected_tool) {
+    handle_tool_use(e) {
+        switch (this.tool_status.tool) {
             case "move":
                 if (e.which === 1 || e.which === 2) {
                     this.grabbing_canvas = true;
@@ -61,7 +61,7 @@ class CanvasControlBase {
 
     handle_mousemove(e) {
         this.hover_item_from_canvas(e);
-        this.use_tool(e);
+        this.tool_preview(e);
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
@@ -81,7 +81,7 @@ class CanvasControlBase {
         // Implement by subclasses.
     }
 
-    use_tool(e) {
+    tool_preview(e) {
         // Implement by subclasses.
     }
 
