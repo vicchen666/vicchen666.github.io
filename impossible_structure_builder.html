@@ -4,6 +4,7 @@
 <head>
     <title>Impossible Structure Builder</title>
     <link rel="icon" type="image/svg+xml" href="images/favicons/impossible_structure_builder.svg" />
+    <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/impossible_structure_builder/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="scripts/vectors.js" defer></script>
@@ -13,86 +14,77 @@
 </head>
 
 <body>
-    <svg width="0" height="0">
-        <filter id="filter-hover">
-            <feColorMatrix values=" 0.5 0   0   0 0
-                                    0   0.5 0   0 0
-                                    0   0   0.5 0 0
-                                    0   0   0   1 0"/>
-        </filter>
-    </svg>
-
     <div id="main-banner">
-        <a href="index.html">
-            <img id="button-home" class="icon-button" src="images/svg_icons/home.svg" title="Home Page">
+        <a href="index.html" id="button-home" class="icon-button" title="Home Page">
+            <img src="images/svg_icons/home.svg">
         </a>
         <div>Impossible Structure Builder</div>
         <div style="display: flex;">
-            <img id="button-download" class="icon-button" src="images/svg_icons/download.svg" title="Download project">
-            <img id="button-upload" class="icon-button" src="images/svg_icons/upload.svg" title="Upload a project file from your computer">
+            <button id="button-download" class="icon-button" title="Download project"><img src="images/svg_icons/download.svg"></button>
+            <button id="button-upload" class="icon-button" title="Upload a project file from your computer"><img src="images/svg_icons/upload.svg"></button>
             <input id="input-upload" class="invisible" type="file" accept=".json">
         </div>
     </div>
 
     <div id="toolbar">
         <div class="toolbar-item">
-            <div class="tool-button selected" data-tool="move">
+            <button class="tool-button selected" data-tool="move">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
-            </div>
+            </button>
             <div class="tool-submenu invisible">
-                <div class="tool-submenu-button" data-tool="move" title="Click and drag to move the canvas">
+                <button class="tool-submenu-button" data-tool="move" title="Click and drag to move the canvas">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
                     <div>Move</div>
-                </div>
+                </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <div class="tool-button" data-tool="add-vertex-click">
+            <button class="tool-button" data-tool="add-vertex-click">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
-            </div>
+            </button>
             <div class="tool-submenu invisible">
-                <div class="tool-submenu-button" data-tool="add-vertex-click" title="Click to add a vertex">
+                <button class="tool-submenu-button" data-tool="add-vertex-click" title="Click to add a vertex">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
                     <div>Add Vertex</div>
-                </div>
-                <div class="tool-submenu-button" data-tool="add-vertex-coordinates" title="Click to add a vertex at a specific location">
+                </button>
+                <button class="tool-submenu-button" data-tool="add-vertex-coordinates" title="Click to add a vertex at a specific location">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_coordinates.svg">
                     <div>Add Vertex at Coordinates</div>
-                </div>
+                </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <div class="tool-button" data-tool="extend-beam-vertex">
+            <button class="tool-button" data-tool="extend-beam-vertex">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
-            </div>
+            </button>
             <div class="tool-submenu invisible">
-                <div class="tool-submenu-button" data-tool="extend-beam-vertex" title="Select a vertex and click to extend the beam">
+                <button class="tool-submenu-button" data-tool="extend-beam-vertex" title="Select a vertex and click to extend the beam">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
                     <div>Extend Beam with New Vertex</div>
-                </div>
-                <div class="tool-submenu-button" data-tool="extend-beam-length" title="Select a vertex and enter a length to extend the beam">
+                </button>
+                <button class="tool-submenu-button" data-tool="extend-beam-length" title="Select a vertex and enter a length to extend the beam">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_length.svg">
                     <div>Extend Beam with Length</div>
-                </div>
+                </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <div class="tool-button" data-tool="connect-vertex-along-axes">
+            <button class="tool-button" data-tool="connect-vertex-along-axes">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_along_axes.svg">
-            </div>
+            </button>
             <div class="tool-submenu invisible">
-                <div class="tool-submenu-button" data-tool="connect-vertex-along-axes" title="Select two vertices and axes to connect them">
+                <button class="tool-submenu-button" data-tool="connect-vertex-along-axes" title="Select two vertices and axes to connect them">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_along_axes.svg">
                     <div>Connect Vertex Along Axes</div>
-                </div>
-                <div class="tool-submenu-button" data-tool="connect-vertex-beam" title="Select a vertex, axis, and beam to connect them">
+                </button>
+                <button class="tool-submenu-button" data-tool="connect-vertex-beam" title="Select a vertex, axis, and beam to connect them">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_beam.svg">
                     <div>Connect Vertex to Beam</div>
-                </div>
-                <div class="tool-submenu-button" data-tool="beam-intersection" title="Select two beams to create an intersection">
+                </button>
+                <button class="tool-submenu-button" data-tool="beam-intersection" title="Select two beams to create an intersection">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/beam_intersection.svg">
                     <div>Beam Intersection</div>
-                </div>
+                </button>
             </div>
         </div>
     </div>

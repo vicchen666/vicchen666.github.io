@@ -248,7 +248,7 @@ const ctx = canvas.getContext("2d");
                 ctx.fillStyle = "lime";
                 draw_optical_elements(element_index, true);
             }
-            element_index = optical_elements.findIndex(e => e.id === selected_elements.selected);
+            element_index = optical_elements.findIndex(e => e.id === selected_elements.selected[0]);
             if (element_index !== -1) {
                 ctx.strokeStyle = "limegreen";
                 ctx.fillStyle = "limegreen";
@@ -261,7 +261,7 @@ const ctx = canvas.getContext("2d");
                 ctx.fillStyle = "lime";
                 draw_light_sources(element_index, true);
             }
-            element_index = light_sources.findIndex(e => e.id === selected_elements.selected);
+            element_index = light_sources.findIndex(e => e.id === selected_elements.selected[0]);
             if (element_index !== -1) {
                 ctx.strokeStyle = "limegreen";
                 ctx.fillStyle = "limegreen";

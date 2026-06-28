@@ -1,41 +1,8 @@
 body {
-    height: 100vh;
-    font-size: 20px;
-    color: white;
-    background-color: rgb(15, 23, 42);
-    display: flex;
-    margin: 0;
-    user-select: none;
-    font-family: Arial, Helvetica, sans-serif;
+    flex-direction: row;
 }
-button {
-    color: white;
-    cursor: pointer;
-    background-color: rgb(23, 47, 92);
-    line-height: 1.5;
-    border-radius: 3px;
-    border: 1px solid darkgray;
-    font-size: 30px;
-    padding: 7px 15px;
-    margin: 15px;
-    &:hover {
-        background-color: rgb(36, 58, 99);
-    }
-}
-img {
-    display: block;
-}
-.icon-button {
-    height: 70px;
-    cursor: pointer;
-    margin-left: 10px;
-    margin-right: 10px;
-    &:hover {
-        filter: url(/calculators.html#filter-hover);
-    }
-}
-.invisible {
-    display: none;
+input {
+    background-color: #0e415b;
 }
 
 /* main */
@@ -50,9 +17,9 @@ img {
     display: flex;
     justify-content: space-between;
 }
-#main-sidebar > :nth-child(2) > div {
-    cursor: pointer;
-    color: #ffffff;
+#main-sidebar > :nth-child(2) > button {
+    width: stretch;
+    text-align: left;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
@@ -90,6 +57,9 @@ img {
 }
 
 /* loot luck */
+#loot-luck > section button {
+    font-size: 30px;
+}
 #loot-luck > section > div {
     display: flex;
     font-size: 30px;
@@ -117,12 +87,11 @@ img {
 }
 
 /* misc */
-#button-toggle-sidebar, #button-home {
-    height: 70px;
-    cursor: pointer;
+#button-hide-sidebar, #button-home {
     margin-left: 10px;
     margin-right: 10px;
-    &:hover {
-        filter: url(/calculators.html#filter-hover);
-    }
+}
+#button-show-sidebar {
+    position: absolute;
+    left: 10px;
 }

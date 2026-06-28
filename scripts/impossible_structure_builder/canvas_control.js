@@ -99,6 +99,11 @@ const ctx = canvas.getContext("2d");
                         "-2": vec_scale(vec_unit(this.axes[1]), -1),
                         "-3": vec_scale(vec_unit(this.axes[2]), -1),
                     };
+                    Object.keys(unit_axes).forEach(key => {
+                        if (axis.vertex.beams.has(Number(key))) {
+                            delete unit_axes[key];
+                        }
+                    });
                     const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, vec_dot(axis_vec, vec_sub(canvas_point, vertex_position))]));
                     const nearest_axis = Number(Object.entries(dot_prods)
                         .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity })
@@ -145,7 +150,10 @@ const ctx = canvas.getContext("2d");
                     this.preview_elements.beams.push(new Beam([vertex, new_vertex], Math.abs(Number(nearest_axis.key)), true));
                     this.render_frame();
                     break;
-                }            
+                }
+                case "axes_intersection":
+                    
+                    break;
             }
         }
 
@@ -271,12 +279,15 @@ const ctx = canvas.getContext("2d");
                             if (this.selected_elements.hovered === -1) return;
                             if (this.vertices[this.selected_elements.hovered].beams.size === 6) return;
                             if (this.selected_elements.selected.includes(this.selected_elements.hovered)) return;
+                            // return if axis 1 doesn't intersect with all the axis of vertex 2
                             this.selected_elements.hovered = -1;
 
                             this.tool_status.status = "select_axis_2";
                             this.tool_status.can_select_elements = new Set();
-                            this.tool_status.create_element = "axis";
+                            this.tool_status.create_element = "axes_intersection";
                             this.render_frame();
+                            break;
+                        case "select_axis_2":
                             break;
                     }
                     break;

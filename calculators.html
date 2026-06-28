@@ -4,6 +4,7 @@
 <head>
     <title>Calculators</title>
     <link rel="icon" type="image/x-icon" href="images/favicons/calculators.ico" />
+    <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/calculators/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="scripts/calculators/main.js" defer></script>
@@ -11,25 +12,21 @@
 </head>
 
 <body>
-    <svg width="0" height="0">
-        <filter id="filter-hover">
-            <feColorMatrix values=" 0.5 0   0   0 0
-                                    0   0.5 0   0 0
-                                    0   0   0.5 0 0
-                                    0   0   0   1 0"/>
-        </filter>
-    </svg>
-
+    <button id="button-show-sidebar" class="icon-button invisible" title="Show sidebar">
+        <img src="images/svg_icons/3_lines.svg">
+    </button>
     <div id="main-sidebar">
         <div>
-            <img id="button-toggle-sidebar" class="icon-button" src="images/svg_icons/3_lines.svg">
-            <a href="index.html">
-                <img id="button-home" class="icon-button" src="images/svg_icons/home.svg">
+            <button id="button-hide-sidebar" class="icon-button" title="Hide sidebar">
+                <img src="images/svg_icons/3_lines.svg">
+            </button>
+            <a href="index.html" id="button-home" class="icon-button" title="Home Page">
+                <img src="images/svg_icons/home.svg">
             </a>
         </div>
         <div>
-            <div id="button-calculators-main">List</div>
-            <div id="button-calculators-loot-luck">Loot Luck</div>
+            <button id="button-calculators-main">List</button>
+            <button id="button-calculators-loot-luck">Loot Luck</button>
         </div>
     </div>
     <div id="main-container">
@@ -60,7 +57,7 @@
                     </div>
                     <div>
                         <div>
-                            <button id="input-loot-luck-calculate">Calculate</button>
+                            <button id="input-loot-luck-calculate" class="text-button">Calculate</button>
                             <div></div>
                         </div>
                         <div>Percentile Rank: </div>

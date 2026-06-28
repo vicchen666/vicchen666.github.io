@@ -4,46 +4,42 @@
 <head>
     <title>My Home Page</title>
     <link rel="icon" type="image/x-icon" href="images/favicons/main_page.ico" />
+    <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/home_page/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="scripts/home_page/main.js" defer></script>
 </head>
 
 <body>
-    <svg width="0" height="0">
-        <filter id="filter-hover">
-            <feColorMatrix values=" 0.5 0   0   0 0
-                                    0   0.5 0   0 0
-                                    0   0   0.5 0 0
-                                    0   0   0   1 0"/>
-        </filter>
-    </svg>
-
     <div id="main-banner">My Home Page</div>
 
     <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
         <div id="home">
-            <button id="button-projects">My Projects</button>
-            <button id="button-about">About Me</button>
-            <a class="a-button" href="https://github.com/vicchen666/vicchen666.github.io" target="_blank">GitHub</a>
+            <button id="button-projects" class="text-button">My Projects</button>
+            <button id="button-about" class="text-button">About Me</button>
+            <a class="a-button text-button" href="https://github.com/vicchen666/vicchen666.github.io" target="_blank">GitHub</a>
         </div>
 
         <div id="projects" class="invisible">
-            <img src="images/svg_icons/arrow_left.svg" class="back-to-home icon-button">
+            <button class="back-to-home icon-button">
+                <img src="images/svg_icons/arrow_left.svg">
+            </button>
             <div>
-                <a class="a-button" href="skyblock_tools.html">Skyblock Tools</a>
+                <a class="a-button text-button" href="skyblock_tools.html">Skyblock Tools</a>
                 <div>Just some skyblock tools</div>
-                <a class="a-button" href="calculators.html">Calculators</a>
+                <a class="a-button text-button" href="calculators.html">Calculators</a>
                 <div>Calculate everything you want</div>
-                <a class="a-button" href="lenses_and_mirrors.html">Lenses and Mirrors</a>
+                <a class="a-button text-button" href="lenses_and_mirrors.html">Lenses and Mirrors</a>
                 <div>Simulate light rays interacting with optical elements</div>
-                <a class="a-button" href="impossible_structure_builder.html">Impossible Structure Builder (WIP)</a>
+                <a class="a-button text-button" href="impossible_structure_builder.html">Impossible Structure Builder (WIP)</a>
                 <div>Build impossible structures from vertices and beams</div>
             </div>
         </div>
 
         <div id="about" class="invisible" style="font-size: 30px;">
-            <img src="images/svg_icons/arrow_left.svg" class="back-to-home icon-button">
+            <button class="back-to-home icon-button">
+                <img src="images/svg_icons/arrow_left.svg">
+            </button>
             <span>
                 A player addicted to Hypixel SkyBlock.<br>
                 But I also like to play modded Minecraft, Terraria, Stonehearth.<br>

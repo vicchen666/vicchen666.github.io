@@ -4,6 +4,7 @@
 <head>
     <title>Lenses and Mirrors</title>
     <link rel="icon" type="image/svg+xml" href="images/favicons/lenses_and_mirrors.svg" />
+    <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/lenses_and_mirrors/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="scripts/vectors.js" defer></script>
@@ -13,23 +14,14 @@
 </head>
 
 <body>
-    <svg width="0" height="0">
-        <filter id="filter-hover">
-            <feColorMatrix values=" 0.5 0   0   0 0
-                                    0   0.5 0   0 0
-                                    0   0   0.5 0 0
-                                    0   0   0   1 0"/>
-        </filter>
-    </svg>
-
     <div id="main-banner">
-        <a href="index.html">
-            <img id="button-home" class="icon-button" src="images/svg_icons/home.svg" title="Home Page">
+        <a href="index.html" id="button-home" class="icon-button" title="Home Page">
+            <img src="images/svg_icons/home.svg">
         </a>
         <div>Lenses and Mirrors</div>
         <div style="display: flex;">
-            <img id="button-download" class="icon-button" src="images/svg_icons/download.svg" title="Download project">
-            <img id="button-upload" class="icon-button" src="images/svg_icons/upload.svg" title="Upload a project file from your computer">
+            <button id="button-download" class="icon-button" title="Download project"><img src="images/svg_icons/download.svg"></button>
+            <button id="button-upload" class="icon-button" title="Upload a project file from your computer"><img src="images/svg_icons/upload.svg"></button>
             <input id="input-upload" class="invisible" type="file" accept=".json">
         </div>
     </div>
@@ -37,22 +29,22 @@
     <div style="flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-sidebar">
             <div style="display: flex;">
-                <div class="tab clickable" style="border-width: 0 1px 1px 0;">
+                <button class="tab clickable" style="border-width: 0 1px 1px 0;">
                     <img src="images/svg_icons/plus.svg" style="height: 30px;">
-                </div>
-                <div class="tab">
+                </button>
+                <button class="tab">
                     <img src="images/svg_icons/3_lines.svg" style="height: 40px;">
-                </div>
+                </button>
             </div>
             <div id="element-add" class="invisible scrollbar">
-                <div data-type="optical_elements">Convex Lens</div>
-                <div data-type="optical_elements">Concave Lens</div>
-                <div data-type="optical_elements">Convex Mirror</div>
-                <div data-type="optical_elements">Concave Mirror</div>
-                <div data-type="optical_elements">Flat Mirror</div>
-                <div data-type="optical_elements">Barrier</div>
-                <div data-type="light_sources">Point Source</div>
-                <div data-type="light_sources">Parallel Source</div>
+                <button data-type="optical_elements">Convex Lens</button>
+                <button data-type="optical_elements">Concave Lens</button>
+                <button data-type="optical_elements">Convex Mirror</button>
+                <button data-type="optical_elements">Concave Mirror</button>
+                <button data-type="optical_elements">Flat Mirror</button>
+                <button data-type="optical_elements">Barrier</button>
+                <button data-type="light_sources">Point Source</button>
+                <button data-type="light_sources">Parallel Source</button>
             </div>
             <div id="element-list" class="scrollbar"></div>
         </div>
@@ -62,7 +54,7 @@
         </div>
 
         <div id="general-settings-frame">
-            <img id="general-settings-icon" src="images/svg_icons/gear.svg">
+            <button id="general-settings-icon" class="icon-button"><img src="images/svg_icons/gear.svg"></button>
             <div id="general-settings" class="invisible">
                 <div style="font-size: 30px;">General Settings</div>
                 <div>

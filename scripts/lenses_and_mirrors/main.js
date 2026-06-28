@@ -24,7 +24,7 @@
         }
     });
 
-    $("#element-add > div").on("click", function() {
+    $("#element-add > button").on("click", function() {
         const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
         switch($(this).index()) {
             case 1:
@@ -55,12 +55,12 @@
                 break;
         }
 
-        $("#element-list").append($("<div>").data("id", c.element_id++).text(`New ${$(this).text()}`));
+        $("#element-list").append($("<button>").data("id", c.element_id++).text(`New ${$(this).text()}`));
         c.add_element($(this).data("type"), element);
         c.update_light_path();
     });
 
-    $("#element-list").on("click", "> div", function() {
+    $("#element-list").on("click", "> button", function() {
         const elementId = +$(this).data("id");
         const selectedId = c.selected_elements.selected[0];
         if (elementId === selectedId) {
@@ -79,9 +79,9 @@
                 reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === elementId));
             }
         }
-    }).on("mouseenter", "> div", function () {
+    }).on("mouseenter", "> button", function () {
         c.selected_elements.hovered = +$(this).data("id");
-    }).on("mouseleave", "> div", function() {
+    }).on("mouseleave", "> button", function() {
         c.selected_elements.hovered = -1;
     });
 
@@ -157,8 +157,8 @@
             }
         }
         settings.append($("<div>").css("display", "flex")
-        .append($("<button>").attr({"id": "element-center", "title": "Click to center the element"}).text("Center"))
-        .append($("<button>").attr({"id": "element-delete", "title": "Click to delete (or press Delete key)"}).text("Delete")));
+        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Click to center the element"}).text("Center"))
+        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Click to delete (or press Delete key)"}).text("Delete")));
         $("#element-settings").removeClass("invisible");
         move_general_settings_icon("visible");
     }
@@ -205,7 +205,7 @@
             case "name":
                 if($(this).val()) {
                     c[type][index].name = $(this).val();
-                    $("#element-list > div").filter(function() {return $(this).data("id") === c[type][index].id}).text($(this).val());
+                    $("#element-list > button").filter(function() {return $(this).data("id") === c[type][index].id}).text($(this).val());
                 }
                 break;
             case "x":
@@ -270,12 +270,12 @@
         selectedIds.slice().forEach(id => {
             let index = c.optical_elements.findIndex(e => e.id === id);
             if (index !== -1) {
-                $("#element-list > div").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
+                $("#element-list > button").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
                 c.remove_element("optical_elements", index);
             } else {
                 index = c.light_sources.findIndex(e => e.id === id);
                 if (index !== -1) {
-                    $("#element-list > div").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
+                    $("#element-list > button").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
                     c.remove_element("light_sources", index);
                 }
             }
@@ -405,12 +405,12 @@
                 data.elements.optical_elements.forEach(e => {
                     c.add_element("optical_elements", e);
                     c.optical_elements[c.optical_elements.length - 1].id = id;
-                    $("#element-list").append($("<div>").data("id", id++).text(e.name));
+                    $("#element-list").append($("<button>").data("id", id++).text(e.name));
                 });
                 data.elements.light_sources.forEach(e => {
                     c.add_element("light_sources", e);
                     c.light_sources[c.light_sources.length - 1].id = id;
-                    $("#element-list").append($("<div>").data("id", id++).text(e.name));
+                    $("#element-list").append($("<button>").data("id", id++).text(e.name));
                 });
                 c.element_id = id;
                 c.set_canvas();

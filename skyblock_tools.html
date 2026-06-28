@@ -4,6 +4,7 @@
 <head>
     <title>Skyblock Tools</title>
     <link rel="icon" type="image/x-icon" href="images/favicons/skyblock_tools.ico" />
+    <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/skyblock_tools/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="scripts/skyblock_tools/main.js" defer></script>
@@ -11,25 +12,21 @@
 </head>
 
 <body>
-    <svg width="0" height="0">
-        <filter id="filter-hover">
-            <feColorMatrix values=" 0.5 0   0   0 0
-                                    0   0.5 0   0 0
-                                    0   0   0.5 0 0
-                                    0   0   0   1 0"/>
-        </filter>
-    </svg>
-
+    <button id="button-show-sidebar" class="icon-button invisible" title="Show sidebar">
+        <img src="images/svg_icons/3_lines.svg">
+    </button>
     <div id="main-sidebar">
-        <div style="display: flex;">
-            <img id="button-toggle-sidebar" class="icon-button" src="images/svg_icons/3_lines.svg">
-            <a href="index.html">
-                <img id="button-home" class="icon-button" src="images/svg_icons/home.svg">
+        <div>
+            <button id="button-hide-sidebar" class="icon-button" title="Hide sidebar">
+                <img src="images/svg_icons/3_lines.svg">
+            </button>
+            <a href="index.html" id="button-home" class="icon-button" title="Home Page">
+                <img src="images/svg_icons/home.svg">
             </a>
         </div>
         <div>
-            <div id="button-skyblock-tools-main">List</div>
-            <div id="button-skyblock-tools-fossil-finder">Fossil Solver</div>
+            <button id="button-skyblock-tools-main">List</button>
+            <button id="button-skyblock-tools-fossil-finder">Fossil Solver</button>
         </div>
     </div>
     <div id="main-container">
@@ -56,7 +53,7 @@
                     <div class="ui-header">Fossil Excavator</div>
                 </div>
                 <div id="fossil-finder-selection" class="ui ui-chest invisible" style="position: absolute;"></div>
-                <button id="fossil-finder-reset" onclick="fossil_finder_reset()">Reset</button>
+                <button id="fossil-finder-reset" class="text-button" onclick="fossil_finder_reset()">Reset</button>
                 <div style="display: flex; float: right;">
                     <div style="margin: 10px;">Possible Fossils: 0</div>
                 </div>
