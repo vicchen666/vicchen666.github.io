@@ -377,7 +377,7 @@
                 const data = JSON.parse(e.target.result);
                 upload_project(data);
             } catch (err) {
-                console.log(err);
+                console.error(err);
                 message("fail", "File upload failed! Invalid JSON file.");
             }
         }
@@ -420,7 +420,7 @@
                 throw new Error("No version data");
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
             message("fail", "File upload failed! Invalid JSON structure.");
         }
     }
