@@ -6,8 +6,8 @@ const ctx = canvas.getContext("2d");
     class CanvasControl extends CanvasControlBase {
         constructor(options = {animate: false}) {
             super(options);
-            // this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]];
-            this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
+            this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]];
+            // this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
             // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
             this.axes = this.axes.map(axis => vec_scale(axis, 100));
@@ -103,7 +103,7 @@ const ctx = canvas.getContext("2d");
                         "-3": vec_scale(vec_unit(this.axes[2]), -1),
                     };
                     Object.keys(unit_axes).forEach(key => {
-                        if (vertex.beams.has(Number(key))) {
+                        if (key in vertex.beams) {
                             delete unit_axes[key];
                         }
                     });
@@ -140,7 +140,7 @@ const ctx = canvas.getContext("2d");
                         "-3": vec_scale(vec_unit(this.axes[2]), -1),
                     };
                     Object.keys(unit_axes).forEach(key => {
-                        if (vertex.beams.has(Number(key))) {
+                        if (key in vertex.beams) {
                             delete unit_axes[key];
                         }
                     });
@@ -185,7 +185,7 @@ const ctx = canvas.getContext("2d");
                         "-3": vec_scale(vec_unit(this.axes[2]), -1),
                     };
                     Object.keys(unit_axes).forEach(key => {
-                        if (vertex2.beams.has(Number(key))) {
+                        if (key in vertex2.beams) {
                             delete unit_axes[key];
                             return;
                         }
@@ -233,11 +233,14 @@ const ctx = canvas.getContext("2d");
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            Object.entries(this.beams).forEach(([id, beam]) => {
-                beam.fill();
-            });
-            Object.entries(this.vertices).forEach(([id, vertex]) => {
-                vertex.fill();
+            // render elements sorted by id
+            const combined_object = {...this.beams, ...this.vertices};
+            const sorted_keys = Object.keys(combined_object).sort((a, b) =>
+                a.localeCompare(b, undefined, { numeric: true })
+            );
+
+            sorted_keys.forEach(key => {
+                combined_object[key].fill();
             });
 
             this.draw_tools();
@@ -266,7 +269,7 @@ const ctx = canvas.getContext("2d");
                     switch (this.tool_status.status) {
                         case "select_vertex":
                             if (this.selected_elements.hovered === -1) return;
-                            if (this.vertices[this.selected_elements.hovered].beams.size === 6) return;
+                            if (Object.keys(this.vertices[this.selected_elements.hovered].beams).length === 6) return;
 
                             this.selected_elements.selected.push(this.selected_elements.hovered);
                             this.selected_elements.hovered = -1;
@@ -278,10 +281,10 @@ const ctx = canvas.getContext("2d");
                         case "select_another_vertex":
                             if (this.preview_elements.beams.length !== 1) return;
 
-                            this.preview_elements.vertices[0].preview = false;
-                            this.vertices[this.element_id++] = this.preview_elements.vertices[0];
                             this.preview_elements.beams[0].preview = false;
                             this.beams[this.element_id++] = this.preview_elements.beams[0];
+                            this.preview_elements.vertices[0].preview = false;
+                            this.vertices[this.element_id++] = this.preview_elements.vertices[0];
 
                             this.preview_elements = { vertices: [], beams: [], axes: [] };
                             this.selected_elements.selected = [];
@@ -297,7 +300,7 @@ const ctx = canvas.getContext("2d");
                     switch (this.tool_status.status) {
                         case "select_vertex":
                             if (this.selected_elements.hovered === -1) return;
-                            if (this.vertices[this.selected_elements.hovered].beams.size === 6) return;
+                            if (Object.keys(this.vertices[this.selected_elements.hovered].beams).length === 6) return;
 
                             this.selected_elements.selected.push(this.selected_elements.hovered);
                             this.selected_elements.hovered = -1;
@@ -322,7 +325,7 @@ const ctx = canvas.getContext("2d");
                     switch (this.tool_status.status) {
                         case "select_vertex":
                             if (this.selected_elements.hovered === -1) return;
-                            if (this.vertices[this.selected_elements.hovered].beams.size === 6) return;
+                            if (Object.keys(this.vertices[this.selected_elements.hovered].beams).length === 6) return;
 
                             this.selected_elements.selected.push(this.selected_elements.hovered);
                             this.selected_elements.hovered = -1;
@@ -341,7 +344,7 @@ const ctx = canvas.getContext("2d");
                             break;
                         case "select_vertex_2":
                             if (this.selected_elements.hovered === -1) return;
-                            if (this.vertices[this.selected_elements.hovered].beams.size === 6) return;
+                            if (Object.keys(this.vertices[this.selected_elements.hovered].beams).length === 6) return;
                             if (this.selected_elements.selected.includes(this.selected_elements.hovered)) return;
                             // Return if the axis of vertex 1 doesn't intersect with all the axis of vertex 2 
                             let axes = {
@@ -353,7 +356,7 @@ const ctx = canvas.getContext("2d");
                                 "-3": vec_scale(this.axes[2], -1),
                             };
                             Object.keys(axes).forEach(key => {
-                                if (this.vertices[this.selected_elements.hovered].beams.has(Number(key))) {
+                                if (key in this.vertices[this.selected_elements.hovered].beams) {
                                     delete axes[key];
                                 }
                             });
@@ -376,12 +379,12 @@ const ctx = canvas.getContext("2d");
                         case "select_axis_2":
                             if (this.preview_elements.vertices.length !== 1) return;
 
-                            this.preview_elements.vertices[0].preview = false;
-                            this.vertices[this.element_id++] = this.preview_elements.vertices[0];
                             this.preview_elements.beams[0].preview = false;
                             this.beams[this.element_id++] = this.preview_elements.beams[0];
                             this.preview_elements.beams[1].preview = false;
                             this.beams[this.element_id++] = this.preview_elements.beams[1];
+                            this.preview_elements.vertices[0].preview = false;
+                            this.vertices[this.element_id++] = this.preview_elements.vertices[0];
 
                             this.preview_elements = { vertices: [], beams: [], axes: [] };
                             this.selected_elements.selected = [];
@@ -394,6 +397,7 @@ const ctx = canvas.getContext("2d");
                     break;
             }
             this.render_frame();
+            this.handle_mousemove(e);
         }
 
         display_all_possibilities() {
@@ -611,14 +615,15 @@ const ctx = canvas.getContext("2d");
 
         constructor(position, preview=false) {
             this.position = position;
-            this.beams = new Set();
+            this.beams = {};
             this.edges = new Set();
             this.preview = preview;
         }
 
         draw_outline() {
             const add_edges_1 = () => {
-                this.beams.forEach(main_beam => {
+                Object.keys(this.beams).forEach(main_beam => {
+                    main_beam = Number(main_beam);
                     const main_axis = Math.abs(main_beam);
                     const other_axes = [1, 2, 3].filter(axis => axis !== Math.abs(main_beam));
                     if (main_beam > 0) {
@@ -642,11 +647,13 @@ const ctx = canvas.getContext("2d");
             }
 
             const remove_edges = () => {
-                this.beams.forEach(main_beam => {
+                Object.keys(this.beams).forEach(main_beam => {
+                    main_beam = Number(main_beam);
                     const main_axis = Math.abs(main_beam);
                     const other_axes = [1, 2, 3].filter(axis => axis !== main_axis);
                     if (main_beam > 0) {
-                        this.beams.forEach(secondary_beam => {
+                        Object.keys(this.beams).forEach(secondary_beam => {
+                            secondary_beam = Number(secondary_beam);
                             if (secondary_beam !== main_beam) {
                                 const secondary_axis = Math.abs(secondary_beam);
                                 const other_axis = [1, 2, 3].filter(axis => axis !== main_axis && axis !== secondary_axis)[0];
@@ -663,7 +670,8 @@ const ctx = canvas.getContext("2d");
                             }
                         });
                     } else {
-                        this.beams.forEach(secondary_beam => {
+                        Object.keys(this.beams).forEach(secondary_beam => {
+                            secondary_beam = Number(secondary_beam);
                             if (secondary_beam !== main_beam) {
                                 const secondary_axis = Math.abs(secondary_beam);
                                 const other_axis = [1, 2, 3].filter(axis => axis !== main_axis && axis !== secondary_axis)[0];
@@ -688,11 +696,13 @@ const ctx = canvas.getContext("2d");
             }
 
             const add_edges_2 = () => {
-                this.beams.forEach(main_beam => {
+                Object.keys(this.beams).forEach(main_beam => {
+                    main_beam = Number(main_beam);
                     const main_axis = Math.abs(main_beam);
                     const other_axes = [1, 2, 3].filter(axis => axis !== Math.abs(main_beam));
                     if (main_beam > 0) {
-                        this.beams.forEach(secondary_beam => {
+                        Object.keys(this.beams).forEach(secondary_beam => {
+                            secondary_beam = Number(secondary_beam);
                             if (secondary_beam > 0 && secondary_beam !== main_beam) {
                                 const secondary_axis = Math.abs(secondary_beam);
                                 const other_axis = [1, 2, 3].filter(axis => axis !== main_axis && axis !== secondary_axis)[0];
@@ -724,9 +734,9 @@ const ctx = canvas.getContext("2d");
         }
 
         fill() {
-            if (this.preview) ctx.globalAlpha = Axis.preview_alpha;
+            if (this.preview) ctx.globalAlpha = Vertex.preview_alpha;
             for (let i=0; i<3; i++) {
-                if (this.beams.has(i + 1)) continue;
+                if (String(i + 1) in this.beams) continue;
                 const main_axis = Vertex.axes[i];
                 const other_axes = Vertex.axes.filter((_, j) => j !== i);
                 ctx.fillStyle = Vertex.fill_styles[i];
@@ -807,13 +817,13 @@ const ctx = canvas.getContext("2d");
             this.direction = direction;
             this.preview = preview;
             if (vec_dot(vec_sub(this.vertices[0].position, this.vertices[1].position), Beam.axes[this.direction - 1]) < 0) this.vertices.reverse();
-            this.vertices[0].beams.add(-this.direction);
-            this.vertices[1].beams.add(this.direction);
+            this.vertices[0].beams[String(-this.direction)] = this;
+            this.vertices[1].beams[String(this.direction)] = this;
         }
 
         destroy() {
-            this.vertices[0].beams.delete(-this.direction);
-            this.vertices[1].beams.delete(this.direction);
+            delete this.vertices[0].beams[String(-this.direction)];
+            delete this.vertices[1].beams[String(this.direction)];
         }
 
         draw_outline() {
@@ -843,23 +853,57 @@ const ctx = canvas.getContext("2d");
         }
 
         fill() {
-            if (this.preview) ctx.globalAlpha = Axis.preview_alpha;
+            if (this.preview) ctx.globalAlpha = Beam.preview_alpha;
             const main_axis = Beam.axes[this.direction - 1];
             const other_axes_index = [1, 2, 3].filter(axis => axis !== this.direction);
             const other_axes = other_axes_index.map(i => Beam.axes[i - 1]);
             for (let i=0; i<2; i++) {
+                // Draw the part of the other beams of the vertices[1] that is covered by the beam
+                if (!(String(-other_axes_index[i]) in this.vertices[1].beams)) continue;
+                if (vec_len(vec_sub(this.vertices[1].position, this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position)) < vec_len(Beam.axes[other_axes_index[i] - 1])) continue;
+                const p1 = vec_sub(this.vertices[1].position, other_axes[i]);
+                const p2 = vec_sub(this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position, other_axes[1 - i]);
+                const overlapping_point = line_intersection(p1, main_axis, p2, other_axes[i]);
+                ctx.fillStyle = Beam.fill_styles[this.direction - 1];
+                ctx.save();
+                ctx.globalAlpha = this.vertices[1].beams[String(-other_axes_index[i])].preview ? Beam.preview_alpha : 1;
+                ctx.beginPath();
+                ctx.moveTo(...p1);
+                ctx.lineTo(...vec_sub(p1, other_axes[1 - i]));
+                if (vec_dot(vec_sub(overlapping_point, p2), other_axes[i]) > 0) {
+                    ctx.lineTo(...overlapping_point);
+                } else {
+                    const alt_overlapping_point = line_intersection(p1, main_axis, p2, other_axes[1 - i]);
+                    ctx.lineTo(...p2)
+                    ctx.lineTo(...alt_overlapping_point);
+                }
+                ctx.lineTo(...p1);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
+            for (let i=0; i<2; i++) {
+                // Draw the part of the beam that is not covered by the other beam
+                if (vec_len(vec_sub(this.vertices[0].position, this.vertices[1].position)) < vec_len(Beam.axes[this.direction - 1])) continue;
                 ctx.fillStyle = Beam.fill_styles[other_axes_index[i] - 1];
                 ctx.beginPath();
                 let position = this.vertices[1].position;
                 ctx.moveTo(...position);
-                position = vec_sub(position, other_axes[1 - i]);
-                ctx.lineTo(...position);
-                if (this.vertices[0].beams.has(other_axes_index[i])) {
-                    const v1_start = vec_sub(this.vertices[0].position, main_axis);
-                    const v2_start = vec_sub(v1_start, other_axes[1 - i]);
-                    const overlapping_point = line_intersection(v1_start, other_axes[i], v2_start, main_axis);
-                    ctx.lineTo(...overlapping_point);
+                if (String(other_axes_index[i]) in this.vertices[0].beams) {
+                    // If the beam is covered by the other beam of the vertices[0]
+                    const p1 = vec_sub(this.vertices[0].position, main_axis);
+                    const p2 = vec_sub(this.vertices[1].position, other_axes[1 - i]);
+                    const overlapping_point = line_intersection(p1, other_axes[i], p2, main_axis);
+                    if (vec_dot(vec_sub(overlapping_point, p2), main_axis) > 0) {
+                        ctx.lineTo(...vec_sub(position, other_axes[1 - i]));
+                        ctx.lineTo(...overlapping_point);
+                    } else {
+                        // If the overlapping point is inside the vertices[1]
+                        const alt_overlapping_point = line_intersection(p1, other_axes[i], p2, other_axes[1 - i]);
+                        ctx.lineTo(...alt_overlapping_point);
+                    }
                 } else {
+                    ctx.lineTo(...vec_sub(position, other_axes[1 - i]));
                     ctx.lineTo(...vec_sub(vec_sub(this.vertices[0].position, main_axis), other_axes[1 - i]));
                 }
                 ctx.lineTo(...vec_sub(this.vertices[0].position, main_axis));
@@ -893,7 +937,8 @@ const ctx = canvas.getContext("2d");
 
         draw() {
             if (this.direction === 0 || !this.show) return;
-            let position = this.vertex.position;
+            const vec_to_center = vec_scale(vec_add(vec_add(Vertex.axes[0], Vertex.axes[1]), Vertex.axes[2]), 0.5);
+            let position = vec_sub(this.vertex.position, vec_to_center);
             const unit_axis = this.direction > 0 ? vec_unit(Axis.axes[this.direction - 1]) : vec_scale(vec_unit(Axis.axes[-this.direction - 1]), -1);
             position = vec_add(position, vec_scale(unit_axis, 200));
 
