@@ -31,36 +31,35 @@
 
     function select_tool() {
         c.can_move_canvas = false;
+        c.default_cursor = "default";
         c.selected_elements = { selected: [], hovered: -1 };
-        c.tool_status.status = "idle";
-        c.tool_status.can_select_elements = new Set([]);
-        c.tool_status.create_element = null;
         c.preview_elements.beams.forEach(beam => beam.destroy());
         c.preview_elements = { vertices: [], beams: [], axes: [] };
         switch (c.tool_status.tool) {
             case "move":
                 c.can_move_canvas = true;
-                c.tool_status.can_select_elements.add("vertex").add("beam");
-                $("#main-canvas").css("cursor", "move");
+                c.default_cursor = "move";
+                break;
+            case "delete-vertex":
+                c.tool_status.status = "select_vertex";
+                break;
+            case "delete-beam":
+                c.tool_status.status = "select_beam";
                 break;
             case "add-vertex-click":
-                c.tool_status.create_element = "vertex";
-                $("#main-canvas").css("cursor", "pointer");
+                c.tool_status.status = "add_vertex";
                 break;
             case "extend-beam-vertex":
                 c.tool_status.status = "select_vertex";
-                c.tool_status.can_select_elements.add("vertex");
-                $("#main-canvas").css("cursor", "pointer");
                 break;
             case "extend-beam-length":
                 c.tool_status.status = "select_vertex";
-                c.tool_status.can_select_elements.add("vertex");
-                $("#main-canvas").css("cursor", "pointer");
+                break;
+            case "connect-vertices":
+                c.tool_status.status = "select_vertex";
                 break;
             case "connect-vertex-along-axes":
                 c.tool_status.status = "select_vertex";
-                c.tool_status.can_select_elements.add("vertex");
-                $("#main-canvas").css("cursor", "pointer");
                 break;
         }
         c.render_frame();

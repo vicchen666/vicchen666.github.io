@@ -4,7 +4,8 @@ class CanvasControlBase {
         this.animate = animate;
         this.frame_interval = frame_interval;
         this.animation = null;
-        this.tool_status = { tool: "move", status: "idle", can_select_elements: new Set([]), create_element: null };
+        this.default_cursor = "default";
+        this.tool_status = { tool: "move", status: "idle"};
         this.grabbing_canvas = false;
         this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
         this.size = 1;
@@ -60,8 +61,8 @@ class CanvasControlBase {
     }
 
     handle_mousemove(e) {
-        this.hover_item_from_canvas(e);
-        this.tool_preview(e);
+        canvas.style.cursor = this.default_cursor;
+        this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
@@ -81,7 +82,7 @@ class CanvasControlBase {
         // Implement by subclasses.
     }
 
-    tool_preview(e) {
+    tool_preview = {
         // Implement by subclasses.
     }
 
