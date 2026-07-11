@@ -7,7 +7,7 @@ const ctx = canvas.getContext("2d");
         constructor(options = {animate: false}) {
             super(options);
             this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]];
-            // this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
+            // this.axes = [[0, 1], [M ath.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
             // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
             this.axes = this.axes.map(axis => vec_scale(axis, 100));
@@ -62,52 +62,9 @@ const ctx = canvas.getContext("2d");
                     this.render_frame();
                 },
             },
-            "delete-vertex": {
-                "select_vertex": e => {
-                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-
-                    let nearest_id = -1;
-                    let nearest_dist = Infinity;
-
-                    Object.entries(this.vertices).forEach(([id, vertex]) => {
-                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
-                        if (dist > nearest_dist) return;
-
-                        nearest_dist = dist;
-                        nearest_id = id;
-                    });
-
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
-                        this.selected_elements.hovered = nearest_id;
-                        canvas.style.cursor = "pointer";
-                    } else {
-                        this.selected_elements.hovered = -1;
-                    }
-                    this.render_frame();
-                },
-            },
-            "delete-beam": {
+            "add-vertex-beam": {
                 "select_beam": e => {
-                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-
-                    let nearest_id = -1;
-                    let nearest_dist = Infinity;
-
-                    Object.entries(this.beams).forEach(([id, beam]) => {
-                        const dist = point_to_line_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                        if (dist > nearest_dist) return;
-
-                        nearest_dist = dist;
-                        nearest_id = id;
-                    });
-
-                    if (nearest_id !== -1 && nearest_dist < Beam.hover_dist) {
-                        this.selected_elements.hovered = nearest_id;
-                        canvas.style.cursor = "pointer";
-                    } else {
-                        this.selected_elements.hovered = -1;
-                    }
-                    this.render_frame();                    
+                    
                 },
             },
             "extend-beam-vertex": {
@@ -116,17 +73,17 @@ const ctx = canvas.getContext("2d");
 
                     let nearest_id = -1;
                     let nearest_dist = Infinity;
-
                     Object.entries(this.vertices).forEach(([id, vertex]) => {
                         const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
                         if (dist > nearest_dist) return;
                         if (Object.keys(vertex.beams).length === 6) return;
 
-                        nearest_dist = dist;
                         nearest_id = id;
+                        nearest_dist = dist;
                     });
 
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
+                    if (nearest_id !== -1) {
                         this.selected_elements.hovered = nearest_id;
                         canvas.style.cursor = "pointer";
                     } else {
@@ -174,17 +131,17 @@ const ctx = canvas.getContext("2d");
 
                     let nearest_id = -1;
                     let nearest_dist = Infinity;
-
                     Object.entries(this.vertices).forEach(([id, vertex]) => {
                         const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
                         if (dist > nearest_dist) return;
                         if (Object.keys(vertex.beams).length === 6) return;
 
-                        nearest_dist = dist;
                         nearest_id = id;
+                        nearest_dist = dist;
                     });
 
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
+                    if (nearest_id !== -1) {
                         this.selected_elements.hovered = nearest_id;
                         canvas.style.cursor = "pointer";
                     } else {
@@ -203,18 +160,17 @@ const ctx = canvas.getContext("2d");
 
                     let nearest_id = -1;
                     let nearest_dist = Infinity;
-
                     Object.entries(this.vertices).forEach(([id, vertex]) => {
                         const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
                         if (dist > nearest_dist) return;
-                        if (this.selected_elements.selected.includes(id)) return;
                         if (Object.keys(vertex.beams).length === 6) return;
 
-                        nearest_dist = dist;
                         nearest_id = id;
+                        nearest_dist = dist;
                     });
 
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
+                    if (nearest_id !== -1) {
                         this.selected_elements.hovered = nearest_id;
                         canvas.style.cursor = "pointer";
                     } else {
@@ -222,7 +178,52 @@ const ctx = canvas.getContext("2d");
                     }
                     this.render_frame();
                 },
-                "select_another_vertex": e => {
+                "select_vertex_2": e => {
+                    this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
+                    this.preview_elements.beams = [];
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    let nearest_direction = 0;
+                    Object.entries(this.vertices).forEach(([id, vertex]) => {
+                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (this.selected_elements.selected.includes(id)) return;
+                        if (Object.keys(vertex.beams).length === 6) return;
+                        const direction = Object.entries({
+                            "1": vec_unit(this.axes[0]),
+                            "2": vec_unit(this.axes[1]),
+                            "3": vec_unit(this.axes[2]),
+                            "-1": vec_scale(vec_unit(this.axes[0]), -1),
+                            "-2": vec_scale(vec_unit(this.axes[1]), -1),
+                            "-3": vec_scale(vec_unit(this.axes[2]), -1),
+                        }).filter(([key, axis_vec]) => {
+                            if (key in vertex1.beams) return false;
+                            if (String(-Number(key)) in vertex.beams) return false;
+                            return true;
+                        }).reduce((best, [key, axis_vec]) => {
+                            const dist = point_to_line_dist(vertex1.position, vertex.position, axis_vec);
+                            if (vec_dot(vec_sub(vertex.position, vertex1.position), axis_vec) < 0) return best;
+                            return dist < best.dist ? { key, dist } : best;
+                        }, { key: null, dist: Infinity });
+                        if (direction.dist > this.vertex_connect_length_threshold) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                        nearest_direction = direction.key;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        this.preview_elements.beams.push(new Beam([this.vertices[this.selected_elements.selected[0]], this.vertices[nearest_id]], Math.abs(Number(nearest_direction)), { preview: true }));
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
                 },
             },
             "connect-vertex-along-axes": {
@@ -231,17 +232,17 @@ const ctx = canvas.getContext("2d");
 
                     let nearest_id = -1;
                     let nearest_dist = Infinity;
-
                     Object.entries(this.vertices).forEach(([id, vertex]) => {
                         const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
                         if (dist > nearest_dist) return;
                         if (Object.keys(vertex.beams).length === 6) return;
 
-                        nearest_dist = dist;
                         nearest_id = id;
+                        nearest_dist = dist;
                     });
 
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
+                    if (nearest_id !== -1) {
                         this.selected_elements.hovered = nearest_id;
                         canvas.style.cursor = "pointer";
                     } else {
@@ -273,50 +274,47 @@ const ctx = canvas.getContext("2d");
                         return;
                     };
 
-                    this.preview_elements.axes.push(new Axis(vertex, Number(nearest_axis.key), true));
+                    this.preview_elements.axes.push(new Axis(vertex, Number(nearest_axis.key), { preview: true }));
                     canvas.style.cursor = "pointer";
                     this.render_frame();
                 },
                 "select_vertex_2": e => {
                     const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                    let nearest_id = -1;
-                    let nearest_dist = Infinity;
-
                     const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
                     const direction1 = this.preview_elements.axes[0].direction;
                     const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : vec_scale(this.axes[-direction1 - 1], -1);
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
                     Object.entries(this.vertices).forEach(([id, vertex]) => {
                         const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
                         if (dist > nearest_dist) return;
                         if (this.selected_elements.selected.includes(id)) return;
                         if (Object.keys(vertex.beams).length === 6) return;
                         // Return if the axis of vertex 1 doesn't intersect with all the axis of the vertex
-                        const axes = Object.fromEntries(
-                            Object.entries({
-                                "1": this.axes[0],
-                                "2": this.axes[1],
-                                "3": this.axes[2],
-                                "-1": vec_scale(this.axes[0], -1),
-                                "-2": vec_scale(this.axes[1], -1),
-                                "-3": vec_scale(this.axes[2], -1),
-                            }).filter(([key, axis]) => {
-                                if (key in vertex.beams) return false;
-                                if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
-                                const intersection = ray_intersection(vertex1.position, direction1_vec, vertex.position, axis);
-                                if (intersection === null) return false;
-                                if (vec_len(vec_sub(vertex.position, intersection)) < this.vertex_connect_length_threshold) return false;
-                                if (vec_len(vec_sub(vertex1.position, intersection)) < this.vertex_connect_length_threshold) return false;
-                                return true;
-                            })
-                        );
-                        if (Object.keys(axes).length === 0) return;
+                        if (Object.entries({
+                            "1": this.axes[0],
+                            "2": this.axes[1],
+                            "3": this.axes[2],
+                            "-1": vec_scale(this.axes[0], -1),
+                            "-2": vec_scale(this.axes[1], -1),
+                            "-3": vec_scale(this.axes[2], -1),
+                        }).filter(([key, axis]) => {
+                            if (key in vertex.beams) return false;
+                            if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
+                            const intersection = ray_intersection(vertex1.position, direction1_vec, vertex.position, axis);
+                            if (intersection === null) return false;
+                            if (vec_len(vec_sub(vertex.position, intersection)) < this.vertex_connect_length_threshold) return false;
+                            if (vec_len(vec_sub(vertex1.position, intersection)) < this.vertex_connect_length_threshold) return false;
+                            return true;
+                        }).length === 0) return;
 
-                        nearest_dist = dist;
                         nearest_id = id;
+                        nearest_dist = dist;
                     });
 
-                    if (nearest_id !== -1 && nearest_dist < Vertex.hover_dist) {
+                    if (nearest_id !== -1) {
                         this.selected_elements.hovered = nearest_id;
                         canvas.style.cursor = "pointer";
                     } else {
@@ -325,11 +323,11 @@ const ctx = canvas.getContext("2d");
                     this.render_frame();
                 },
                 "select_axis_2": e => {
-                    this.preview_elements.axes[0].show = false;
+                    this.preview_elements.axes[0].show = true;
+                    this.preview_elements.vertices = [];
                     this.preview_elements.beams[this.preview_elements.beams.length - 2]?.destroy();
                     this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
                     this.preview_elements.beams = [];
-                    this.preview_elements.vertices = [];
 
                     const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 2]];
                     const vertex2 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
@@ -359,17 +357,263 @@ const ctx = canvas.getContext("2d");
                     const nearest_axis = Object.entries(dot_prods)
                         .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
                     if (dot_prods[nearest_axis.key] < 0) {
-                        this.preview_elements.axes[0].show = true;
                         this.render_frame();
                         return;
                     };
 
+                    this.preview_elements.axes[0].show = false;
                     const new_vertex = new Vertex(ray_intersection(vertex1.position, direction1_vec, vertex2.position, unit_axes[nearest_axis.key]), { preview: true });
                     this.preview_elements.vertices.push(new_vertex);
                     this.preview_elements.beams.push(new Beam([vertex1, new_vertex], Math.abs(direction1), { preview: true }));
                     this.preview_elements.beams.push(new Beam([vertex2, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
                     canvas.style.cursor = "pointer";
                     this.render_frame();
+                },
+            },
+            "connect-vertex-beam":{
+                "select_vertex": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.vertices).forEach(([id, vertex]) => {
+                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (Object.keys(vertex.beams).length === 6) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+                "select_axis": e => {
+                    this.preview_elements.axes = [];
+
+                    const vertex = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                    const unit_axes = Object.fromEntries(
+                        Object.entries({
+                            "1": vec_unit(this.axes[0]),
+                            "2": vec_unit(this.axes[1]),
+                            "3": vec_unit(this.axes[2]),
+                            "-1": vec_scale(vec_unit(this.axes[0]), -1),
+                            "-2": vec_scale(vec_unit(this.axes[1]), -1),
+                            "-3": vec_scale(vec_unit(this.axes[2]), -1),
+                        }).filter(([key]) => !(key in vertex.beams))
+                    );
+
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+                    const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, vec_dot(axis_vec, vec_sub(canvas_point, vertex.position))]));
+                    const nearest_axis = Object.entries(dot_prods)
+                        .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
+                    if (dot_prods[nearest_axis.key] < 0) {
+                        this.render_frame();
+                        return;
+                    };
+
+                    this.preview_elements.axes.push(new Axis(vertex, Number(nearest_axis.key), { preview: true }));
+                    canvas.style.cursor = "pointer";
+                    this.render_frame();
+                },
+                "select_beam": e => {
+                    this.preview_elements.axes[0].show = true;
+                    this.preview_elements.vertices = [];
+                    this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 2]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 3]?.destroy();
+                    this.preview_elements.beams = [];
+                    if (this.selected_elements.hovered in this.beams) {
+                        this.beams[this.selected_elements.hovered].show = true;
+                        this.beams[this.selected_elements.hovered].assign_vertices();
+                    }
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                    const direction1 = this.preview_elements.axes[0].direction;
+                    const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : vec_scale(this.axes[-direction1 - 1], -1);
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (Object.values(vertex1.beams).includes(beam)) return;
+                        if (ray_seg_intersection(vertex1.position, direction1_vec, beam.vertices[0].position, beam.vertices[1].position) === null) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+                    if (nearest_id === -1) {
+                        this.selected_elements.hovered = -1;
+                        this.render_frame();
+                        return;
+                    }
+
+                    this.preview_elements.axes[0].show = false;
+                    this.selected_elements.hovered = nearest_id;
+                    this.beams[nearest_id].show = false;
+                    this.beams[nearest_id].destroy();
+                    const vertex2 = new Vertex(ray_seg_intersection(vertex1.position, direction1_vec, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                    this.preview_elements.vertices.push(vertex2);
+                    this.preview_elements.beams.push(new Beam([vertex1, vertex2], Math.abs(direction1), { preview: true }));
+                    this.preview_elements.beams.push(new Beam([vertex2, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
+                    this.preview_elements.beams.push(new Beam([vertex2, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                    canvas.style.cursor = "pointer";
+                    this.render_frame(); 
+                },
+            },
+            "beam-intersection": {
+                "select_beam": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+                "select_beam_2": e => {
+                    this.preview_elements.vertices = [];
+                    this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 2]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 3]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 4]?.destroy();
+                    this.preview_elements.beams = [];
+                    if (this.selected_elements.selected[0] in this.beams) {
+                        this.beams[this.selected_elements.selected[0]].show = true;
+                        this.beams[this.selected_elements.selected[0]].assign_vertices();
+                    }
+                    if (this.selected_elements.hovered in this.beams) {
+                        this.beams[this.selected_elements.hovered].show = true;
+                        this.beams[this.selected_elements.hovered].assign_vertices();
+                    }
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    const beam1 = this.beams[this.selected_elements.selected[0]];
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (this.selected_elements.selected.includes(id)) return;
+                        if (beam1.vertices.some(vertex => Object.values(vertex.beams).includes(beam))) return;
+                        if (seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, beam.vertices[0].position, beam.vertices[1].position) === null) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+                    if (nearest_id === -1) {
+                        this.selected_elements.hovered = -1;
+                        this.render_frame();
+                        return;
+                    }
+
+                    this.selected_elements.hovered = nearest_id;
+                    beam1.show = false;
+                    beam1.destroy();
+                    this.beams[nearest_id].show = false;
+                    this.beams[nearest_id].destroy();
+                    const vertex = new Vertex(seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                    this.preview_elements.vertices.push(vertex);
+                    this.preview_elements.beams.push(new Beam([vertex, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
+                    this.preview_elements.beams.push(new Beam([vertex, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                    this.preview_elements.beams.push(new Beam([vertex, beam1.vertices[0]], beam1.direction, { preview: true }));
+                    this.preview_elements.beams.push(new Beam([vertex, beam1.vertices[1]], beam1.direction, { preview: true }));
+                    canvas.style.cursor = "pointer";
+                    this.render_frame();
+                },
+            },
+            "delete-vertex": {
+                "select_vertex": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.vertices).forEach(([id, vertex]) => {
+                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
+                        if (dist > nearest_dist) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+            },
+            "dissolve-vertex": {
+                "select_vertex": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.vertices).forEach(([id, vertex]) => {
+                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
+                        if (dist > nearest_dist) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+            },
+            "delete-beam": {
+                "select_beam": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();                    
                 },
             },
         }
@@ -412,25 +656,7 @@ const ctx = canvas.getContext("2d");
                     this.register_preview(this.preview_elements.vertices[0]);
                     this.preview_elements.vertices = [];
                     break;
-                case "delete-vertex":
-                    if (e.which !== 1) return;
-                    if (this.selected_elements.hovered === -1) return;
-
-                    Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => 
-                    {
-                        beam.destroy();
-                        delete this.beams[beam.id];
-                    });
-                    delete this.vertices[this.selected_elements.hovered];
-                    this.selected_elements.hovered = -1;
-                    break;
-                case "delete-beam":
-                    if (e.which !== 1) return;
-                    if (this.selected_elements.hovered === -1) return;
-                    
-                    this.beams[this.selected_elements.hovered].destroy();
-                    delete this.beams[this.selected_elements.hovered];
-                    this.selected_elements.hovered = -1;
+                case "add-vertex-beam":
                     break;
                 case "extend-beam-vertex":
                     if (e.which !== 1) return;
@@ -488,6 +714,16 @@ const ctx = canvas.getContext("2d");
 
                             this.tool_status.status = "select_vertex_2";
                             break;
+                        case "select_vertex_2":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            this.register_preview(this.preview_elements.beams[0]);
+                            this.preview_elements.beams = [];
+                            this.selected_elements.hovered = -1;
+                            this.selected_elements.selected = [];
+
+                            this.tool_status.status = "select_vertex";
+                            break;
                     }
                     break;
                 case "connect-vertex-along-axes":
@@ -527,6 +763,110 @@ const ctx = canvas.getContext("2d");
                             this.tool_status.status = "select_vertex";
                             break;
                     }
+                    break;
+                case "connect-vertex-beam":
+                    if (e.which !== 1) return;
+                    switch (this.tool_status.status) {
+                        case "select_vertex":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            this.selected_elements.selected.push(this.selected_elements.hovered);
+                            this.selected_elements.hovered = -1;
+
+                            this.tool_status.status = "select_axis";
+                            break;
+                        case "select_axis":
+                            if (this.preview_elements.axes.length !== 1) return;
+
+                            this.preview_elements.axes[this.preview_elements.axes.length - 1].preview = false;
+                            this.tool_status.status = "select_beam";
+                            break;
+                        case "select_beam":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            delete this.beams[this.selected_elements.hovered];
+                            this.register_preview(this.preview_elements.beams[0]);
+                            this.register_preview(this.preview_elements.beams[1]);
+                            this.register_preview(this.preview_elements.beams[2]);
+                            this.register_preview(this.preview_elements.vertices[0]);
+                            this.preview_elements = { vertices: [], beams: [], axes: [] };
+                            this.selected_elements.hovered = -1;
+                            this.selected_elements.selected = [];
+
+                            this.tool_status.status = "select_vertex";
+                            break;
+                    }
+                    break;
+                case "beam-intersection":
+                    if (e.which !== 1) return;
+                    switch (this.tool_status.status) {
+                        case "select_beam":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            this.selected_elements.selected.push(this.selected_elements.hovered);
+                            this.selected_elements.hovered = -1;
+
+                            this.tool_status.status = "select_beam_2";
+                            break;
+                        case "select_beam_2":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            delete this.beams[this.selected_elements.selected[0]];
+                            delete this.beams[this.selected_elements.hovered];
+                            this.register_preview(this.preview_elements.beams[0]);
+                            this.register_preview(this.preview_elements.beams[1]);
+                            this.register_preview(this.preview_elements.beams[2]);
+                            this.register_preview(this.preview_elements.beams[3]);
+                            this.register_preview(this.preview_elements.vertices[0]);
+                            this.preview_elements = { vertices: [], beams: [], axes: [] };
+                            this.selected_elements.hovered = -1;
+                            this.selected_elements.selected = [];
+
+                            this.tool_status.status = "select_beam";
+                            break;
+                    }
+                    break;
+                case "delete-vertex":
+                    if (e.which !== 1) return;
+                    if (this.selected_elements.hovered === -1) return;
+
+                    Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => 
+                    {
+                        beam.destroy();
+                        delete this.beams[beam.id];
+                    });
+                    delete this.vertices[this.selected_elements.hovered];
+                    this.selected_elements.hovered = -1;
+                    break;
+                case "dissolve-vertex":
+                    if (e.which !== 1) return;
+                    if (this.selected_elements.hovered === -1) return;
+
+                    Object.entries(this.vertices[this.selected_elements.hovered].beams).forEach(([dir, beam]) => 
+                    {
+                        if (!this.beams[beam.id]) return;
+                        beam.destroy();
+                        delete this.beams[beam.id];
+                        const same_axis_beam = this.vertices[this.selected_elements.hovered].beams[String(-Number(dir))];
+                        if (same_axis_beam) {
+                            same_axis_beam.destroy();
+                            delete this.beams[same_axis_beam.id];
+                            const vertex1 = beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? beam.vertices[1] : beam.vertices[0];
+                            const vertex2 = same_axis_beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
+                            const new_beam = new Beam([vertex1, vertex2], Math.abs(Number(dir)), { id: this.element_id });
+                            this.beams[this.element_id++] = new_beam;
+                        }
+                    });
+                    delete this.vertices[this.selected_elements.hovered];
+                    this.selected_elements.hovered = -1;
+                    break;
+                case "delete-beam":
+                    if (e.which !== 1) return;
+                    if (this.selected_elements.hovered === -1) return;
+                    
+                    this.beams[this.selected_elements.hovered].destroy();
+                    delete this.beams[this.selected_elements.hovered];
+                    this.selected_elements.hovered = -1;
                     break;
             }
             this.render_frame();
@@ -700,29 +1040,6 @@ const ctx = canvas.getContext("2d");
             // vertices.forEach(vertex => vertex.draw_outline());
         }
 
-        draw_beams() {
-            let vertices = [];
-            let beams = [];
-            vertices.push(new Vertex([0, 0]));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[0], 10))));
-            vertices.push(new Vertex(vec_add(vertices[0].position, vec_scale(this.axes[1], 1.5))));
-            vertices.push(new Vertex(vec_add(vertices[2].position, vec_scale(this.axes[0], 10))));
-
-            beams.push(new Beam([vertices[1], vertices[0]], 1));
-            beams.push(new Beam([vertices[2], vertices[0]], 2));
-            beams.push(new Beam([vertices[3], vertices[2]], 1));
-            
-            ctx.lineJoin = "round";
-            ctx.lineCap = "round";
-            ctx.lineWidth = 2 / this.size;
-
-            beams.forEach(beam => beam.fill());
-            vertices.forEach(vertex => vertex.fill());
-
-            // beams.forEach(beam => beam.draw_outline());
-            // vertices.forEach(vertex => vertex.draw_outline());
-        }
-
         draw_tools() {
             Object.entries(this.beams).forEach(([id, beam]) => {
                 if (id === this.selected_elements.hovered) {
@@ -760,15 +1077,17 @@ const ctx = canvas.getContext("2d");
         static fill_styles;
         static seal_cracks_line_width;
 
-        constructor(position, { id=0, preview=false } = {}) {
+        constructor(position, { id=0, preview=false, show=true } = {}) {
             this.position = position;
             this.id = id;
             this.beams = {};
             this.edges = new Set();
             this.preview = preview;
+            this.show = show;
         }
 
         draw_outline() {
+            if (!this.show) return;
             const add_edges_1 = () => {
                 Object.keys(this.beams).forEach(main_beam => {
                     main_beam = Number(main_beam);
@@ -882,6 +1201,7 @@ const ctx = canvas.getContext("2d");
         }
 
         fill() {
+            if (!this.show) return;
             if (this.preview) ctx.globalAlpha = Vertex.preview_alpha;
             for (let i=0; i<3; i++) {
                 if (String(i + 1) in this.beams) continue;
@@ -913,6 +1233,7 @@ const ctx = canvas.getContext("2d");
         }
 
         draw_hovered() {
+            if (!this.show) return;
             ctx.fillStyle = Vertex.hovered_style;
             ctx.beginPath();
             let position = vec_sub(this.position, Vertex.axes[0]);
@@ -933,6 +1254,7 @@ const ctx = canvas.getContext("2d");
         }
 
         draw_selected() {
+            if (!this.show) return;
             ctx.fillStyle = Vertex.selected_style;
             ctx.beginPath();
             let position = vec_sub(this.position, Vertex.axes[0]);
@@ -963,12 +1285,17 @@ const ctx = canvas.getContext("2d");
         static fill_styles;
         static seal_cracks_line_width;
 
-        constructor(vertices, direction, { id=0, preview=false } = {}) {
+        constructor(vertices, direction, { id=0, preview=false, show=true } = {}) {
             this.vertices = vertices;
             this.direction = direction;
             this.id = id;
             this.preview = preview;
+            this.show = show;
             if (vec_dot(vec_sub(this.vertices[0].position, this.vertices[1].position), Beam.axes[this.direction - 1]) < 0) this.vertices.reverse();
+            this.assign_vertices();
+        }
+
+        assign_vertices() {
             this.vertices[0].beams[String(-this.direction)] = this;
             this.vertices[1].beams[String(this.direction)] = this;
         }
@@ -979,6 +1306,7 @@ const ctx = canvas.getContext("2d");
         }
 
         draw_outline() {
+            if (!this.show) return;
             const main_axis = Beam.axes[this.direction - 1];
             const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
             let starts = [];
@@ -1005,13 +1333,18 @@ const ctx = canvas.getContext("2d");
         }
 
         fill() {
+            if (!this.show) return;
             if (this.preview) ctx.globalAlpha = Beam.preview_alpha;
             const main_axis = Beam.axes[this.direction - 1];
             const other_axes_index = [1, 2, 3].filter(axis => axis !== this.direction);
             const other_axes = other_axes_index.map(i => Beam.axes[i - 1]);
             for (let i=0; i<2; i++) {
                 // Draw the part of the other beams of the vertices[1] that is covered by the beam
+                // Continue if the other beam does not exist
                 if (!(String(-other_axes_index[i]) in this.vertices[1].beams)) continue;
+                // Continue if the other beam is not shown
+                if(!this.vertices[1].beams[String(-other_axes_index[i])].show) continue;
+                // Continue if the other beam is shorter than the axis of the beam
                 if (vec_len(vec_sub(this.vertices[1].position, this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position)) < vec_len(Beam.axes[other_axes_index[i] - 1])) continue;
                 const p1 = vec_sub(this.vertices[1].position, other_axes[i]);
                 const p2 = vec_sub(this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position, other_axes[1 - i]);
@@ -1074,7 +1407,27 @@ const ctx = canvas.getContext("2d");
         }
 
         draw_hovered() {
+            if (!this.show) return;
             ctx.fillStyle = Beam.hovered_style;
+            const main_axis = Beam.axes[this.direction - 1];
+            const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
+            ctx.beginPath();
+            let position = vec_sub(vec_sub(this.vertices[0].position, main_axis), other_axes[1]);
+            ctx.moveTo(...position);
+            position = vec_sub(position, other_axes[0]);
+            ctx.lineTo(...position);
+            position = vec_add(position, other_axes[1]);
+            ctx.lineTo(...position);
+            ctx.lineTo(...vec_sub(this.vertices[1].position, other_axes[0]));
+            ctx.lineTo(...this.vertices[1].position);
+            ctx.lineTo(...vec_sub(this.vertices[1].position, other_axes[1]));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        draw_selected() {
+            if (!this.show) return;
+            ctx.fillStyle = Beam.selected_style;
             const main_axis = Beam.axes[this.direction - 1];
             const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
             ctx.beginPath();
@@ -1098,7 +1451,7 @@ const ctx = canvas.getContext("2d");
         static stroke_style;
         static line_width;
 
-        constructor(vertex, direction, preview=false, show=true) {
+        constructor(vertex, direction, { preview=false, show=true } = {}) {
             this.vertex = vertex;
             this.direction = direction;
             this.preview = preview;

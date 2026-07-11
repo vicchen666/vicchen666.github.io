@@ -32,6 +32,20 @@
     function select_tool() {
         c.can_move_canvas = false;
         c.default_cursor = "default";
+        if (c.selected_elements.hovered in c.vertices) {
+            c.vertices[c.selected_elements.hovered].show = true;
+        } else if (c.selected_elements.hovered in c.beams) {
+            c.beams[c.selected_elements.hovered].show = true;
+            c.beams[c.selected_elements.hovered].assign_vertices();
+        }
+        c.selected_elements.selected.forEach(id => {
+            if (id in c.vertices) {
+                c.vertices[id].show = true;
+            } else if (id in c.beams) {
+                c.beams[id].show = true;
+                c.beams[id].assign_vertices();
+            }
+        });
         c.selected_elements = { selected: [], hovered: -1 };
         c.preview_elements.beams.forEach(beam => beam.destroy());
         c.preview_elements = { vertices: [], beams: [], axes: [] };
@@ -40,26 +54,21 @@
                 c.can_move_canvas = true;
                 c.default_cursor = "move";
                 break;
-            case "delete-vertex":
-                c.tool_status.status = "select_vertex";
-                break;
-            case "delete-beam":
-                c.tool_status.status = "select_beam";
-                break;
             case "add-vertex-click":
                 c.tool_status.status = "add_vertex";
                 break;
             case "extend-beam-vertex":
-                c.tool_status.status = "select_vertex";
-                break;
             case "extend-beam-length":
-                c.tool_status.status = "select_vertex";
-                break;
             case "connect-vertices":
+            case "connect-vertex-along-axes":
+            case "connect-vertex-beam":
+            case "delete-vertex":
+            case "dissolve-vertex":
                 c.tool_status.status = "select_vertex";
                 break;
-            case "connect-vertex-along-axes":
-                c.tool_status.status = "select_vertex";
+            case "delete-beam":
+            case "beam-intersection":
+                c.tool_status.status = "select_beam";
                 break;
         }
         c.render_frame();
