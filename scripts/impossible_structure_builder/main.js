@@ -5,6 +5,9 @@
     //     return "";
     // });
 
+    document.addEventListener("DOMContentLoaded", () => {
+    });
+
     $("#toolbar").on("click", ".tool-button", function() {
         $(this).addClass("selected");
         $(this).parent().siblings().find(".tool-button").removeClass("selected");
@@ -32,6 +35,8 @@
     function select_tool() {
         c.can_move_canvas = false;
         c.default_cursor = "default";
+        c.preview_elements.beams.forEach(beam => beam.destroy());
+        c.preview_elements = { vertices: [], beams: [], axes: [] };
         if (c.selected_elements.hovered in c.vertices) {
             c.vertices[c.selected_elements.hovered].show = true;
         } else if (c.selected_elements.hovered in c.beams) {
@@ -47,8 +52,6 @@
             }
         });
         c.selected_elements = { selected: [], hovered: -1 };
-        c.preview_elements.beams.forEach(beam => beam.destroy());
-        c.preview_elements = { vertices: [], beams: [], axes: [] };
         switch (c.tool_status.tool) {
             case "move":
                 c.can_move_canvas = true;
@@ -66,11 +69,110 @@
             case "dissolve-vertex":
                 c.tool_status.status = "select_vertex";
                 break;
-            case "delete-beam":
+            case "add-vertex-beam":
             case "beam-intersection":
+            case "delete-beam":
                 c.tool_status.status = "select_beam";
                 break;
         }
         c.render_frame();
     }
+
+    $("#general-settings-icon").on("click", function() {
+        $("#general-settings").toggleClass("invisible");
+    });
+
+    function normalize_hex_color(value) {
+        const hex = String(value).replace("#", "").toLowerCase();
+        if (hex.length === 3) {
+            return hex.split("").map(char => char + char).join("");
+        }
+        return hex.slice(0, 6);
+    }
+
+    function build_style_with_alpha(color, alpha) {
+        const normalized_color = normalize_hex_color(color);
+        const clamped_alpha = Math.max(0, Math.min(1, +alpha));
+        const alpha_hex = Math.round(clamped_alpha * 255).toString(16).padStart(2, "0");
+        return `#${normalized_color}${alpha_hex}`;
+    }
+
+    function parse_style_with_alpha(style) {
+        const hex = String(style || "").replace("#", "").toLowerCase();
+        if (hex.length === 8) {
+            return {
+                color: `#${hex.slice(0, 6)}`,
+                alpha: parseInt(hex.slice(6), 16) / 255,
+            };
+        }
+        return {
+            color: `#${normalize_hex_color(hex)}`,
+            alpha: 1,
+        };
+    }
+
+    $(".general-settings-section-grid > input").on("change", function() {
+        if ($(this).parent().data("setting_type") === "rendering_styles") {
+            switch ($(this).data("setting")) {
+                case "background_color":
+                    canvas.style.backgroundColor = $(this).val();
+                    break;
+                case "vertex_fill_color_1":
+                    c.settings.vertex_fill_styles[0] = $(this).val();
+                    break;
+                case "vertex_fill_color_2":
+                    c.settings.vertex_fill_styles[1] = $(this).val();
+                    break;
+                case "vertex_fill_color_3":
+                    c.settings.vertex_fill_styles[2] = $(this).val();
+                    break;
+                case "beam_fill_color_1":
+                    c.settings.beam_fill_styles[0] = $(this).val();
+                    break;
+                case "beam_fill_color_2":
+                    c.settings.beam_fill_styles[1] = $(this).val();
+                    break;
+                case "beam_fill_color_3":
+                    c.settings.beam_fill_styles[2] = $(this).val();
+                    break;
+                case "hover_color": {
+                    c.settings.hovered_style = build_style_with_alpha($(this).val(), parse_style_with_alpha(c.settings.hovered_style).alpha);
+                    break;
+                }
+                case "hover_alpha": {
+                    if ($(this).val() < 0) {
+                        $(this).val(0);
+                    } else if ($(this).val() > 1) {
+                        $(this).val(1);
+                    }
+                    c.settings.hovered_style = build_style_with_alpha(parse_style_with_alpha(c.settings.hovered_style).color, $(this).val());
+                    break;
+                }
+                case "select_color":
+                    c.settings.selected_style = build_style_with_alpha($(this).val(), parse_style_with_alpha(c.settings.selected_style).alpha);
+                    break;
+                case "select_alpha":
+                    if ($(this).val() < 0) {
+                        $(this).val(0);
+                    } else if ($(this).val() > 1) {
+                        $(this).val(1);
+                    }
+                    c.settings.selected_style = build_style_with_alpha(parse_style_with_alpha(c.settings.selected_style).color, $(this).val());
+                    break;
+                case "axis_arrow_color":
+                    c.settings.axis_style = $(this).val();
+                    break;
+                case "preview_alpha":
+                    if ($(this).val() < 0) {
+                        $(this).val(0);
+                    } else if ($(this).val() > 1) {
+                        $(this).val(1);
+                    }
+                    c.settings.preview_alpha = +$(this).val();
+                    break;
+            }
+            c.sync_settings();
+            c.render_frame();
+        }
+    });
 }

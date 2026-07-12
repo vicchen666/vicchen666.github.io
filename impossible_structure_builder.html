@@ -117,7 +117,47 @@
     </div>
     <div style="flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-canvas">
-            <canvas style="width: 100%; height: 100%;"></canvas>
+            <canvas style="width: 100%; height: 100%;background-color: #0f172a"></canvas>
+        </div>
+
+        <div id="general-settings-frame">
+            <button id="general-settings-icon" class="icon-button">
+                <img src="images/svg_icons/gear.svg">
+            </button>
+            <div id="general-settings" class="invisible">
+                <div id="general-settings-title">General Settings</div>
+                <div class="general-settings-section">
+                    <div class="general-settings-section-title">Rendering Styles</div>
+                    <div class="general-settings-section-grid" data-setting_type="rendering_styles">
+                        <div>Background Color</div>
+                        <input type="color" data-setting="background_color" value="#0f172a">
+                        <div>Vertex Fill Color 1</div>
+                        <input type="color" data-setting="vertex_fill_color_1" value="#ffffff">
+                        <div>Vertex Fill Color 2</div>
+                        <input type="color" data-setting="vertex_fill_color_2" value="#808080">
+                        <div>Vertex Fill Color 3</div>
+                        <input type="color" data-setting="vertex_fill_color_3" value="000000">
+                        <div>Beam Fill Color 1</div>
+                        <input type="color" data-setting="beam_fill_color_1" value="#ffffff">
+                        <div>Beam Fill Color 2</div>
+                        <input type="color" data-setting="beam_fill_color_2" value="#808080">
+                        <div>Beam Fill Color 3</div>
+                        <input type="color" data-setting="beam_fill_color_3" value="#000000">
+                        <div>Hover Color</div>
+                        <input type="color" data-setting="hover_color" value="#add8e6">
+                        <div>Hover Alpha</div>
+                        <input type="number" min="0" max="1" step="0.1" data-setting="hover_alpha" value="0.5">
+                        <div>Select Color</div>
+                        <input type="color" data-setting="select_color" value="#ade6b5">
+                        <div>Select Alpha</div>
+                        <input type="number" min="0" max="1" step="0.1" data-setting="select_alpha" value="0.8">
+                        <div>Axis Arrow Color</div>
+                        <input type="color" data-setting="axis_arrow_color" value="#ffffff">
+                        <div>Preview Alpha</div>
+                        <input type="number" min="0" max="1" step="0.1" data-setting="preview_alpha" value="0.5">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

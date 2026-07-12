@@ -6,51 +6,34 @@ const ctx = canvas.getContext("2d");
     class CanvasControl extends CanvasControlBase {
         constructor(options = {animate: false}) {
             super(options);
-            this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]];
+
+            this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]].map(axis => vec_scale(axis, 100)),
             // this.axes = [[0, 1], [M ath.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
             // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
-            this.axes = this.axes.map(axis => vec_scale(axis, 100));
-
-            this.vertex_connect_length_threshold = 1e-5;
-            this.preview_alpha = 0.5;
-            this.axis_style = "white";
-            this.axis_width = 5;
-            this.hovered_style = "rgba(173, 216, 230, 0.5)";
-            this.selected_style = "rgba(173, 230, 181, 0.8)";
-            this.outline_style = "yellow";
-            this.vertex_fill_styles = ["white", "gray", "black"];
-            this.beams_fill_styles = ["white", "gray", "black"];
-            this.seal_cracks_line_width = 1;
-
             this.vertices = {};
             this.beams = {};
             this.preview_elements = { vertices: [], beams: [], axes: [] };
             this.element_id = 0;
 
-            Beam.axes = this.axes;
-            Beam.hover_dist = Math.max(...this.axes.map(axis => vec_len(axis)));
-            Beam.preview_alpha = this.preview_alpha;
-            Beam.hovered_style = this.hovered_style;
-            Beam.selected_style = this.selected_style;
-            Beam.outline_style = this.outline_style;
-            Beam.fill_styles = this.beams_fill_styles;
-            Vertex.axes = this.axes;
-            Vertex.hover_dist = Math.max(...this.axes.map(axis => vec_len(axis))) * 2 ** .5;
-            Vertex.preview_alpha = this.preview_alpha;
-            Vertex.hovered_style = this.hovered_style;
-            Vertex.selected_style = this.selected_style;
-            Vertex.outline_style = this.outline_style;
-            Vertex.fill_styles = this.vertex_fill_styles;
-            Axis.axes = this.axes;
-            Axis.stroke_style = this.axis_style;
-            Axis.preview_alpha = this.preview_alpha;
-            Axis.line_width = this.axis_width;
-
+            this.sync_settings();
             this.setup_listeners();
             this.set_canvas(true);
             this.draw();
         }
+
+        settings = {
+            vertex_connect_length_threshold: 1e-5,
+            preview_alpha: 0.5,
+            axis_style: "white",
+            axis_width: 5,
+            hovered_style: "#add8e680",
+            selected_style: "#ade6b5cc",
+            outline_style: "yellow",
+            vertex_fill_styles: ["white", "gray", "black"],
+            beam_fill_styles: ["white", "gray", "black"],
+            seal_cracks_line_width: 1,
+        };
 
         tool_preview = {
             "add-vertex-click": {
@@ -64,7 +47,48 @@ const ctx = canvas.getContext("2d");
             },
             "add-vertex-beam": {
                 "select_beam": e => {
-                    
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+                "add_vertex": e => {
+                    this.preview_elements.vertices = [];
+                    this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
+                    this.preview_elements.beams[this.preview_elements.beams.length - 2]?.destroy();
+                    this.preview_elements.beams = [];
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    const beam = this.beams[this.selected_elements.selected[0]];
+                    const point = point_to_seg_point(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                    let vertex;
+                    if (point === beam.vertices[0].position || point === beam.vertices[1].position) {
+                        vertex = new Vertex(vec_scale(vec_add(beam.vertices[0].position, beam.vertices[1].position), 0.5), { preview: true });
+                    } else {
+                        vertex = new Vertex(point, { preview: true });
+                    }
+
+                    this.preview_elements.vertices.push(vertex);
+                    this.preview_elements.beams.push(new Beam([beam.vertices[0], vertex], beam.direction, { preview: true }));
+                    this.preview_elements.beams.push(new Beam([beam.vertices[1], vertex], beam.direction, { preview: true }));
+                    canvas.style.cursor = "pointer";
+                    this.render_frame();
                 },
             },
             "extend-beam-vertex": {
@@ -499,10 +523,8 @@ const ctx = canvas.getContext("2d");
                     this.preview_elements.beams[this.preview_elements.beams.length - 3]?.destroy();
                     this.preview_elements.beams[this.preview_elements.beams.length - 4]?.destroy();
                     this.preview_elements.beams = [];
-                    if (this.selected_elements.selected[0] in this.beams) {
-                        this.beams[this.selected_elements.selected[0]].show = true;
-                        this.beams[this.selected_elements.selected[0]].assign_vertices();
-                    }
+                    this.beams[this.selected_elements.selected[0]].show = true;
+                    this.beams[this.selected_elements.selected[0]].assign_vertices();
                     if (this.selected_elements.hovered in this.beams) {
                         this.beams[this.selected_elements.hovered].show = true;
                         this.beams[this.selected_elements.hovered].assign_vertices();
@@ -620,9 +642,9 @@ const ctx = canvas.getContext("2d");
 
         render_frame() {
             ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, -canvas.height / this.size);
-            Beam.seal_cracks_line_width = this.seal_cracks_line_width / this.size;
-            Vertex.seal_cracks_line_width = this.seal_cracks_line_width / this.size;
-            Axis.line_width = this.axis_width / this.size;
+            Beam.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
+            Vertex.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
+            Axis.line_width = this.settings.axis_width / this.size;
 
             ctx.lineJoin = "round";
             ctx.lineCap = "round";
@@ -657,6 +679,31 @@ const ctx = canvas.getContext("2d");
                     this.preview_elements.vertices = [];
                     break;
                 case "add-vertex-beam":
+                    if (e.which !== 1) return;
+                    switch (this.tool_status.status) {
+                        case "select_beam":
+                            if (this.selected_elements.hovered === -1) return;
+
+                            this.selected_elements.selected.push(this.selected_elements.hovered);
+                            this.selected_elements.hovered = -1;
+                            this.beams[this.selected_elements.selected[0]].show = false;
+                            this.beams[this.selected_elements.selected[0]].destroy();
+
+                            this.tool_status.status = "add_vertex";
+                            break;
+                        case "add_vertex":
+                            if (this.preview_elements.vertices.length !== 1) return;
+
+                            delete this.beams[this.selected_elements.selected[0]];
+                            this.register_preview(this.preview_elements.beams[0]);
+                            this.register_preview(this.preview_elements.beams[1]);
+                            this.register_preview(this.preview_elements.vertices[0]);
+                            this.preview_elements = { vertices: [], beams: [], axes: [] };
+                            this.selected_elements.selected = [];
+
+                            this.tool_status.status = "select_beam";
+                            break;
+                    }
                     break;
                 case "extend-beam-vertex":
                     if (e.which !== 1) return;
@@ -1064,6 +1111,27 @@ const ctx = canvas.getContext("2d");
             this.preview_elements.vertices.forEach(vertex => {
                 vertex.fill();
             });
+        }
+
+        sync_settings() {
+            Beam.axes = this.axes;
+            Beam.hover_dist = Math.max(...this.axes.map(axis => vec_len(axis)));
+            Beam.preview_alpha = this.settings.preview_alpha;
+            Beam.hovered_style = this.settings.hovered_style;
+            Beam.selected_style = this.settings.selected_style;
+            Beam.outline_style = this.settings.outline_style;
+            Beam.fill_styles = this.settings.beam_fill_styles;
+            Vertex.axes = this.axes;
+            Vertex.hover_dist = Math.max(...this.axes.map(axis => vec_len(axis))) * 2 ** .5;
+            Vertex.preview_alpha = this.settings.preview_alpha;
+            Vertex.hovered_style = this.settings.hovered_style;
+            Vertex.selected_style = this.settings.selected_style;
+            Vertex.outline_style = this.settings.outline_style;
+            Vertex.fill_styles = this.settings.vertex_fill_styles;
+            Axis.axes = this.axes;
+            Axis.stroke_style = this.settings.axis_style;
+            Axis.preview_alpha = this.settings.preview_alpha;
+            Axis.line_width = this.settings.axis_width;
         }
     }
 

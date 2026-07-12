@@ -299,7 +299,7 @@
         }
     }
 
-    $(".general-settings-grid > input").on("change", function() {
+    $(".general-settings-section-grid > input").on("change", function() {
         if ($(this).parent().data("setting_type") === "ray_rendering") {
             if (+$(this).val() < 0) {
                 $(this).val(c[$(this).data("setting")]);
