@@ -13,6 +13,7 @@ const ctx = canvas.getContext("2d");
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
             this.vertices = {};
             this.beams = {};
+            this.render_order = [];
             this.preview_elements = { vertices: [], beams: [], axes: [] };
             this.element_id = 0;
 
@@ -233,7 +234,7 @@ const ctx = canvas.getContext("2d");
                             if (vec_dot(vec_sub(vertex.position, vertex1.position), axis_vec) < 0) return best;
                             return dist < best.dist ? { key, dist } : best;
                         }, { key: null, dist: Infinity });
-                        if (direction.dist > this.vertex_connect_length_threshold) return;
+                        if (direction.dist > this.settings.vertex_connect_length_threshold) return;
 
                         nearest_id = id;
                         nearest_dist = dist;
@@ -329,8 +330,8 @@ const ctx = canvas.getContext("2d");
                             if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
                             const intersection = ray_intersection(vertex1.position, direction1_vec, vertex.position, axis);
                             if (intersection === null) return false;
-                            if (vec_len(vec_sub(vertex.position, intersection)) < this.vertex_connect_length_threshold) return false;
-                            if (vec_len(vec_sub(vertex1.position, intersection)) < this.vertex_connect_length_threshold) return false;
+                            if (vec_len(vec_sub(vertex.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
+                            if (vec_len(vec_sub(vertex1.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
                             return true;
                         }).length === 0) return;
 
@@ -370,8 +371,8 @@ const ctx = canvas.getContext("2d");
                             if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
                             const intersection = ray_intersection(vertex1.position, direction1_vec, vertex2.position, axis_vec);
                             if (intersection === null) return false;
-                            if (vec_len(vec_sub(vertex2.position, intersection)) < this.vertex_connect_length_threshold) return false;
-                            if (vec_len(vec_sub(vertex1.position, intersection)) < this.vertex_connect_length_threshold) return false;
+                            if (vec_len(vec_sub(vertex2.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
+                            if (vec_len(vec_sub(vertex1.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
                             return true;
                         })
                     );
@@ -641,6 +642,7 @@ const ctx = canvas.getContext("2d");
         }
 
         render_frame() {
+            this.highlight_selected_elements();
             ctx.clearRect(...vec_scale(this.origin, 1 / this.size), canvas.width / this.size, -canvas.height / this.size);
             Beam.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
             Vertex.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
@@ -650,18 +652,12 @@ const ctx = canvas.getContext("2d");
             ctx.lineCap = "round";
             ctx.lineWidth = 2 / this.size;
 
-            // render elements sorted by id
             const combined_object = {...this.beams, ...this.vertices};
-            const sorted_keys = Object.keys(combined_object).sort((a, b) =>
-                a.localeCompare(b, undefined, { numeric: true })
-            );
-
-            sorted_keys.forEach(key => {
+            this.render_order.forEach(key => {
                 combined_object[key].fill();
             });
 
             this.draw_tools();
-            // this.draw_beams();
             // this.display_sierpinski(8);
             // this.display_all_possibilities();
             // this.display_penrose_triangle();
@@ -694,7 +690,7 @@ const ctx = canvas.getContext("2d");
                         case "add_vertex":
                             if (this.preview_elements.vertices.length !== 1) return;
 
-                            delete this.beams[this.selected_elements.selected[0]];
+                            this.remove_element(this.beams[this.selected_elements.selected[0]]);
                             this.register_preview(this.preview_elements.beams[0]);
                             this.register_preview(this.preview_elements.beams[1]);
                             this.register_preview(this.preview_elements.vertices[0]);
@@ -831,7 +827,7 @@ const ctx = canvas.getContext("2d");
                         case "select_beam":
                             if (this.selected_elements.hovered === -1) return;
 
-                            delete this.beams[this.selected_elements.hovered];
+                            this.remove_element(this.beams[this.selected_elements.hovered]);
                             this.register_preview(this.preview_elements.beams[0]);
                             this.register_preview(this.preview_elements.beams[1]);
                             this.register_preview(this.preview_elements.beams[2]);
@@ -858,8 +854,8 @@ const ctx = canvas.getContext("2d");
                         case "select_beam_2":
                             if (this.selected_elements.hovered === -1) return;
 
-                            delete this.beams[this.selected_elements.selected[0]];
-                            delete this.beams[this.selected_elements.hovered];
+                            this.remove_element(this.beams[this.selected_elements.selected[0]]);
+                            this.remove_element(this.beams[this.selected_elements.hovered]);
                             this.register_preview(this.preview_elements.beams[0]);
                             this.register_preview(this.preview_elements.beams[1]);
                             this.register_preview(this.preview_elements.beams[2]);
@@ -879,10 +875,9 @@ const ctx = canvas.getContext("2d");
 
                     Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => 
                     {
-                        beam.destroy();
-                        delete this.beams[beam.id];
+                        this.remove_element(this.beams[beam.id]);
                     });
-                    delete this.vertices[this.selected_elements.hovered];
+                    this.remove_element(this.vertices[this.selected_elements.hovered]);
                     this.selected_elements.hovered = -1;
                     break;
                 case "dissolve-vertex":
@@ -892,27 +887,23 @@ const ctx = canvas.getContext("2d");
                     Object.entries(this.vertices[this.selected_elements.hovered].beams).forEach(([dir, beam]) => 
                     {
                         if (!this.beams[beam.id]) return;
-                        beam.destroy();
-                        delete this.beams[beam.id];
+                        this.remove_element(this.beams[beam.id]);
                         const same_axis_beam = this.vertices[this.selected_elements.hovered].beams[String(-Number(dir))];
                         if (same_axis_beam) {
-                            same_axis_beam.destroy();
-                            delete this.beams[same_axis_beam.id];
+                            this.remove_element(this.beams[same_axis_beam.id]);
                             const vertex1 = beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? beam.vertices[1] : beam.vertices[0];
                             const vertex2 = same_axis_beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
-                            const new_beam = new Beam([vertex1, vertex2], Math.abs(Number(dir)), { id: this.element_id });
-                            this.beams[this.element_id++] = new_beam;
+                            this.register_preview(new Beam([vertex1, vertex2], Math.abs(Number(dir))));
                         }
                     });
-                    delete this.vertices[this.selected_elements.hovered];
+                    this.remove_element(this.vertices[this.selected_elements.hovered]);
                     this.selected_elements.hovered = -1;
                     break;
                 case "delete-beam":
                     if (e.which !== 1) return;
                     if (this.selected_elements.hovered === -1) return;
                     
-                    this.beams[this.selected_elements.hovered].destroy();
-                    delete this.beams[this.selected_elements.hovered];
+                    this.remove_element(this.beams[this.selected_elements.hovered]);
                     this.selected_elements.hovered = -1;
                     break;
             }
@@ -922,15 +913,56 @@ const ctx = canvas.getContext("2d");
 
         // Add preview element to this.vertices or this.beams
         register_preview(element) {
+            element.preview = false;
+            element.id = this.element_id;
+            this.render_order.push(this.element_id);
             if (element instanceof Vertex) {
-                element.preview = false;
-                element.id = this.element_id;
-                this.vertices[this.element_id++] = element;
+                this.vertices[this.element_id] = element;
+                const order = $("<div>").text(this.render_order.indexOf(this.element_id) + 1);
+                const button = $("<button>").data("id", this.element_id).text('Vertex');
+                $("#element-list").append($("<div>").append(order).append(button));
             } else if (element instanceof Beam) {
-                element.preview = false;
-                element.id = this.element_id;
-                this.beams[this.element_id++] = element;
+                this.beams[this.element_id] = element;
+                const order = $("<div>").text(this.render_order.indexOf(this.element_id) + 1);
+                const button = $("<button>").data("id", this.element_id).text('Beam');
+                $("#element-list").append($("<div>").append(order).append(button));
             }
+            this.element_id++;
+            this.update_element_order();
+        }
+
+        remove_element(element) {
+            this.render_order.splice(this.render_order.indexOf(element.id), 1);
+            if (element instanceof Vertex) {
+                delete this.vertices[element.id];
+            } else if (element instanceof Beam) {
+                element.destroy();
+                delete this.beams[element.id];
+            }
+            $('#element-list > div > button').filter(function () {
+                return $(this).data('id') === element.id;
+            }).parent().remove();
+            this.update_element_order();
+        }
+
+        update_element_order() {
+            $("#element-list > div").each((_, button) => {
+                const id = $(button).children("button").data("id");
+                $(button).children("div").text(this.render_order.indexOf(id) + 1);
+            })
+        }
+
+        highlight_selected_elements() {
+            $("#element-list > div > button").each((_, button) => {
+                const id = String($(button).data("id"));
+                if (id === this.selected_elements.hovered) {
+                    $(button).css("color", "lime");
+                } else if (this.selected_elements.selected.includes(id)) {
+                    $(button).css("color", "limegreen");
+                } else {
+                    $(button).css("color", "");
+                }
+            });
         }
 
         display_all_possibilities() {
@@ -1369,8 +1401,8 @@ const ctx = canvas.getContext("2d");
         }
 
         destroy() {
-            delete this.vertices[0].beams[String(-this.direction)];
-            delete this.vertices[1].beams[String(this.direction)];
+            if (this.vertices[0].beams[String(-this.direction)] === this) delete this.vertices[0].beams[String(-this.direction)];
+            if (this.vertices[1].beams[String(this.direction)] === this) delete this.vertices[1].beams[String(this.direction)];
         }
 
         draw_outline() {

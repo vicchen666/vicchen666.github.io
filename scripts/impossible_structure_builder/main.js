@@ -175,4 +175,21 @@
             c.render_frame();
         }
     });
+
+    $("#element-list").on("click", "> div > button", function() {
+        if (c.tool_status.tool === "select") {
+            c.selected_elements.selected.push(String($(this).data("id")));
+            c.selected_elements.hovered = -1;
+            c.render_frame();
+
+        }
+    }).on("mouseenter", "> div > button", function() {
+        if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+        c.selected_elements.hovered = String($(this).data("id"));
+        c.render_frame();
+    }).on("mouseleave", "> div > button", function() {
+        if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+        c.selected_elements.hovered = -1;
+        c.render_frame();
+    });
 }

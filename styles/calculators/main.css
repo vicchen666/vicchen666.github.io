@@ -2,7 +2,7 @@ body {
     flex-direction: row;
 }
 input {
-    background-color: #0e415b;
+    background-color: var(--primary-color);
 }
 
 /* main */
@@ -40,7 +40,7 @@ input {
 .editor {
     width: 800px;
     max-height: 500px;
-    background-color: #0e415b;
+    background-color: var(--primary-color);
 }
 .editor > header {
     display: flex;

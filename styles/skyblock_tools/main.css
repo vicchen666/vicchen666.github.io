@@ -4,18 +4,14 @@
 }
 body {
     font-family: minecraft;
-    background-color: #2d1606;
     flex-direction: row;
     background-image: url("../../images/crafting_table1.png");
 }
+input {
+    background-color: var(--primary-color);
+}
 button {
     font-family: minecraft;
-}
-.text-button {
-    background-color: chocolate;
-}
-input {
-    background-color: #b35919;
 }
 
 /* main */
@@ -54,7 +50,7 @@ input {
 /* editor */
 .editor {
     width: 800px;
-    background-color: #b35919;
+    background-color: var(--primary-color);
 }
 .editor > header {
     display: flex;
@@ -69,9 +65,9 @@ input {
 
 /* ui */
 .ui {
-    background-color: #C6C6C6;
+    background-color: #c6c6c6;
     border: 3px solid;
-    border-color: #DBDBDB #5B5B5B #5B5B5B #DBDBDB;
+    border-color: #dbdbdb #5b5b5b #5b5b5b #dbdbdb;
     border-radius: 4.5px;
     margin: 18px auto;
     padding: 12px;
@@ -85,7 +81,7 @@ input {
     display: block;
     font-size: 23px;
     line-height: 1.2;
-    color: #2B2D2F;
+    color: #2b2d2f;
     letter-spacing: .3px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -97,7 +93,7 @@ input {
     display: inline-block;
     background: #8b8b8b no-repeat center center / 48px 48px;
     border: 3px solid;
-    border-color: #373737 #FFF #FFF #373737;
+    border-color: #373737 #ffffff #ffffff #373737;
     width: 48px;
     height: 48px;
     font-size: 24px;
@@ -120,7 +116,7 @@ input {
 }
 .invslot-item:hover::before {
     content: "";
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: #ffffff80;
     position: absolute;
     height: 48px;
     width: 48px;
@@ -131,9 +127,6 @@ input {
     font-size: 20px;
     margin: 0;
     border: 0;
-    &:hover {
-        background-color: chocolate;
-    }
 }
 #fossil-finder-reveal {
     margin-right: 10px;

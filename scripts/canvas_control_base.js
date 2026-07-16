@@ -17,6 +17,7 @@ class CanvasControlBase {
 
     setup_listeners() {
         canvas.addEventListener("wheel", e => this.handle_wheel(e));
+        canvas.addEventListener("mouseleave", e => this.handle_mouseleave(e));
         canvas.addEventListener("mousedown", e => this.handle_mousedown(e));
         window.addEventListener("mousemove", e => this.handle_mousemove(e));
         window.addEventListener("mouseup", () => this.handle_mouseup());
@@ -36,6 +37,10 @@ class CanvasControlBase {
         this.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
         this.origin = origin;
         this.set_canvas();
+    }
+
+    handle_mouseleave(e) {
+        this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
     }
 
     handle_mousedown(e) {
@@ -61,8 +66,10 @@ class CanvasControlBase {
     }
 
     handle_mousemove(e) {
-        canvas.style.cursor = this.default_cursor;
-        this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
+        if (document.elementFromPoint(e.clientX, e.clientY) === canvas) {
+            canvas.style.cursor = this.default_cursor;
+            this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
+        }
         if (!this.grabbing_canvas) return;
         this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;

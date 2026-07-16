@@ -1,0 +1,39 @@
+.blue-dark-theme {
+    --primary-color: #233254;
+    --secondary-color: #172f5c;
+    --tertiary-color: #243a63;
+    --quaternary-color: #16294d;
+    --primary-darker-color: #0f172a;
+    --primary-bright-color: #ffffff;
+    --secondary-bright-color: #a9a9a9;
+
+    --background-color: var(--primary-darker-color);
+    --text-color: var(--primary-bright-color);
+    --button-color: var(--secondary-color);
+    --button-border-color: var(--secondary-bright-color);
+    --button-hover-color: var(--tertiary-color);
+    --banner-color: var(--primary-color);
+    --input-border-color: var(--primary-bright-color);
+    --select-border-color: var(--primary-bright-color);
+    --section-border-color: var(--secondary-bright-color);
+    --scrollbar-color: var(--primary-bright-color);
+}
+.orange-theme {
+    --primary-color: #b35919;
+    --secondary-color: #d2691e;
+    --tertiary-color: #e7823b;
+    --primary-darker-color: #2d1606;
+    --primary-bright-color: #ffffff;
+    --secondary-bright-color: #a9a9a9;
+
+    --background-color: var(--primary-darker-color);
+    --text-color: var(--primary-bright-color);
+    --button-color: var(--secondary-color);
+    --button-border-color: var(--secondary-bright-color);
+    --button-hover-color: var(--tertiary-color);
+    --banner-color: var(--primary-color);
+    --input-border-color: var(--primary-bright-color);
+    --select-border-color: var(--primary-bright-color);
+    --section-border-color: var(--secondary-bright-color);
+    --scrollbar-color: var(--primary-bright-color);
+}

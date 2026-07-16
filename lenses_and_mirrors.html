@@ -4,6 +4,7 @@
 <head>
     <title>Lenses and Mirrors</title>
     <link rel="icon" type="image/svg+xml" href="images/favicons/lenses_and_mirrors.svg" />
+    <link rel="stylesheet" href="styles/colors.css" />
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/lenses_and_mirrors/main.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
@@ -13,7 +14,7 @@
     <script src="scripts/lenses_and_mirrors/main.js" defer></script>
 </head>
 
-<body>
+<body class="blue-dark-theme">
     <div id="main-banner">
         <a href="index.html" id="button-home" class="icon-button" title="Home Page">
             <img src="images/svg_icons/home.svg">
@@ -26,7 +27,7 @@
         </div>
     </div>
 
-    <div style="flex-grow: 1; position: relative; overflow: hidden;">
+    <div style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-sidebar">
             <div style="display: flex;">
                 <button class="tab clickable" style="border-width: 0 1px 1px 0;">
@@ -55,7 +56,7 @@
 
         <div id="general-settings-frame">
             <button id="general-settings-icon" class="icon-button"><img src="images/svg_icons/gear.svg"></button>
-            <div id="general-settings" class="invisible">
+            <div id="general-settings" class="invisible scrollbar">
                 <div id="general-settings-title">General Settings</div>
                 <div class="general-settings-section">
                     <div class="general-settings-section-title">Ray Rendering</div>

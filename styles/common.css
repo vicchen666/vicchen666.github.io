@@ -1,8 +1,8 @@
 body {
     height: 100vh;
     font-size: 20px;
-    color: white;
-    background-color: rgb(15, 23, 42);
+    color: var(--text-color);
+    background-color: var(--background-color);
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -15,34 +15,34 @@ button {
     border: none;
     background-color: transparent;
     cursor: pointer;
-    color:white;
+    color: var(--text-color);
 }
 .text-button {
-    background-color: rgb(23 47 92);
+    background-color: var(--button-color);
     line-height: 1.5;
     border-radius: 3px;
-    border: 1px solid darkgray;
+    border: 1px solid var(--button-border-color);
     font-size: 40px;
     padding: 7px 15px;
     margin: 15px;
     &:hover {
-        background-color: rgb(36 58 99);
+        background-color: var(--button-hover-color);
     }
 }
 .a-button {
     text-align: center;
     text-decoration: none;
-    color: white;
+    color: var(--text-color);
 }
 input {
-    background-color: rgb(23 47 92);
-    color: white;
-    border: 1px solid white;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--input-border-color);
 }
 select {
-    background-color: rgb(23 47 92);
-    color: white;
-    border: 1px solid white;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    border: 1px solid var(--input-border-color);
     width: fit-content;
 }
 img {
