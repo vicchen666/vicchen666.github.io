@@ -4,6 +4,27 @@
         e.returnValue = "";
         return "";
     });
+
+    document.addEventListener("keydown", e => {
+        const active = document.activeElement;
+        if (active.tagName === "INPUT" || active.tagName === "TEXTAREA") {
+            return;
+        }
+        const key = e.key.toLowerCase();
+
+        switch (key) {
+            case "delete":
+            case "backspace":
+            case "d":
+                if (!c.selected_elements.selected.length) return;
+                delete_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+                break;
+            case "c":
+                if (!c.selected_elements.selected.length) return;
+                center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+                break;
+        }
+    });
     
     $(".tab").on("click", function() {
         const index = $(this).index();
@@ -25,7 +46,7 @@
     });
 
     $("#element-add > button").on("click", function() {
-        const element = {id: c.element_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
+        const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
         switch($(this).index()) {
             case 1:
                 element.focal_length = -200;
@@ -55,28 +76,28 @@
                 break;
         }
 
-        $("#element-list").append($("<button>").data("id", c.element_id++).text(`New ${$(this).text()}`));
+        $("#element-list").append($("<button>").data("id", c.next_id++).text(`New ${$(this).text()}`));
         c.add_element($(this).data("type"), element);
         c.update_light_path();
     });
 
     $("#element-list").on("click", "> button", function() {
-        const elementId = +$(this).data("id");
-        const selectedId = c.selected_elements.selected[0];
-        if (elementId === selectedId) {
+        const element_id = +$(this).data("id");
+        const selected_id = c.selected_elements.selected[0];
+        if (element_id === selected_id) {
             c.selected_elements.selected = [];
             $(this).css("color","");
             $("#element-settings").addClass("invisible");
             move_general_settings_icon("invisible");
         } else {
-            c.selected_elements.selected = [elementId];
+            c.selected_elements.selected = [element_id];
             $(this).siblings().css("color","");
             $(this).css("color","limegreen");
-            const index = c.optical_elements.findIndex(e => e.id === elementId);
+            const index = c.optical_elements.findIndex(e => e.id === element_id);
             if (index !== -1) {
                 reload_element_settings("optical_elements", index);
             } else {
-                reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === elementId));
+                reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === element_id));
             }
         }
     }).on("mouseenter", "> button", function () {
@@ -92,13 +113,13 @@
         const element = c[type][index];
         settings.text("");
         if (type === "optical_elements") {
-            settings.append($("<div>").data({"type": type, "index": index}).css("font-size", "40px").text("Optical Element"));
+            settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
             settings.append($("<select>"));
             optical_elements.forEach(e => {
                 settings.children("select").append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
             });
         } else {
-            settings.append($("<div>").data({"type": type, "index": index}).css("font-size", "40px").text("Light Source"));
+            settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
             settings.append($("<select>"));
             light_sources.forEach(e => {
                 settings.children("select").append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
@@ -157,15 +178,16 @@
             }
         }
         settings.append($("<div>").css("display", "flex")
-        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Click to center the element"}).text("Center"))
-        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Click to delete (or press Delete key)"}).text("Delete")));
+        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Click to center the element (hotkey: c)"}).text("Center"))
+        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Click to delete (hotkey: d or Delete)"}).text("Delete")));
+
         $("#element-settings").removeClass("invisible");
         move_general_settings_icon("visible");
     }
 
     $("#element-settings").on("change", "> select", function() {
-        const type = $(this).siblings().first().data("type");
-        const index = $(this).siblings().first().data("index");
+        const type = $("#element-settings-title").data("type");
+        const index = $("#element-settings-title").data("index");
         switch($(this).val()) {
             case "concave_lens":
                 c[type][index].focal_length = -Math.abs(c[type][index].focal_length);
@@ -199,8 +221,8 @@
         reload_element_settings(type, index);
         c.update_light_path();
     }).on("input", "#element-settings-grid > input", function() {
-        const type = $(this).parent().siblings().first().data("type");
-        const index = $(this).parent().siblings().first().data("index");
+        const type = $("#element-settings-title").data("type");
+        const index = $("#element-settings-title").data("index");
         switch($(this).data("setting")) {
             case "name":
                 if($(this).val()) {
@@ -245,41 +267,41 @@
         }
         c.update_light_path();
     }).on("click", "#element-center", function() {
-        const type = $(this).parent().siblings().first().data("type");
-        const index = $(this).parent().siblings().first().data("index");
+        const type = $("#element-settings-title").data("type");
+        const index = $("#element-settings-title").data("index");
+        center_element(c[type][index].id);
+    }).on("click", "#element-delete", () => {
+        const type = $("#element-settings-title").data("type");
+        const index = $("#element-settings-title").data("index");
+        delete_element(c[type][index].id);
+    });
+
+    function center_element(id) {
+        let index = c.optical_elements.findIndex(e => e.id === id);
+        let type;
+        if (index === -1) {
+            type = "light_sources";
+            index = c.light_sources.findIndex(e => e.id === id);
+        } else {
+            type = "optical_elements";
+            index = c.optical_elements.findIndex(e => e.id === id);
+        }
         c.origin = [c[type][index].position[0] * c.size - canvas.width / 2, c[type][index].position[1] * c.size + canvas.height / 2];
         c.set_canvas();
-    }).on("click", "#element-delete", () => {
-        delete_element();
-    });
+    }
 
-    document.addEventListener("keydown", e => {
-        const active = document.activeElement;
-        if (active.tagName === "INPUT" || active.tagName === "TEXTAREA") {
-            return;
-        }
-        if (e.key === "Delete") {
-            delete_element();
-        }
-    });
-
-    function delete_element() {
-        const selectedIds = c.selected_elements.selected;
-        if (!selectedIds.length) return;
-
-        selectedIds.slice().forEach(id => {
-            let index = c.optical_elements.findIndex(e => e.id === id);
+    function delete_element(id) {
+        let index = c.optical_elements.findIndex(e => e.id === id);
+        if (index !== -1) {
+            $("#element-list > button").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
+            c.remove_element("optical_elements", index);
+        } else {
+            index = c.light_sources.findIndex(e => e.id === id);
             if (index !== -1) {
-                $("#element-list > button").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
-                c.remove_element("optical_elements", index);
-            } else {
-                index = c.light_sources.findIndex(e => e.id === id);
-                if (index !== -1) {
-                    $("#element-list > button").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
-                    c.remove_element("light_sources", index);
-                }
+                $("#element-list > button").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
+                c.remove_element("light_sources", index);
             }
-        });
+        }
 
         c.selected_elements.selected = [];
         $("#element-settings").addClass("invisible");
@@ -412,7 +434,7 @@
                     c.light_sources[c.light_sources.length - 1].id = id;
                     $("#element-list").append($("<button>").data("id", id++).text(e.name));
                 });
-                c.element_id = id;
+                c.next_id = id;
                 c.set_canvas();
                 c.update_light_path();
                 message("success", "File uploaded successfully!")
@@ -440,6 +462,6 @@
                 $("#message-box").css("background-color", "crimson");
                 break;
         }
-        $("#message-box").text(text).fadeIn(500).delay(3000).fadeOut(1000);
+        $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);
     }
 }

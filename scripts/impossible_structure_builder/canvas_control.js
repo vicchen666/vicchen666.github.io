@@ -7,15 +7,16 @@ const ctx = canvas.getContext("2d");
         constructor(options = {animate: false}) {
             super(options);
 
-            this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]].map(axis => vec_scale(axis, 100)),
-            // this.axes = [[0, 1], [M ath.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
+            // this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]]
+            this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
             // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
             // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
+            this.axes = this.axes.map(axis => vec_scale(axis, 100));
             this.vertices = {};
             this.beams = {};
             this.render_order = [];
+            this.next_name = { vertex: 1, beam: 1 };
             this.preview_elements = { vertices: [], beams: [], axes: [] };
-            this.element_id = 0;
 
             this.sync_settings();
             this.setup_listeners();
@@ -37,6 +38,48 @@ const ctx = canvas.getContext("2d");
         };
 
         tool_preview = {
+            "select": {
+                "select_element": e => {
+                    const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+
+                    let nearest_id = -1;
+                    let nearest_dist = Infinity;
+                    Object.entries(this.vertices).forEach(([id, vertex]) => {
+                        const dist = vec_len(vec_sub(vertex.position, canvas_point));
+                        if (dist > Vertex.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (this.selected_elements.selected.includes(id)) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                        this.render_frame();
+                        return;
+                    }
+
+                    Object.entries(this.beams).forEach(([id, beam]) => {
+                        const dist = point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
+                        if (dist > Beam.hover_dist) return;
+                        if (dist > nearest_dist) return;
+                        if (this.selected_elements.selected.includes(id)) return;
+
+                        nearest_id = id;
+                        nearest_dist = dist;
+                    });
+
+                    if (nearest_id !== -1) {
+                        this.selected_elements.hovered = nearest_id;
+                        canvas.style.cursor = "pointer";
+                    } else {
+                        this.selected_elements.hovered = -1;
+                    }
+                    this.render_frame();
+                },
+            },
             "add-vertex-click": {
                 "add_vertex": e => {
                     this.preview_elements.vertices = [];
@@ -494,7 +537,7 @@ const ctx = canvas.getContext("2d");
                     this.render_frame(); 
                 },
             },
-            "beam-intersection": {
+            "add-beam-intersection": {
                 "select_beam": e => {
                     const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
@@ -667,6 +710,13 @@ const ctx = canvas.getContext("2d");
         handle_tool_use(e) {
             super.handle_tool_use(e);
             switch (this.tool_status.tool) {
+                case "select":
+                    if (e.which !== 1) return;
+                    if (this.selected_elements.hovered === -1) return;
+
+                    this.selected_elements.selected = [this.selected_elements.hovered];
+                    this.selected_elements.hovered = -1;
+                    break;
                 case "add-vertex-click":
                     if (e.which !== 1) return;
                     if (this.preview_elements.vertices.length !== 1) return;
@@ -840,7 +890,7 @@ const ctx = canvas.getContext("2d");
                             break;
                     }
                     break;
-                case "beam-intersection":
+                case "add-beam-intersection":
                     if (e.which !== 1) return;
                     switch (this.tool_status.status) {
                         case "select_beam":
@@ -873,8 +923,7 @@ const ctx = canvas.getContext("2d");
                     if (e.which !== 1) return;
                     if (this.selected_elements.hovered === -1) return;
 
-                    Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => 
-                    {
+                    Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => {
                         this.remove_element(this.beams[beam.id]);
                     });
                     this.remove_element(this.vertices[this.selected_elements.hovered]);
@@ -884,8 +933,7 @@ const ctx = canvas.getContext("2d");
                     if (e.which !== 1) return;
                     if (this.selected_elements.hovered === -1) return;
 
-                    Object.entries(this.vertices[this.selected_elements.hovered].beams).forEach(([dir, beam]) => 
-                    {
+                    Object.entries(this.vertices[this.selected_elements.hovered].beams).forEach(([dir, beam]) => {
                         if (!this.beams[beam.id]) return;
                         this.remove_element(this.beams[beam.id]);
                         const same_axis_beam = this.vertices[this.selected_elements.hovered].beams[String(-Number(dir))];
@@ -914,20 +962,19 @@ const ctx = canvas.getContext("2d");
         // Add preview element to this.vertices or this.beams
         register_preview(element) {
             element.preview = false;
-            element.id = this.element_id;
-            this.render_order.push(this.element_id);
+            element.id = this.next_id;
+            this.render_order.push(this.next_id);
             if (element instanceof Vertex) {
-                this.vertices[this.element_id] = element;
-                const order = $("<div>").text(this.render_order.indexOf(this.element_id) + 1);
-                const button = $("<button>").data("id", this.element_id).text('Vertex');
-                $("#element-list").append($("<div>").append(order).append(button));
+                element.name = `Vertex ${this.next_name.vertex++}`;
+                this.vertices[this.next_id] = element;
             } else if (element instanceof Beam) {
-                this.beams[this.element_id] = element;
-                const order = $("<div>").text(this.render_order.indexOf(this.element_id) + 1);
-                const button = $("<button>").data("id", this.element_id).text('Beam');
-                $("#element-list").append($("<div>").append(order).append(button));
+                element.name = `Beam ${this.next_name.beam++}`;
+                this.beams[this.next_id] = element;
             }
-            this.element_id++;
+            const order = $("<div>").text(this.render_order.indexOf(this.next_id) + 1);
+            const button = $("<button>").data("id", this.next_id).text(element.name);
+            $("#element-list").append($("<div>").append(order).append(button));
+            this.next_id++;
             this.update_element_order();
         }
 
@@ -955,12 +1002,11 @@ const ctx = canvas.getContext("2d");
         highlight_selected_elements() {
             $("#element-list > div > button").each((_, button) => {
                 const id = String($(button).data("id"));
+                button.classList.remove("hovered", "selected");
                 if (id === this.selected_elements.hovered) {
-                    $(button).css("color", "lime");
+                    $(button).addClass("hovered");
                 } else if (this.selected_elements.selected.includes(id)) {
-                    $(button).css("color", "limegreen");
-                } else {
-                    $(button).css("color", "");
+                    $(button).addClass("selected");
                 }
             });
         }
@@ -1385,7 +1431,7 @@ const ctx = canvas.getContext("2d");
         static fill_styles;
         static seal_cracks_line_width;
 
-        constructor(vertices, direction, { id=0, preview=false, show=true } = {}) {
+        constructor(vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
             this.vertices = vertices;
             this.direction = direction;
             this.id = id;
@@ -1551,7 +1597,7 @@ const ctx = canvas.getContext("2d");
         static stroke_style;
         static line_width;
 
-        constructor(vertex, direction, { preview=false, show=true } = {}) {
+        constructor(vertex, direction, { preview=false, show=true, name="" } = {}) {
             this.vertex = vertex;
             this.direction = direction;
             this.preview = preview;

@@ -11,6 +11,8 @@ class CanvasControlBase {
         this.size = 1;
         this.mouse_x = 0;
         this.mouse_y = 0;
+        this.next_id = 0;
+        this.next_name = {};
         this.selected_elements = { selected: [], hovered: -1 };
         this.preview_elements = {};
     }

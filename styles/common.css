@@ -38,6 +38,12 @@ input {
     background-color: var(--secondary-color);
     color: var(--text-color);
     border: 1px solid var(--input-border-color);
+    outline-color: var(--input-outline-color);
+}
+input[readonly] {
+    cursor: default;
+    border: 1px solid var(--input-readonly-border-color);
+    color: var(--input-readonly-text-color);
 }
 select {
     background-color: var(--secondary-color);
@@ -48,6 +54,10 @@ select {
 img {
     display: block;
 }
+.icon-button {
+    width: fit-content;
+    height: fit-content;
+}
 .icon-button > img, .icon-button > img {
     width: 70px;
     height: 70px;
@@ -57,4 +67,8 @@ img {
 }
 .invisible {
     display: none !important;
+}
+.scrollbar {
+    overflow-y: auto;
+    scrollbar-color: var(--scrollbar-color) transparent;
 }

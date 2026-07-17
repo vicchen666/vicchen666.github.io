@@ -6,6 +6,8 @@
     --primary-darker-color: #0f172a;
     --primary-bright-color: #ffffff;
     --secondary-bright-color: #a9a9a9;
+    --error-color: #ff0000;
+    --success-color: #00ff00;
 
     --background-color: var(--primary-darker-color);
     --text-color: var(--primary-bright-color);
@@ -14,6 +16,9 @@
     --button-hover-color: var(--tertiary-color);
     --banner-color: var(--primary-color);
     --input-border-color: var(--primary-bright-color);
+    --input-outline-color: var(--primary-bright-color);
+    --input-readonly-border-color: #9ca3af;
+    --input-readonly-text-color: #6b7280;
     --select-border-color: var(--primary-bright-color);
     --section-border-color: var(--secondary-bright-color);
     --scrollbar-color: var(--primary-bright-color);
@@ -25,6 +30,8 @@
     --primary-darker-color: #2d1606;
     --primary-bright-color: #ffffff;
     --secondary-bright-color: #a9a9a9;
+    --error-color: #ff0000;
+    --success-color: #00ff00;
 
     --background-color: var(--primary-darker-color);
     --text-color: var(--primary-bright-color);
@@ -33,6 +40,9 @@
     --button-hover-color: var(--tertiary-color);
     --banner-color: var(--primary-color);
     --input-border-color: var(--primary-bright-color);
+    --input-outline-color: var(--primary-bright-color);
+    --input-readonly-border-color: #9ca3af;
+    --input-readonly-text-color: #6b7280;
     --select-border-color: var(--primary-bright-color);
     --section-border-color: var(--secondary-bright-color);
     --scrollbar-color: var(--primary-bright-color);

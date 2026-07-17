@@ -6,7 +6,6 @@ const ctx = canvas.getContext("2d");
     class CanvasControl extends CanvasControlBase {
         constructor(options = {}) {
             super(options);
-            this.element_id = 0;
             this.phase = 0;
             this.fill_length = 20;
             this.sep_length = 10;

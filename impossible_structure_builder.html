@@ -21,6 +21,7 @@
         </a>
         <div>Impossible Structure Builder</div>
         <div style="display: flex;">
+            <button id="button-info" class="icon-button" title="Information"><img src="images/svg_icons/information.svg"></button>
             <button id="button-download" class="icon-button" title="Download project"><img src="images/svg_icons/download.svg"></button>
             <button id="button-upload" class="icon-button" title="Upload a project file from your computer"><img src="images/svg_icons/upload.svg"></button>
             <input id="input-upload" class="invisible" type="file" accept=".json">
@@ -29,26 +30,26 @@
 
     <div id="toolbar">
         <div class="toolbar-item">
-            <button class="tool-button selected" data-tool="move">
+            <button class="tool-button selected" data-tool="move" title="hotkey: 1">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
             </button>
             <div class="tool-submenu invisible">
-                <button class="tool-submenu-button" data-tool="move" title="Drag to move the canvas">
+                <button class="tool-submenu-button" data-tool="move" title="Drag to move the canvas or change the order of elements on the sidebar">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
                     <div>Move</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="select" title="Click on a object to select it">
+                <button class="tool-submenu-button" data-tool="select" title="Click on an element on the sidebar or canvas to select and edit it">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/select.svg">
                     <div>Select</div>
                 </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <button class="tool-button" data-tool="add-vertex-click">
+            <button class="tool-button" data-tool="add-vertex-click" title="hotkey: 2">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
             </button>
             <div class="tool-submenu invisible">
-                <button class="tool-submenu-button" data-tool="add-vertex-click" title="Click to add a vertex">
+                <button class="tool-submenu-button" data-tool="add-vertex-click" title="Click to add a vertex at the cursor">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_click.svg">
                     <div>Add Vertex</div>
                 </button>
@@ -56,52 +57,52 @@
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_coordinates.svg">
                     <div>Add Vertex at Coordinates</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="add-vertex-beam" title="Select a beam and click to add a vertex">
+                <button class="tool-submenu-button" data-tool="add-vertex-beam" title="Select a beam and add a vertex on it">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/add_vertex_beam.svg">
                     <div>Add Vertex on Beam</div>
                 </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <button class="tool-button" data-tool="extend-beam-vertex">
+            <button class="tool-button" data-tool="extend-beam-vertex" title="hotkey: 3">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
             </button>
             <div class="tool-submenu invisible">
-                <button class="tool-submenu-button" data-tool="extend-beam-vertex" title="Select a vertex and click to extend the beam">
+                <button class="tool-submenu-button" data-tool="extend-beam-vertex" title="Select a vertex and extend the beam">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_vertex.svg">
                     <div>Extend Beam with New Vertex</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="extend-beam-length" title="Select a vertex and enter a length to extend the beam">
+                <button class="tool-submenu-button" data-tool="extend-beam-length" title="Select a vertex and an axis and enter a length to extend the beam">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/extend_beam_length.svg">
                     <div>Extend Beam with Length</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="connect-vertices" title="Select two vertices to connect them with a beam">
+                <button class="tool-submenu-button" data-tool="connect-vertices" title="Select two vertices to connect them with a beam, two vertices need to be on the same axis">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertices.svg">
                     <div>Connect Vertices</div>
                 </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <button class="tool-button" data-tool="connect-vertex-along-axes">
+            <button class="tool-button" data-tool="connect-vertex-along-axes" title="hotkey: 4">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_along_axes.svg">
             </button>
             <div class="tool-submenu invisible">
-                <button class="tool-submenu-button" data-tool="connect-vertex-along-axes" title="Select two vertices and axes to connect them">
+                <button class="tool-submenu-button" data-tool="connect-vertex-along-axes" title="Select two vertices and two axes to create a vertex to connect them">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_along_axes.svg">
                     <div>Connect Vertex Along Axes</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="connect-vertex-beam" title="Select a vertex, axis, and beam to connect them">
+                <button class="tool-submenu-button" data-tool="connect-vertex-beam" title="Select a vertex, axis, and beam to create a beam to connect them">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/connect_vertex_beam.svg">
                     <div>Connect Vertex to Beam</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="beam-intersection" title="Select two beams to create an intersection">
-                    <img class="tool-icon" src="images/impossible_structure_builder_tools/beam_intersection.svg">
-                    <div>Beam Intersection</div>
+                <button class="tool-submenu-button" data-tool="add-beam-intersection" title="Select two beams to create a vertex at their intersection">
+                    <img class="tool-icon" src="images/impossible_structure_builder_tools/add_beam_intersection.svg">
+                    <div>Add Beam Intersection</div>
                 </button>
             </div>
         </div>
         <div class="toolbar-item">
-            <button class="tool-button" data-tool="delete-vertex">
+            <button class="tool-button" data-tool="delete-vertex" title="hotkey: 5">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/delete_vertex.svg">
             </button>
             <div class="tool-submenu invisible">
@@ -109,7 +110,7 @@
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/delete_vertex.svg">
                     <div>Delete Vertex</div>
                 </button>
-                <button class="tool-submenu-button" data-tool="dissolve-vertex" title="Click on a vertex to delete it. Beams on the same axis are reconnected; beams without a matching connection are deleted.">
+                <button class="tool-submenu-button" data-tool="dissolve-vertex" title="Click on a vertex to delete it. Beams on the same axis are reconnected; beams without a matching connection are deleted">
                     <img class="tool-icon" src="images/impossible_structure_builder_tools/dissolve_vertex.svg">
                     <div>Dissolve Vertex</div>
                 </button>
@@ -120,17 +121,18 @@
             </div>
         </div>
     </div>
+
     <div style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
         <div id="main-sidebar">
             <div id="element-list" class="scrollbar"></div>
         </div>
 
         <div id="main-canvas">
-            <canvas style="width: 100%; height: 100%;background-color: #0f172a"></canvas>
+            <canvas></canvas>
         </div>
 
         <div id="general-settings-frame">
-            <button id="general-settings-icon" class="icon-button">
+            <button id="general-settings-icon" class="icon-button" title="General Settings">
                 <img src="images/svg_icons/gear.svg">
             </button>
             <div id="general-settings" class="invisible scrollbar">
@@ -167,6 +169,69 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div id="element-settings" class="invisible scrollbar"></div>
+
+    </div>
+
+    <div id="message-box"></div>
+
+    <div id="info-box" class="invisible scrollbar">
+        <div id="info-box-header">
+            <div id="info-box-title">Information</div>
+            <button id="info-box-close" class="icon-button" title="Close">
+                <img src="images/svg_icons/cross.svg">
+            </button>
+        </div>
+        <div class="info-box-content">
+            <div class="info-box-content-title">Hotkeys</div>
+            <table id="info-box-hotkeys" class="info-box-content-text">
+                <thead>
+                    <tr>
+                        <th>Hotkey</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Select first tool</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Select second tool</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Select third tool</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Select fourth tool</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Select fifth tool</td>
+                    </tr>
+                    <tr>
+                        <td>c</td>
+                        <td>Center the selected element</td>
+                    </tr>
+                    <tr>
+                        <td>d, Delete</td>
+                        <td>Delete the selected element (only in select mode)</td>
+                    </tr>
+                    <tr>
+                        <td>s</td>
+                        <td>Save the current project</td>
+                    </tr>
+                    <tr>
+                        <td>o</td>
+                        <td>Open a project</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
