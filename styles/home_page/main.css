@@ -1,9 +1,9 @@
 /* main */
-#main-banner {
+#main-header {
     height: 100px;
     text-align: center;
     align-content: center;
-    background-color: var(--banner-color);
+    background-color: var(--header-color);
     border-bottom: 1px solid var(--section-border-color);
     font-size: 50px;
 }

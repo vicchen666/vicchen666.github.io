@@ -14,7 +14,7 @@
     --button-color: var(--secondary-color);
     --button-border-color: var(--secondary-bright-color);
     --button-hover-color: var(--tertiary-color);
-    --banner-color: var(--primary-color);
+    --header-color: var(--primary-color);
     --input-border-color: var(--primary-bright-color);
     --input-outline-color: var(--primary-bright-color);
     --input-readonly-border-color: #9ca3af;
@@ -38,7 +38,7 @@
     --button-color: var(--secondary-color);
     --button-border-color: var(--secondary-bright-color);
     --button-hover-color: var(--tertiary-color);
-    --banner-color: var(--primary-color);
+    --header-color: var(--primary-color);
     --input-border-color: var(--primary-bright-color);
     --input-outline-color: var(--primary-bright-color);
     --input-readonly-border-color: #9ca3af;

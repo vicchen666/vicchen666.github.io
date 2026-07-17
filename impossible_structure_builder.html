@@ -15,7 +15,7 @@
 </head>
 
 <body class="blue-dark-theme">
-    <div id="main-banner">
+    <header id="main-header">
         <a href="index.html" id="button-home" class="icon-button" title="Home Page">
             <img src="images/svg_icons/home.svg">
         </a>
@@ -26,9 +26,9 @@
             <button id="button-upload" class="icon-button" title="Upload a project file from your computer"><img src="images/svg_icons/upload.svg"></button>
             <input id="input-upload" class="invisible" type="file" accept=".json">
         </div>
-    </div>
+    </header>
 
-    <div id="toolbar">
+    <section id="toolbar">
         <div class="toolbar-item">
             <button class="tool-button selected" data-tool="move" title="hotkey: 1">
                 <img class="tool-icon" src="images/impossible_structure_builder_tools/move.svg">
@@ -120,18 +120,18 @@
                 </button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
-        <div id="main-sidebar">
+    <main style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
+        <aside id="main-sidebar">
             <div id="element-list" class="scrollbar"></div>
-        </div>
+        </aside>
 
-        <div id="main-canvas">
+        <section id="main-canvas">
             <canvas></canvas>
-        </div>
+        </section>
 
-        <div id="general-settings-frame">
+        <section id="general-settings-frame">
             <button id="general-settings-icon" class="icon-button" title="General Settings">
                 <img src="images/svg_icons/gear.svg">
             </button>
@@ -169,23 +169,22 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="element-settings" class="invisible scrollbar"></div>
+        <aside id="element-settings" class="invisible scrollbar"></aside>
+    </main>
 
-    </div>
+    <section id="message-box"></section>
 
-    <div id="message-box"></div>
-
-    <div id="info-box" class="invisible scrollbar">
-        <div id="info-box-header">
+    <dialog id="info-box" class="scrollbar" closedby="any">
+        <header id="info-box-header">
             <div id="info-box-title">Information</div>
             <button id="info-box-close" class="icon-button" title="Close">
                 <img src="images/svg_icons/cross.svg">
             </button>
-        </div>
-        <div class="info-box-content">
-            <div class="info-box-content-title">Hotkeys</div>
+        </header>
+        <section class="info-box-content">
+            <header class="info-box-content-title">Hotkeys</header>
             <table id="info-box-hotkeys" class="info-box-content-text">
                 <thead>
                     <tr>
@@ -215,11 +214,15 @@
                         <td>Select fifth tool</td>
                     </tr>
                     <tr>
+                        <td>i</td>
+                        <td>Open this information box</td>
+                    </tr>
+                    <tr>
                         <td>c</td>
                         <td>Center the selected element</td>
                     </tr>
                     <tr>
-                        <td>d, Delete</td>
+                        <td>d, Backspace, Delete</td>
                         <td>Delete the selected element (only in select mode)</td>
                     </tr>
                     <tr>
@@ -232,7 +235,6 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-
+        </section>
+    </dialog>
 </body>

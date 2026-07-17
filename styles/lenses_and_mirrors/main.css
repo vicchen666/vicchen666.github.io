@@ -1,11 +1,11 @@
-/* banner */
-#main-banner {
+/* header */
+#main-header {
     display: flex;
     height: 100px;
     flex-shrink: 0;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--banner-color);
+    background-color: var(--header-color);
     border-bottom: 1px solid var(--section-border-color);
     font-size: 50px;
     white-space: nowrap;

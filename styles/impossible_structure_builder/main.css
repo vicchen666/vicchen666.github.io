@@ -1,11 +1,11 @@
-/* banner */
-#main-banner {
+/* header */
+#main-header {
     display: flex;
     height: 100px;
     flex-shrink: 0;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--banner-color);
+    background-color: var(--header-color);
     border-bottom: 1px solid var(--section-border-color);
     font-size: 50px;
     white-space: nowrap;
@@ -256,9 +256,7 @@
 
 /* info */
 #info-box {
-    display: flex;
     flex-direction: column;
-    position: absolute;
     z-index: 1;
     width: 500px;
     top: 220px;
@@ -267,6 +265,9 @@
     border: var(--section-border-color) 1px solid;
     padding: 10px;
     transform: translateX(-50%);
+    &[open] {
+        display: flex;
+    }
 }
 #info-box-header {
     display: flex;

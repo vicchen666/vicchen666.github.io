@@ -15,7 +15,7 @@
 </head>
 
 <body class="blue-dark-theme">
-    <div id="main-banner">
+    <header id="main-header">
         <a href="index.html" id="button-home" class="icon-button" title="Home Page">
             <img src="images/svg_icons/home.svg">
         </a>
@@ -25,19 +25,19 @@
             <button id="button-upload" class="icon-button" title="Upload a project file from your computer"><img src="images/svg_icons/upload.svg"></button>
             <input id="input-upload" class="invisible" type="file" accept=".json">
         </div>
-    </div>
+    </header>
 
-    <div style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
-        <div id="main-sidebar">
-            <div style="display: flex;">
+    <main style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
+        <aside id="main-sidebar">
+            <header style="display: flex;">
                 <button class="tab clickable" style="border-width: 0 1px 1px 0;">
                     <img src="images/svg_icons/plus.svg" style="height: 30px;">
                 </button>
                 <button class="tab">
                     <img src="images/svg_icons/3_lines.svg" style="height: 40px;">
                 </button>
-            </div>
-            <div id="element-add" class="invisible scrollbar">
+            </header>
+            <section id="element-add" class="invisible scrollbar">
                 <button data-type="optical_elements">Convex Lens</button>
                 <button data-type="optical_elements">Concave Lens</button>
                 <button data-type="optical_elements">Convex Mirror</button>
@@ -46,15 +46,15 @@
                 <button data-type="optical_elements">Barrier</button>
                 <button data-type="light_sources">Point Source</button>
                 <button data-type="light_sources">Parallel Source</button>
-            </div>
-            <div id="element-list" class="scrollbar"></div>
-        </div>
+            </section>
+            <section id="element-list" class="scrollbar"></section>
+        </aside>
 
-        <div id="main-canvas">
+        <section id="main-canvas">
             <canvas></canvas>
-        </div>
+        </section>
 
-        <div id="general-settings-frame">
+        <section id="general-settings-frame">
             <button id="general-settings-icon" class="icon-button" title="General Settings">
                 <img src="images/svg_icons/gear.svg">
             </button>
@@ -72,10 +72,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="element-settings" class="invisible scrollbar"></div>
-    </div>
+        <aside id="element-settings" class="invisible scrollbar"></aside>
+    </main>
 
-    <div id="message-box"></div>
+    <section id="message-box"></section>
 </body>

@@ -11,9 +11,27 @@
             return;
         }
         const key = e.key.toLowerCase();
-        console.log(key);
+
+        if ($("dialog[open]").length) {
+            switch (key) {
+                case "i":
+                    $("#info-box")[0].close();
+                    break;
+            }
+            return;
+        };
 
         switch (key) {
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+                const $this = $(".toolbar-item").eq(Number(key) - 1).find(".tool-button");
+                $this.addClass("selected");
+                $this.parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
+                select_tool($this.data("tool"));
+                break;
             case "delete":
             case "backspace":
             case "d":
@@ -25,15 +43,8 @@
                 if (!c.selected_elements.selected.length) return;
                 center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
                 break;
-            case "1":
-            case "2":
-            case "3":
-            case "4":
-            case "5":
-                const $this = $(".toolbar-item").eq(Number(key) - 1).find(".tool-button");
-                $this.addClass("selected");
-                $this.parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
-                select_tool($this.data("tool"));
+            case "i":
+                $("#info-box")[0].showModal();
                 break;
         }
     });
@@ -350,10 +361,12 @@
     });
 
     $("#button-info").on("click", function() {
-        $("#info-box").toggleClass("invisible");
+        // $("#info-box").toggleClass("invisible");
+        $("#info-box")[0].showModal();
     });
 
     $("#info-box-close").on("click", function() {
-        $("#info-box").addClass("invisible");
+        // $("#info-box").addClass("invisible");
+        $("#info-box")[0].close();
     });
 }
