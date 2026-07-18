@@ -91,7 +91,7 @@
         $("#element-settings").addClass("invisible");
         move_general_settings_icon("invisible");
 
-        const buttons = $("#element-list > div > button");
+        const buttons = $(".element-list-item > button");
         buttons.addClass("default-cursor");
 
         switch (c.tool_status.tool) {
@@ -125,7 +125,9 @@
         c.render_frame();
     }
 
-    $("#element-list").on("click", "> div > button", function() {
+
+
+    $("#element-list").on("click", "> .element-list-item > button", function() {
         if (c.tool_status.tool === "select") {
             if (c.selected_elements.selected.includes(String($(this).data("id")))) {
                 c.selected_elements.selected = [];
@@ -139,11 +141,11 @@
             }
             c.render_frame();
         }
-    }).on("mouseenter", "> div > button", function() {
+    }).on("mouseenter", "> .element-list-item > button", function() {
         if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
         c.selected_elements.hovered = String($(this).data("id"));
         c.render_frame();
-    }).on("mouseleave", "> div > button", function() {
+    }).on("mouseleave", "> .element-list-item > button", function() {
         if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
         c.selected_elements.hovered = -1;
         c.render_frame();
@@ -222,7 +224,7 @@
             case "name":
                 if($(this).val()) {
                     element.name = $(this).val();
-                    $("#element-list > div > button").filter(function() {return $(this).data("id") === element.id}).text($(this).val());
+                    $(".element-list-item > button").filter(function() {return $(this).data("id") === element.id}).text($(this).val());
                 }
                 break;
         }

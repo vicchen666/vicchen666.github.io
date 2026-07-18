@@ -174,17 +174,17 @@
     flex-direction: column;
     padding: 10px;
 }
-#element-list > div {
+.element-list-item {
     width: stretch;
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 }
-#element-list > div > div {
+.element-list-item > div {
     font-size: 20px;
     margin-right: 10px;
 }
-#element-list > div > button {
+.element-list-item > button {
     text-align: left;
     font-size: 30px;
     &.default-cursor {

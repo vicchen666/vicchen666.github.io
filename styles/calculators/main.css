@@ -13,17 +13,18 @@ input {
     display: flex;
     flex-direction: column;
 }
-#main-sidebar > :first-child {
+#sidebar-header {
     display: flex;
     justify-content: space-between;
 }
-#main-sidebar > :nth-child(2) > button {
+#sidebar-list > li {
     width: stretch;
+}
+#sidebar-list > li > button {
     text-align: left;
     font-size: 30px;
     line-height: 40px;
     padding: 30px;
-    text-decoration: none;
     &:hover {
         color: lightgray;
     }

@@ -63,9 +63,9 @@
         }
     });
 
-    $("#element-add > button").on("click", function() {
+    $(".element-add-item > button").on("click", function() {
         const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
-        switch($(this).index()) {
+        switch($(this).parent().index()) {
             case 1:
                 element.focal_length = -200;
                 break;
@@ -94,23 +94,23 @@
                 break;
         }
 
-        $("#element-list").append($("<button>").data("id", c.next_id++).text(`New ${$(this).text()}`));
+        $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", c.next_id++).text(`New ${$(this).text()}`)));
         c.add_element($(this).data("type"), element);
         c.update_light_path();
     });
 
-    $("#element-list").on("click", "> button", function() {
+    $("#element-list").on("click", "> .element-list-item > button", function() {
         const element_id = +$(this).data("id");
         const selected_id = c.selected_elements.selected[0];
         if (element_id === selected_id) {
             c.selected_elements.selected = [];
-            $(this).css("color","");
+            $(this).removeClass("selected");
             $("#element-settings").addClass("invisible");
             move_general_settings_icon("invisible");
         } else {
             c.selected_elements.selected = [element_id];
-            $(this).siblings().css("color","");
-            $(this).css("color","limegreen");
+            $(".element-list-item > button").removeClass("selected");
+            $(this).addClass("selected");
             const index = c.optical_elements.findIndex(e => e.id === element_id);
             if (index !== -1) {
                 reload_element_settings("optical_elements", index);
@@ -118,9 +118,9 @@
                 reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === element_id));
             }
         }
-    }).on("mouseenter", "> button", function () {
+    }).on("mouseenter", "> .element-list-item > button", function () {
         c.selected_elements.hovered = +$(this).data("id");
-    }).on("mouseleave", "> button", function() {
+    }).on("mouseleave", "> .element-list-item > button", function() {
         c.selected_elements.hovered = -1;
     });
 
@@ -130,32 +130,32 @@
         const settings = $("#element-settings");
         const element = c[type][index];
         settings.text("");
+        const type_select = $("<select>").attr("id","element-settings-select-type");
         if (type === "optical_elements") {
             settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
-            settings.append($("<select>"));
             optical_elements.forEach(e => {
-                settings.children("select").append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
+                type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
             });
         } else {
             settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
-            settings.append($("<select>"));
             light_sources.forEach(e => {
-                settings.children("select").append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
+                type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
             });
         }
+        settings.append(type_select);
         switch (element.type) {
             case "lens":
-                settings.children("select").val(element.focal_length > 0 ? "convex_lens" : "concave_lens");
+                type_select.val(element.focal_length > 0 ? "convex_lens" : "concave_lens");
                 break;
             case "mirror":
-                settings.children("select").val(element.focal_length > 0 ? "concave_mirror" : "convex_mirror");
+                type_select.val(element.focal_length > 0 ? "concave_mirror" : "convex_mirror");
                 break;
             case "point":
             case "parallel":
-                settings.children("select").val(`${element.type}_source`);
+                type_select.val(`${element.type}_source`);
                 break;
             default:
-                settings.children("select").val(element.type);
+                type_select.val(element.type);
         }
 
         const settings_grid = $("<div>").attr("id", "element-settings-grid").appendTo(settings);
@@ -203,7 +203,7 @@
         move_general_settings_icon("visible");
     }
 
-    $("#element-settings").on("change", "> select", function() {
+    $("#element-settings").on("change", "> #element-settings-select-type", function() {
         const type = $("#element-settings-title").data("type");
         const index = $("#element-settings-title").data("index");
         switch($(this).val()) {
@@ -245,7 +245,7 @@
             case "name":
                 if($(this).val()) {
                     c[type][index].name = $(this).val();
-                    $("#element-list > button").filter(function() {return $(this).data("id") === c[type][index].id}).text($(this).val());
+                    $(".element-list-item > button").filter(function() { return $(this).data("id") === c[type][index].id }).text($(this).val());
                 }
                 break;
             case "x":
@@ -260,7 +260,7 @@
                 break;
             case "focal_length":
                 if ($(this).val() > 0) {
-                    if ($(this).parent().siblings().eq(1).val() === "concave_lens" || $(this).parent().siblings().eq(1).val() === "convex_mirror") {
+                    if ($("#element-settings-select-type").val() === "concave_lens" || $("#element-settings-select-type").val() === "convex_mirror") {
                         c[type][index].focal_length = -$(this).val();
                     } else {
                         c[type][index].focal_length = +$(this).val();
@@ -311,12 +311,12 @@
     function delete_element(id) {
         let index = c.optical_elements.findIndex(e => e.id === id);
         if (index !== -1) {
-            $("#element-list > button").filter(function() {return $(this).data("id") === c.optical_elements[index].id}).remove();
+            $(".element-list-item > button").filter(function() { return $(this).data("id") === c.optical_elements[index].id }).parent().remove();
             c.remove_element("optical_elements", index);
         } else {
             index = c.light_sources.findIndex(e => e.id === id);
             if (index !== -1) {
-                $("#element-list > button").filter(function() {return $(this).data("id") === c.light_sources[index].id}).remove();
+                $(".element-list-item > button").filter(function() { return $(this).data("id") === c.light_sources[index].id }).parent().remove();
                 c.remove_element("light_sources", index);
             }
         }
@@ -457,12 +457,12 @@
                 data.elements.optical_elements.forEach(e => {
                     c.add_element("optical_elements", e);
                     c.optical_elements[c.optical_elements.length - 1].id = id;
-                    $("#element-list").append($("<button>").data("id", id++).text(e.name));
+                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
                 });
                 data.elements.light_sources.forEach(e => {
                     c.add_element("light_sources", e);
                     c.light_sources[c.light_sources.length - 1].id = id;
-                    $("#element-list").append($("<button>").data("id", id++).text(e.name));
+                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
                 });
                 c.next_id = id;
                 c.set_canvas();

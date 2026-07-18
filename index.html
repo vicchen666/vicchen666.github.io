@@ -14,27 +14,37 @@
 <body class="blue-dark-theme">
     <header id="main-header">My Home Page</header>
 
-    <main style="flex: 1; display: flex; justify-content: center; align-items: center;">
-        <section id="home">
-            <button id="button-projects" class="text-button">My Projects</button>
-            <button id="button-about" class="text-button">About Me</button>
-            <a class="a-button text-button" href="https://github.com/vicchen666/vicchen666.github.io" target="_blank">GitHub</a>
-        </section>
+    <main style="display: flex; flex-grow: 1;  justify-content: center; align-items: center;">
+        <ul id="home">
+            <li><button id="button-projects" class="text-button">My Projects</button></li>
+            <li><button id="button-about" class="text-button">About Me</button></li>
+            <li><a class="a-button text-button" href="https://github.com/vicchen666/vicchen666.github.io" target="_blank">GitHub</a></li>
+        </ul>
 
         <section id="projects" class="invisible">
             <button class="back-to-home icon-button">
                 <img src="images/svg_icons/arrow_left.svg">
             </button>
-            <div>
-                <a class="a-button text-button" href="skyblock_tools.html">Skyblock Tools</a>
-                <div>Just some skyblock tools</div>
-                <a class="a-button text-button" href="calculators.html">Calculators</a>
-                <div>Calculate everything you want</div>
-                <a class="a-button text-button" href="lenses_and_mirrors.html">Lenses and Mirrors</a>
-                <div>Simulate light rays interacting with optical elements</div>
-                <a class="a-button text-button" href="impossible_structure_builder.html">Impossible Structure Builder (WIP)</a>
-                <div>Build impossible structures from vertices and beams</div>
-            </div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><a class="a-button text-button" href="skyblock_tools.html">Skyblock Tools</a></td>
+                        <td>Just some skyblock tools</td>
+                    </tr>
+                    <tr>
+                        <td><a class="a-button text-button" href="calculators.html">Calculators</a></td>
+                        <td>Calculate everything you want</td>
+                    </tr>
+                    <tr>
+                        <td><a class="a-button text-button" href="lenses_and_mirrors.html">Lenses and Mirrors</a></td>
+                        <td>Simulate light rays interacting with optical elements</td>
+                    </tr>
+                    <tr>
+                        <td><a class="a-button text-button" href="impossible_structure_builder.html">Impossible Structure Builder (WIP)</a></td>
+                        <td>Build impossible structures from vertices and beams</td>
+                    </tr>
+                </tbody>
+            </table>
         </section>
 
         <section id="about" class="invisible" style="font-size: 30px;">

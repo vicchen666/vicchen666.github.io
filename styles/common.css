@@ -14,8 +14,11 @@ button {
     padding: 0;
     border: none;
     background-color: transparent;
-    cursor: pointer;
     color: var(--text-color);
+    cursor: pointer;
+}
+li > button, li > .text-button{
+    width: stretch;
 }
 .text-button {
     background-color: var(--button-color);
@@ -30,6 +33,7 @@ button {
     }
 }
 .a-button {
+    display: block;
     text-align: center;
     text-decoration: none;
     color: var(--text-color);
@@ -53,6 +57,15 @@ select {
 }
 img {
     display: block;
+}
+ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+table {
+    border-spacing: 0;
+    border-collapse: collapse;
 }
 dialog {
     position: absolute;

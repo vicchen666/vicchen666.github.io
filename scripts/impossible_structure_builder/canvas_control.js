@@ -973,7 +973,7 @@ const ctx = canvas.getContext("2d");
             }
             const order = $("<div>").text(this.render_order.indexOf(this.next_id) + 1);
             const button = $("<button>").data("id", this.next_id).text(element.name);
-            $("#element-list").append($("<div>").append(order).append(button));
+            $("#element-list").append($("<li>").addClass("element-list-item").append(order).append(button));
             this.next_id++;
             this.update_element_order();
         }
@@ -986,21 +986,21 @@ const ctx = canvas.getContext("2d");
                 element.destroy();
                 delete this.beams[element.id];
             }
-            $('#element-list > div > button').filter(function () {
+            $('.element-list-item > button').filter(function () {
                 return $(this).data('id') === element.id;
             }).parent().remove();
             this.update_element_order();
         }
 
         update_element_order() {
-            $("#element-list > div").each((_, button) => {
+            $(".element-list-item").each((_, button) => {
                 const id = $(button).children("button").data("id");
                 $(button).children("div").text(this.render_order.indexOf(id) + 1);
             })
         }
 
         highlight_selected_elements() {
-            $("#element-list > div > button").each((_, button) => {
+            $(".element-list-item > button").each((_, button) => {
                 const id = String($(button).data("id"));
                 button.classList.remove("hovered", "selected");
                 if (id === this.selected_elements.hovered) {

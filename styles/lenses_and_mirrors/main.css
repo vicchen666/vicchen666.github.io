@@ -143,19 +143,26 @@
     display: flex;
     flex-direction: column;
 }
-#element-add > button {
+.element-add-item {
     width: stretch;
+}
+.element-add-item > button {
     text-align: left;
     &:hover {
         border: 2px solid var(--button-border-color);
     }
 }
-#element-list > button {
+.element-list-item {
     width: stretch;
-    text-align: left;
     margin-bottom: 10px;
+}
+.element-list-item > button {
+    text-align: left;
     &:hover {
         color: lime;
+    }
+    &.selected {
+        color: limegreen;
     }
 }
 #element-center, #element-delete {
