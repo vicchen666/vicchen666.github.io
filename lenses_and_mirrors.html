@@ -21,6 +21,7 @@
         </a>
         <div>Lenses and Mirrors</div>
         <div style="display: flex;">
+            <button id="button-info" class="icon-button" title="Information"><img src="images/svg_icons/information.svg"></button>
             <button id="button-download" class="icon-button" title="Download project"><img src="images/svg_icons/download.svg"></button>
             <button id="button-open" class="icon-button" title="Open a project file from your computer"><img src="images/svg_icons/open_folder.svg"></button>
             <input id="input-open" class="invisible" type="file" accept=".json">
@@ -31,10 +32,10 @@
         <aside id="main-sidebar">
             <header style="display: flex;">
                 <button class="tab clickable" style="border-width: 0 1px 1px 0;">
-                    <img src="images/svg_icons/plus.svg" style="height: 30px;">
+                    <img src="images/svg_icons/plus.svg">
                 </button>
                 <button class="tab">
-                    <img src="images/svg_icons/3_lines.svg" style="height: 40px;">
+                    <img src="images/svg_icons/menu_hamburger.svg">
                 </button>
             </header>
             <section id="element-add" class="invisible scrollbar">
@@ -78,4 +79,46 @@
     </main>
 
     <section id="message-box"></section>
+
+    <dialog id="info-box" class="scrollbar" closedby="any">
+        <header id="info-box-header">
+            <div id="info-box-title">Information</div>
+            <button id="info-box-close" class="icon-button" title="Close">
+                <img src="images/svg_icons/cross.svg">
+            </button>
+        </header>
+        <section class="info-box-content">
+            <header class="info-box-content-title">Hotkeys</header>
+            <table id="info-box-hotkeys" class="info-box-content-text">
+                <thead>
+                    <tr>
+                        <th>Hotkey</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>i</td>
+                        <td>Open this information box</td>
+                    </tr>
+                    <tr>
+                        <td>c</td>
+                        <td>Center the selected element</td>
+                    </tr>
+                    <tr>
+                        <td>d, Backspace, Delete</td>
+                        <td>Delete the selected element</td>
+                    </tr>
+                    <tr>
+                        <td>s</td>
+                        <td>Download the current project</td>
+                    </tr>
+                    <tr>
+                        <td>o</td>
+                        <td>Open a project</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </dialog>
 </body>

@@ -12,7 +12,19 @@
         }
         const key = e.key.toLowerCase();
 
+        if ($("dialog[open]").length) {
+            switch (key) {
+                case "i":
+                    $("#info-box")[0].close();
+                    break;
+            }
+            return;
+        };
+
         switch (key) {
+            case "i":
+                $("#info-box")[0].showModal();
+                break;
             case "delete":
             case "backspace":
             case "d":
@@ -22,6 +34,12 @@
             case "c":
                 if (!c.selected_elements.selected.length) return;
                 center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+                break;
+            case "s":
+                download_project();
+                break;
+            case "o":
+                $("#input-open").click();
                 break;
         }
     });
@@ -178,8 +196,8 @@
             }
         }
         settings.append($("<div>").css("display", "flex")
-        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Click to center the element (hotkey: c)"}).text("Center"))
-        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Click to delete (hotkey: d or Delete)"}).text("Delete")));
+        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
+        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
 
         $("#element-settings").removeClass("invisible");
         move_general_settings_icon("visible");
@@ -339,8 +357,20 @@
             c.update_light_path();
         }
     });
+
+    $("#button-info").on("click", function() {
+        $("#info-box")[0].showModal();
+    });
+
+    $("#info-box-close").on("click", function() {
+        $("#info-box")[0].close();
+    });
     
     $("#button-download").on("click", () => {
+        download_project();
+    });
+
+    function download_project() {
         const data = {
             version: 1,
             general_settings: {
@@ -383,7 +413,7 @@
         a.click();
         a.href = "";
         URL.revokeObjectURL(url);
-    });
+    }
 
     $("#button-open").on("click", () => {
         $("#input-open").click();

@@ -243,17 +243,6 @@
     text-align: right;
 }
 
-/* message */
-#message-box {
-    position: absolute;
-    z-index: 2;
-    top: 220px;
-    left: 50%;
-    font-size: 30px;
-    padding: 10px;
-    transform: translateX(-50%);
-}
-
 /* info */
 #info-box {
     flex-direction: column;
@@ -301,4 +290,15 @@
 #info-box-hotkeys th, #info-box-hotkeys td {
     border: 1px solid var(--section-border-color);
     padding: 5px;
+}
+
+/* message */
+#message-box {
+    position: absolute;
+    z-index: 2;
+    top: 220px;
+    left: 50%;
+    font-size: 30px;
+    padding: 10px;
+    transform: translateX(-50%);
 }

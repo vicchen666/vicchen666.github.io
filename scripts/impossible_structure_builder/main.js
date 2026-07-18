@@ -32,6 +32,9 @@
                 $this.parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
                 select_tool($this.data("tool"));
                 break;
+            case "i":
+                $("#info-box")[0].showModal();
+                break;
             case "delete":
             case "backspace":
             case "d":
@@ -42,9 +45,6 @@
             case "c":
                 if (!c.selected_elements.selected.length) return;
                 center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
-                break;
-            case "i":
-                $("#info-box")[0].showModal();
                 break;
         }
     });
@@ -200,8 +200,8 @@
         }
 
         settings.append($("<div>").css("display", "flex")
-        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Click to center the element (hotkey: c)"}).text("Center"))
-        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Click to delete (hotkey: d or Delete)"}).text("Delete")));
+        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
+        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
 
         $("#element-settings").removeClass("invisible");
         move_general_settings_icon("visible");
