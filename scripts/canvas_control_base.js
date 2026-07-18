@@ -1,16 +1,17 @@
-// Requires vec_add, vec_sub, vec_scale from vector.js
 import $ from "jquery";
-import { vec_add, vec_sub, vec_scale } from "vectors";
+import * as v from "vectors";
 
 export default class CanvasControlBase {
-    constructor({ animate = true, frame_interval = 10 } = {}) {
+    constructor(canvas, { animate = true, frame_interval = 10 } = {}) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d");
         this.animate = animate;
         this.frame_interval = frame_interval;
         this.animation = null;
         this.default_cursor = "default";
         this.tool_status = { tool: "move", status: "idle"};
         this.grabbing_canvas = false;
-        this.origin = [-canvas.clientWidth / 2, canvas.clientHeight / 2];
+        this.origin = [-this.canvas.clientWidth / 2, this.canvas.clientHeight / 2];
         this.size = 1;
         this.mouse_x = 0;
         this.mouse_y = 0;
@@ -21,24 +22,24 @@ export default class CanvasControlBase {
     }
 
     setup_listeners() {
-        canvas.addEventListener("wheel", e => this.handle_wheel(e));
-        canvas.addEventListener("mouseleave", e => this.handle_mouseleave(e));
-        canvas.addEventListener("mousedown", e => this.handle_mousedown(e));
+        this.canvas.addEventListener("wheel", e => this.handle_wheel(e));
+        this.canvas.addEventListener("mouseleave", e => this.handle_mouseleave(e));
+        this.canvas.addEventListener("mousedown", e => this.handle_mousedown(e));
         window.addEventListener("mousemove", e => this.handle_mousemove(e));
         window.addEventListener("mouseup", () => this.handle_mouseup());
         window.addEventListener("resize", () => this.handle_resize());
     }
 
     mouse_to_canvas(x, y) {
-        const rect = canvas.getBoundingClientRect();
-        const canvas_point = vec_scale(vec_add(c.origin, vec_sub([x, -y], [rect.left, -rect.top])), 1 / c.size);
+        const rect = this.canvas.getBoundingClientRect();
+        const canvas_point = v.scale(v.add(this.origin, v.sub([x, -y], [rect.left, -rect.top])), 1 / this.size);
         return canvas_point;
     }
 
     handle_wheel(e) {
-        const rect = canvas.getBoundingClientRect();
-        const canvas_point = vec_sub([e.clientX, -e.clientY], [rect.left, -rect.top]);
-        const origin = vec_sub(vec_scale(vec_add(this.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
+        const rect = this.canvas.getBoundingClientRect();
+        const canvas_point = v.sub([e.clientX, -e.clientY], [rect.left, -rect.top]);
+        const origin = v.sub(v.scale(v.add(this.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
         this.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
         this.origin = origin;
         this.set_canvas();
@@ -71,12 +72,12 @@ export default class CanvasControlBase {
     }
 
     handle_mousemove(e) {
-        if (document.elementFromPoint(e.clientX, e.clientY) === canvas) {
-            canvas.style.cursor = this.default_cursor;
+        if (document.elementFromPoint(e.clientX, e.clientY) === this.canvas) {
+            this.canvas.style.cursor = this.default_cursor;
             this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
         }
         if (!this.grabbing_canvas) return;
-        this.origin = vec_add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
+        this.origin = v.add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
         this.mouse_x = e.clientX;
         this.mouse_y = e.clientY;
         this.set_canvas();
@@ -100,10 +101,10 @@ export default class CanvasControlBase {
 
     set_canvas(adjust_size=false) {
         if (adjust_size) {
-            canvas.height = canvas.clientHeight;
-            canvas.width = canvas.clientWidth;
+            this.canvas.height = this.canvas.clientHeight;
+            this.canvas.width = this.canvas.clientWidth;
         }
-        ctx.setTransform(
+        this.ctx.setTransform(
             this.size, 0, 0, -this.size,
             -this.origin[0], this.origin[1]
         );

@@ -1,497 +1,499 @@
-{
-    window.addEventListener("beforeunload", e => {
-        e.preventDefault();
-        e.returnValue = "";
-        return "";
-    });
+﻿import $ from "jquery";
+import c from "canvas_control";
+import * as v from "vectors";
 
-    document.addEventListener("keydown", e => {
-        const active = document.activeElement;
-        if (active.tagName === "INPUT" || active.tagName === "TEXTAREA") {
-            return;
-        }
-        const key = e.key.toLowerCase();
+window.addEventListener("beforeunload", e => {
+    e.preventDefault();
+    e.returnValue = "";
+    return "";
+});
 
-        if ($("dialog[open]").length) {
-            switch (key) {
-                case "i":
-                    $("#info-box")[0].close();
-                    break;
-            }
-            return;
-        };
+document.addEventListener("keydown", e => {
+    const active = document.activeElement;
+    if (active.tagName === "INPUT" || active.tagName === "TEXTAREA") {
+        return;
+    }
+    const key = e.key.toLowerCase();
 
+    if ($("dialog[open]").length) {
         switch (key) {
             case "i":
-                $("#info-box")[0].showModal();
-                break;
-            case "delete":
-            case "backspace":
-            case "d":
-                if (!c.selected_elements.selected.length) return;
-                delete_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
-                break;
-            case "c":
-                if (!c.selected_elements.selected.length) return;
-                center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
-                break;
-            case "s":
-                download_project();
-                break;
-            case "o":
-                $("#input-open").click();
+                $("#info-box")[0].close();
                 break;
         }
-    });
-    
-    $(".tab").on("click", function() {
-        const index = $(this).index();
-        $(this).css("border-width", "0"); 
-        $(this).css("cursor", "default");
-        $(this).removeClass("clickable");
-        switch (index) {
-            case 0:
-                $(this).siblings().css({"border-width": "0 0 1px 1px", "cursor": "pointer"}).addClass("clickable");
-                $("#element-add").removeClass("invisible");
-                $("#element-list").addClass("invisible");
-                break;
-            case 1:
-                $(this).siblings().css({"border-width": "0 1px 1px 0", "cursor": "pointer"}).addClass("clickable");
-                $("#element-add").addClass("invisible");
-                $("#element-list").removeClass("invisible");
-                break;
-        }
-    });
+        return;
+    };
 
-    $(".element-add-item > button").on("click", function() {
-        const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + canvas.width / 2) / c.size), Math.round((c.origin[1] - canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
-        switch($(this).parent().index()) {
-            case 1:
-                element.focal_length = -200;
-                break;
-            case 2:
-                element.type = "mirror";
-                element.focal_length = -200;
-                break;
-            case 3:
-                element.type = "mirror";
-                break;
-            case 4:
-                element.type = "flat_mirror";
-                break;
-            case 5:
-                element.type = "barrier";
-                break;
-            case 6:
-                element.type = "point";
-                element.rotation = 0;
-                element.unit_vector = [1, 0];
-                break;
-            case 7:
-                element.type = "parallel";
-                element.rotation = 0;
-                element.unit_vector = [1, 0];
-                break;
-        }
+    switch (key) {
+        case "i":
+            $("#info-box")[0].showModal();
+            break;
+        case "delete":
+        case "backspace":
+        case "d":
+            if (!c.selected_elements.selected.length) return;
+            delete_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+            break;
+        case "c":
+            if (!c.selected_elements.selected.length) return;
+            center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+            break;
+        case "s":
+            download_project();
+            break;
+        case "o":
+            $("#input-open").click();
+            break;
+    }
+});
 
-        $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", c.next_id++).text(`New ${$(this).text()}`)));
-        c.add_element($(this).data("type"), element);
-        c.update_light_path();
-    });
+$(".tab").on("click", function() {
+    const index = $(this).index();
+    $(this).css("border-width", "0"); 
+    $(this).css("cursor", "default");
+    $(this).removeClass("clickable");
+    switch (index) {
+        case 0:
+            $(this).siblings().css({"border-width": "0 0 1px 1px", "cursor": "pointer"}).addClass("clickable");
+            $("#element-add").removeClass("invisible");
+            $("#element-list").addClass("invisible");
+            break;
+        case 1:
+            $(this).siblings().css({"border-width": "0 1px 1px 0", "cursor": "pointer"}).addClass("clickable");
+            $("#element-add").addClass("invisible");
+            $("#element-list").removeClass("invisible");
+            break;
+    }
+});
 
-    $("#element-list").on("click", "> .element-list-item > button", function() {
-        const element_id = +$(this).data("id");
-        const selected_id = c.selected_elements.selected[0];
-        if (element_id === selected_id) {
-            c.selected_elements.selected = [];
-            $(this).removeClass("selected");
-            $("#element-settings").addClass("invisible");
-            move_general_settings_icon("invisible");
-        } else {
-            c.selected_elements.selected = [element_id];
-            $(".element-list-item > button").removeClass("selected");
-            $(this).addClass("selected");
-            const index = c.optical_elements.findIndex(e => e.id === element_id);
-            if (index !== -1) {
-                reload_element_settings("optical_elements", index);
-            } else {
-                reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === element_id));
-            }
-        }
-    }).on("mouseenter", "> .element-list-item > button", function () {
-        c.selected_elements.hovered = +$(this).data("id");
-    }).on("mouseleave", "> .element-list-item > button", function() {
-        c.selected_elements.hovered = -1;
-    });
-
-    function reload_element_settings(type, index) {
-        const optical_elements = ["Convex Lens", "Concave Lens", "Convex Mirror", "Concave Mirror", "Flat Mirror", "Barrier"];
-        const light_sources = ["Point Source", "Parallel Source"];
-        const settings = $("#element-settings");
-        const element = c[type][index];
-        settings.text("");
-        const type_select = $("<select>").attr("id","element-settings-select-type");
-        if (type === "optical_elements") {
-            settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
-            optical_elements.forEach(e => {
-                type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
-            });
-        } else {
-            settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
-            light_sources.forEach(e => {
-                type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
-            });
-        }
-        settings.append(type_select);
-        switch (element.type) {
-            case "lens":
-                type_select.val(element.focal_length > 0 ? "convex_lens" : "concave_lens");
-                break;
-            case "mirror":
-                type_select.val(element.focal_length > 0 ? "concave_mirror" : "convex_mirror");
-                break;
-            case "point":
-            case "parallel":
-                type_select.val(`${element.type}_source`);
-                break;
-            default:
-                type_select.val(element.type);
-        }
-
-        const settings_grid = $("<div>").attr("id", "element-settings-grid").appendTo(settings);
-        for (const [key, value] of Object.entries(element)) {
-            if (c.elements_settings[element.type].includes(key)) {
-                switch (key) {
-                    case "name":
-                        settings_grid.append($("<div>").text("Name"));
-                        settings_grid.append($("<input>").attr("type", "text").data("setting", "name").val(value));
-                        break;
-                    case "position":
-                        settings_grid.append($("<div>").text("X"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "x").val(value[0]));
-                        settings_grid.append($("<div>").text("Y"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "y").val(value[1]));
-                        break;
-                    case "rotation":
-                        settings_grid.append($("<div>").text("Rotation (deg)"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "rotation").val(value));
-                        break;
-                    case "focal_length":
-                        settings_grid.append($("<div>").text("Focal Length"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "focal_length").val(Math.abs(value)));
-                        break;
-                    case "size":
-                        settings_grid.append($("<div>").text("Size"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "size").val(value));
-                        break;
-                    case "density":
-                        settings_grid.append($("<div>").text("Density"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "density").val(value));
-                        break;
-                    case "angle":
-                        settings_grid.append($("<div>").text("Angle (deg)"));
-                        settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0, "max": 360}).data("setting", "angle").val(value));
-                        break;
-                }
-            }
-        }
-        settings.append($("<div>").css("display", "flex")
-        .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
-        .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
-
-        $("#element-settings").removeClass("invisible");
-        move_general_settings_icon("visible");
+$(".element-add-item > button").on("click", function() {
+    const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + c.canvas.width / 2) / c.size), Math.round((c.origin[1] - c.canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
+    switch($(this).parent().index()) {
+        case 1:
+            element.focal_length = -200;
+            break;
+        case 2:
+            element.type = "mirror";
+            element.focal_length = -200;
+            break;
+        case 3:
+            element.type = "mirror";
+            break;
+        case 4:
+            element.type = "flat_mirror";
+            break;
+        case 5:
+            element.type = "barrier";
+            break;
+        case 6:
+            element.type = "point";
+            element.rotation = 0;
+            element.unit_vector = [1, 0];
+            break;
+        case 7:
+            element.type = "parallel";
+            element.rotation = 0;
+            element.unit_vector = [1, 0];
+            break;
     }
 
-    $("#element-settings").on("change", "> #element-settings-select-type", function() {
-        const type = $("#element-settings-title").data("type");
-        const index = $("#element-settings-title").data("index");
-        switch($(this).val()) {
-            case "concave_lens":
-                c[type][index].focal_length = -Math.abs(c[type][index].focal_length);
-                c[type][index].type = "lens";
-                break;
-            case "convex_lens":
-                c[type][index].focal_length = Math.abs(c[type][index].focal_length);
-                c[type][index].type = "lens";
-                break;
-            case "concave_mirror":
-                c[type][index].focal_length = Math.abs(c[type][index].focal_length);
-                c[type][index].type = "mirror";
-                break;
-            case "convex_mirror":
-                c[type][index].focal_length = -Math.abs(c[type][index].focal_length);
-                c[type][index].type = "mirror";
-                break;
-            case "flat_mirror":
-                c[type][index].type = "flat_mirror";
-                break;
-            case "barrier":
-                c[type][index].type = "barrier";
-                break;
-            case "point_source":
-                c[type][index].type = "point";
-                break;
-            case "parallel_source":
-                c[type][index].type = "parallel";
-                break;
-        }
-        reload_element_settings(type, index);
-        c.update_light_path();
-    }).on("input", "#element-settings-grid > input", function() {
-        const type = $("#element-settings-title").data("type");
-        const index = $("#element-settings-title").data("index");
-        switch($(this).data("setting")) {
-            case "name":
-                if($(this).val()) {
-                    c[type][index].name = $(this).val();
-                    $(".element-list-item > button").filter(function() { return $(this).data("id") === c[type][index].id }).text($(this).val());
-                }
-                break;
-            case "x":
-                c[type][index].position[0] = +$(this).val();
-                break;
-            case "y":
-                c[type][index].position[1] = +$(this).val();
-                break;
-            case "rotation":
-                c[type][index].rotation = $(this).val();
-                c[type][index].unit_vector = [Math.cos(+$(this).val() / 360 * TAU), Math.sin(+$(this).val() / 360 * TAU)];
-                break;
-            case "focal_length":
-                if ($(this).val() > 0) {
-                    if ($("#element-settings-select-type").val() === "concave_lens" || $("#element-settings-select-type").val() === "convex_mirror") {
-                        c[type][index].focal_length = -$(this).val();
-                    } else {
-                        c[type][index].focal_length = +$(this).val();
-                    }
-                }
-                break;
-            case "size":
-                if ($(this).val() > 0) {
-                    c[type][index].size = +$(this).val();
-                }
-                break;
-            case "density":
-                if ($(this).val() > 0) {
-                    c[type][index].density = +$(this).val();
-                }
-                break;
-            case "angle":
-                if ($(this).val() >= 0 && $(this).val() <= 360) {
-                    c[type][index].angle = $(this).val();
-                }
-                break;
-        }
-        c.update_light_path();
-    }).on("click", "#element-center", function() {
-        const type = $("#element-settings-title").data("type");
-        const index = $("#element-settings-title").data("index");
-        center_element(c[type][index].id);
-    }).on("click", "#element-delete", () => {
-        const type = $("#element-settings-title").data("type");
-        const index = $("#element-settings-title").data("index");
-        delete_element(c[type][index].id);
-    });
+    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", c.next_id++).text(`New ${$(this).text()}`)));
+    c.add_element($(this).data("type"), element);
+    c.update_light_path();
+});
 
-    function center_element(id) {
-        let index = c.optical_elements.findIndex(e => e.id === id);
-        let type;
-        if (index === -1) {
-            type = "light_sources";
-            index = c.light_sources.findIndex(e => e.id === id);
-        } else {
-            type = "optical_elements";
-            index = c.optical_elements.findIndex(e => e.id === id);
-        }
-        c.origin = [c[type][index].position[0] * c.size - canvas.width / 2, c[type][index].position[1] * c.size + canvas.height / 2];
-        c.set_canvas();
-    }
-
-    function delete_element(id) {
-        let index = c.optical_elements.findIndex(e => e.id === id);
-        if (index !== -1) {
-            $(".element-list-item > button").filter(function() { return $(this).data("id") === c.optical_elements[index].id }).parent().remove();
-            c.remove_element("optical_elements", index);
-        } else {
-            index = c.light_sources.findIndex(e => e.id === id);
-            if (index !== -1) {
-                $(".element-list-item > button").filter(function() { return $(this).data("id") === c.light_sources[index].id }).parent().remove();
-                c.remove_element("light_sources", index);
-            }
-        }
-
+$("#element-list").on("click", "> .element-list-item > button", function() {
+    const element_id = +$(this).data("id");
+    const selected_id = c.selected_elements.selected[0];
+    if (element_id === selected_id) {
         c.selected_elements.selected = [];
+        $(this).removeClass("selected");
         $("#element-settings").addClass("invisible");
         move_general_settings_icon("invisible");
+    } else {
+        c.selected_elements.selected = [element_id];
+        $(".element-list-item > button").removeClass("selected");
+        $(this).addClass("selected");
+        const index = c.optical_elements.findIndex(e => e.id === element_id);
+        if (index !== -1) {
+            reload_element_settings("optical_elements", index);
+        } else {
+            reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === element_id));
+        }
+    }
+}).on("mouseenter", "> .element-list-item > button", function () {
+    c.selected_elements.hovered = +$(this).data("id");
+}).on("mouseleave", "> .element-list-item > button", function() {
+    c.selected_elements.hovered = -1;
+});
+
+function reload_element_settings(type, index) {
+    const optical_elements = ["Convex Lens", "Concave Lens", "Convex Mirror", "Concave Mirror", "Flat Mirror", "Barrier"];
+    const light_sources = ["Point Source", "Parallel Source"];
+    const settings = $("#element-settings");
+    const element = c[type][index];
+    settings.text("");
+    const type_select = $("<select>").attr("id","element-settings-select-type");
+    if (type === "optical_elements") {
+        settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
+        optical_elements.forEach(e => {
+            type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
+        });
+    } else {
+        settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
+        light_sources.forEach(e => {
+            type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
+        });
+    }
+    settings.append(type_select);
+    switch (element.type) {
+        case "lens":
+            type_select.val(element.focal_length > 0 ? "convex_lens" : "concave_lens");
+            break;
+        case "mirror":
+            type_select.val(element.focal_length > 0 ? "concave_mirror" : "convex_mirror");
+            break;
+        case "point":
+        case "parallel":
+            type_select.val(`${element.type}_source`);
+            break;
+        default:
+            type_select.val(element.type);
+    }
+
+    const settings_grid = $("<div>").attr("id", "element-settings-grid").appendTo(settings);
+    for (const [key, value] of Object.entries(element)) {
+        if (c.elements_settings[element.type].includes(key)) {
+            switch (key) {
+                case "name":
+                    settings_grid.append($("<div>").text("Name"));
+                    settings_grid.append($("<input>").attr("type", "text").data("setting", "name").val(value));
+                    break;
+                case "position":
+                    settings_grid.append($("<div>").text("X"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "x").val(value[0]));
+                    settings_grid.append($("<div>").text("Y"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "y").val(value[1]));
+                    break;
+                case "rotation":
+                    settings_grid.append($("<div>").text("Rotation (deg)"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "rotation").val(value));
+                    break;
+                case "focal_length":
+                    settings_grid.append($("<div>").text("Focal Length"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "focal_length").val(Math.abs(value)));
+                    break;
+                case "size":
+                    settings_grid.append($("<div>").text("Size"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "size").val(value));
+                    break;
+                case "density":
+                    settings_grid.append($("<div>").text("Density"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "density").val(value));
+                    break;
+                case "angle":
+                    settings_grid.append($("<div>").text("Angle (deg)"));
+                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0, "max": 360}).data("setting", "angle").val(value));
+                    break;
+            }
+        }
+    }
+    settings.append($("<div>").css("display", "flex")
+    .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
+    .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
+
+    $("#element-settings").removeClass("invisible");
+    move_general_settings_icon("visible");
+}
+
+$("#element-settings").on("change", "> #element-settings-select-type", function() {
+    const type = $("#element-settings-title").data("type");
+    const index = $("#element-settings-title").data("index");
+    switch($(this).val()) {
+        case "concave_lens":
+            c[type][index].focal_length = -Math.abs(c[type][index].focal_length);
+            c[type][index].type = "lens";
+            break;
+        case "convex_lens":
+            c[type][index].focal_length = Math.abs(c[type][index].focal_length);
+            c[type][index].type = "lens";
+            break;
+        case "concave_mirror":
+            c[type][index].focal_length = Math.abs(c[type][index].focal_length);
+            c[type][index].type = "mirror";
+            break;
+        case "convex_mirror":
+            c[type][index].focal_length = -Math.abs(c[type][index].focal_length);
+            c[type][index].type = "mirror";
+            break;
+        case "flat_mirror":
+            c[type][index].type = "flat_mirror";
+            break;
+        case "barrier":
+            c[type][index].type = "barrier";
+            break;
+        case "point_source":
+            c[type][index].type = "point";
+            break;
+        case "parallel_source":
+            c[type][index].type = "parallel";
+            break;
+    }
+    reload_element_settings(type, index);
+    c.update_light_path();
+}).on("input", "#element-settings-grid > input", function() {
+    const type = $("#element-settings-title").data("type");
+    const index = $("#element-settings-title").data("index");
+    switch($(this).data("setting")) {
+        case "name":
+            if($(this).val()) {
+                c[type][index].name = $(this).val();
+                $(".element-list-item > button").filter(function() { return $(this).data("id") === c[type][index].id }).text($(this).val());
+            }
+            break;
+        case "x":
+            c[type][index].position[0] = +$(this).val();
+            break;
+        case "y":
+            c[type][index].position[1] = +$(this).val();
+            break;
+        case "rotation":
+            c[type][index].rotation = $(this).val();
+            c[type][index].unit_vector = [Math.cos(+$(this).val() / 360 * TAU), Math.sin(+$(this).val() / 360 * TAU)];
+            break;
+        case "focal_length":
+            if ($(this).val() > 0) {
+                if ($("#element-settings-select-type").val() === "concave_lens" || $("#element-settings-select-type").val() === "convex_mirror") {
+                    c[type][index].focal_length = -$(this).val();
+                } else {
+                    c[type][index].focal_length = +$(this).val();
+                }
+            }
+            break;
+        case "size":
+            if ($(this).val() > 0) {
+                c[type][index].size = +$(this).val();
+            }
+            break;
+        case "density":
+            if ($(this).val() > 0) {
+                c[type][index].density = +$(this).val();
+            }
+            break;
+        case "angle":
+            if ($(this).val() >= 0 && $(this).val() <= 360) {
+                c[type][index].angle = $(this).val();
+            }
+            break;
+    }
+    c.update_light_path();
+}).on("click", "#element-center", function() {
+    const type = $("#element-settings-title").data("type");
+    const index = $("#element-settings-title").data("index");
+    center_element(c[type][index].id);
+}).on("click", "#element-delete", () => {
+    const type = $("#element-settings-title").data("type");
+    const index = $("#element-settings-title").data("index");
+    delete_element(c[type][index].id);
+});
+
+function center_element(id) {
+    let index = c.optical_elements.findIndex(e => e.id === id);
+    let type;
+    if (index === -1) {
+        type = "light_sources";
+        index = c.light_sources.findIndex(e => e.id === id);
+    } else {
+        type = "optical_elements";
+        index = c.optical_elements.findIndex(e => e.id === id);
+    }
+    c.origin = [c[type][index].position[0] * c.size - c.canvas.width / 2, c[type][index].position[1] * c.size + c.canvas.height / 2];
+    c.set_canvas();
+}
+
+function delete_element(id) {
+    let index = c.optical_elements.findIndex(e => e.id === id);
+    if (index !== -1) {
+        $(".element-list-item > button").filter(function() { return $(this).data("id") === c.optical_elements[index].id }).parent().remove();
+        c.remove_element("optical_elements", index);
+    } else {
+        index = c.light_sources.findIndex(e => e.id === id);
+        if (index !== -1) {
+            $(".element-list-item > button").filter(function() { return $(this).data("id") === c.light_sources[index].id }).parent().remove();
+            c.remove_element("light_sources", index);
+        }
+    }
+
+    c.selected_elements.selected = [];
+    $("#element-settings").addClass("invisible");
+    move_general_settings_icon("invisible");
+    c.update_light_path();
+}
+
+$("#general-settings-icon").on("click", function() {
+    $("#general-settings").toggleClass("invisible");
+});
+
+function move_general_settings_icon(state) {
+    if (state === "visible") {
+        $("#general-settings-frame").css("right", $("#element-settings").outerWidth() + 10);
+    } else {
+        $("#general-settings-frame").css("right", 10);
+    }
+}
+
+$(".general-settings-section-grid > input").on("change", function() {
+    if ($(this).parent().data("setting_type") === "ray_rendering") {
+        if (+$(this).val() < 0) {
+            $(this).val(c[$(this).data("setting")]);
+            return;
+        }
+        if ($(this).data("setting") === "fill_length" && +$(this).val() === 0 && +$(this).val() + c.sep_length === 0) {
+            $(this).val(c[$(this).data("setting")]);
+            return;
+        }
+        if ($(this).data("setting") === "sep_length" && +$(this).val() === 0 && +$(this).val() + c.fill_length === 0) {
+            $(this).val(c[$(this).data("setting")]);
+            return;
+        }
+        c[$(this).data("setting")] = +$(this).val();
         c.update_light_path();
     }
+});
 
-    $("#general-settings-icon").on("click", function() {
-        $("#general-settings").toggleClass("invisible");
-    });
+$("#button-info").on("click", function() {
+    $("#info-box")[0].showModal();
+});
 
-    function move_general_settings_icon(state) {
-        if (state === "visible") {
-            $("#general-settings-frame").css("right", $("#element-settings").outerWidth() + 10);
-        } else {
-            $("#general-settings-frame").css("right", 10);
-        }
-    }
+$("#info-box-close").on("click", function() {
+    $("#info-box")[0].close();
+});
 
-    $(".general-settings-section-grid > input").on("change", function() {
-        if ($(this).parent().data("setting_type") === "ray_rendering") {
-            if (+$(this).val() < 0) {
-                $(this).val(c[$(this).data("setting")]);
-                return;
+$("#button-download").on("click", () => {
+    download_project();
+});
+
+function download_project() {
+    const data = {
+        version: 1,
+        general_settings: {
+            ray_settings: {
+                max_ray_length: c.max_distance,
+                solid_length: c.fill_length,
+                gap_length: c.sep_length
             }
-            if ($(this).data("setting") === "fill_length" && +$(this).val() === 0 && +$(this).val() + c.sep_length === 0) {
-                $(this).val(c[$(this).data("setting")]);
-                return;
-            }
-            if ($(this).data("setting") === "sep_length" && +$(this).val() === 0 && +$(this).val() + c.fill_length === 0) {
-                $(this).val(c[$(this).data("setting")]);
-                return;
-            }
-            c[$(this).data("setting")] = +$(this).val();
-            c.update_light_path();
-        }
-    });
-
-    $("#button-info").on("click", function() {
-        $("#info-box")[0].showModal();
-    });
-
-    $("#info-box-close").on("click", function() {
-        $("#info-box")[0].close();
-    });
-    
-    $("#button-download").on("click", () => {
-        download_project();
-    });
-
-    function download_project() {
-        const data = {
-            version: 1,
-            general_settings: {
-                ray_settings: {
-                    max_ray_length: c.max_distance,
-                    solid_length: c.fill_length,
-                    gap_length: c.sep_length
-                }
-            },
-            elements: {
-                optical_elements: [],
-                light_sources: []
-            },
-            misc: {
-                canvas: {
-                    origin: c.origin,
-                    scale: c.size
-                }
-            }
-        };
-
-        c.optical_elements.forEach(e => {
-            const index = data.elements.optical_elements.push({}) - 1;
-            for(const [key, value] of Object.entries(e)) {
-                data.elements.optical_elements[index][key] = value;
-            }
-        });
-        c.light_sources.forEach(e => {
-            const index = data.elements.light_sources.push({}) - 1;
-            for(const [key, value] of Object.entries(e)) {
-                data.elements.light_sources[index][key] = value;
-            }
-        });
-
-        const blob = new Blob([JSON.stringify(data, null, 2)]);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Lenses and Mirrors.json';
-        a.click();
-        a.href = "";
-        URL.revokeObjectURL(url);
-    }
-
-    $("#button-open").on("click", () => {
-        $("#input-open").click();
-    });
-    $("#input-open").on("change", function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        $(this).val("");
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                open_project(data);
-            } catch (err) {
-                console.error(err);
-                message("fail", "Failed to open project! Invalid JSON file.");
+        },
+        elements: {
+            optical_elements: [],
+            light_sources: []
+        },
+        misc: {
+            canvas: {
+                origin: c.origin,
+                scale: c.size
             }
         }
-        reader.readAsText(file);
+    };
+
+    c.optical_elements.forEach(e => {
+        const index = data.elements.optical_elements.push({}) - 1;
+        for(const [key, value] of Object.entries(e)) {
+            data.elements.optical_elements[index][key] = value;
+        }
+    });
+    c.light_sources.forEach(e => {
+        const index = data.elements.light_sources.push({}) - 1;
+        for(const [key, value] of Object.entries(e)) {
+            data.elements.light_sources[index][key] = value;
+        }
     });
 
-    function open_project(data) {
+    const blob = new Blob([JSON.stringify(data, null, 2)]);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Lenses and Mirrors.json';
+    a.click();
+    a.href = "";
+    URL.revokeObjectURL(url);
+}
+
+$("#button-open").on("click", () => {
+    $("#input-open").click();
+});
+$("#input-open").on("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    $(this).val("");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
         try {
-            if (data.version === 1) {
-                const ray_settings = data.general_settings.ray_settings;
-                c.max_distance = ray_settings.max_ray_length;
-                c.fill_length = ray_settings.solid_length;
-                c.sep_length= ray_settings.gap_length;
-                reload_general_settings();
-                c.origin = data.misc.canvas.origin;
-                c.size = data.misc.canvas.scale;
-
-                $("#element-settings").addClass("invisible");
-                move_general_settings_icon("invisible");
-                $("#element-list").text("");
-                c.selected_elements = { selected: [], hovered: -1 };
-                c.light_sources = [];
-                c.optical_elements = [];
-                let id = 0;
-                data.elements.optical_elements.forEach(e => {
-                    c.add_element("optical_elements", e);
-                    c.optical_elements[c.optical_elements.length - 1].id = id;
-                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-                });
-                data.elements.light_sources.forEach(e => {
-                    c.add_element("light_sources", e);
-                    c.light_sources[c.light_sources.length - 1].id = id;
-                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-                });
-                c.next_id = id;
-                c.set_canvas();
-                c.update_light_path();
-                message("success", "Project opened successfully!")
-            } else {
-                throw new Error("No version data");
-            }
+            const data = JSON.parse(e.target.result);
+            open_project(data);
         } catch (err) {
             console.error(err);
-            message("fail", "Failed to open project! Invalid JSON structure.");
+            message("fail", "Failed to open project! Invalid JSON file.");
         }
     }
+    reader.readAsText(file);
+});
 
-    function reload_general_settings() {
-        $("#general-settings input").each(function() {
-            $(this).val(c[$(this).data("setting")]);
-        });
-    }
+function open_project(data) {
+    try {
+        if (data.version === 1) {
+            const ray_settings = data.general_settings.ray_settings;
+            c.max_distance = ray_settings.max_ray_length;
+            c.fill_length = ray_settings.solid_length;
+            c.sep_length= ray_settings.gap_length;
+            reload_general_settings();
+            c.origin = data.misc.canvas.origin;
+            c.size = data.misc.canvas.scale;
 
-    function message(type, text) {
-        switch (type) {
-            case "success":
-                $("#message-box").css("background-color", "limegreen");
-                break;
-            case "fail":
-                $("#message-box").css("background-color", "crimson");
-                break;
+            $("#element-settings").addClass("invisible");
+            move_general_settings_icon("invisible");
+            $("#element-list").text("");
+            c.selected_elements = { selected: [], hovered: -1 };
+            c.light_sources = [];
+            c.optical_elements = [];
+            let id = 0;
+            data.elements.optical_elements.forEach(e => {
+                c.add_element("optical_elements", e);
+                c.optical_elements[c.optical_elements.length - 1].id = id;
+                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
+            });
+            data.elements.light_sources.forEach(e => {
+                c.add_element("light_sources", e);
+                c.light_sources[c.light_sources.length - 1].id = id;
+                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
+            });
+            c.next_id = id;
+            c.set_canvas();
+            c.update_light_path();
+            message("success", "Project opened successfully!")
+        } else {
+            throw new Error("No version data");
         }
-        $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);
+    } catch (err) {
+        console.error(err);
+        message("fail", "Failed to open project! Invalid JSON structure.");
     }
+}
+
+function reload_general_settings() {
+    $("#general-settings input").each(function() {
+        $(this).val(c[$(this).data("setting")]);
+    });
+}
+
+function message(type, text) {
+    switch (type) {
+        case "success":
+            $("#message-box").css("background-color", "limegreen");
+            break;
+        case "fail":
+            $("#message-box").css("background-color", "crimson");
+            break;
+    }
+    $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);
 }

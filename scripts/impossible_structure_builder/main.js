@@ -1,12 +1,14 @@
+﻿
+import $ from "jquery";
+import c from "canvas_control";
+import * as v from "vectors";
+import sortable from "sortable";
 
 // window.addEventListener("beforeunload", e => {
 //     e.preventDefault();
 //     e.returnValue = "";
 //     return "";
 // });
-import $ from "jquery";
-import { c, canvas } from "canvas_control";
-import { vec_add, vec_scale } from "vectors";
 
 document.addEventListener("keydown", e => {
     const active = document.activeElement;
@@ -93,6 +95,7 @@ function select_tool(tool) {
     c.selected_elements = { selected: [], hovered: -1 };
     $("#element-settings").addClass("invisible");
     move_general_settings_icon("invisible");
+    sortable($("#element-list")[0], false);
 
     const buttons = $(".element-list-item > button");
     buttons.addClass("default-cursor");
@@ -102,6 +105,7 @@ function select_tool(tool) {
             c.can_move_canvas = true;
             c.default_cursor = "move";
             buttons.removeClass("default-cursor");
+            sortable($("#element-list")[0], true);
             break;
         case "select":
             c.tool_status.status = "select_element";
@@ -240,11 +244,11 @@ $("#element-settings").on("input", "#element-settings-grid > input", function() 
 function center_element(id) {
     if (id in c.vertices) {
         const element = c.vertices[id];
-        c.origin = [element.position[0] * c.size - canvas.width / 2, element.position[1] * c.size + canvas.height / 2];
+        c.origin = [element.position[0] * c.size - c.canvas.width / 2, element.position[1] * c.size + c.canvas.height / 2];
     } else if (id in c.beams) {
         const element = c.beams[id];
-        const midpoint = vec_scale(vec_add(element.vertices[0].position, element.vertices[1].position), 0.5);
-        c.origin = [midpoint[0] * c.size - canvas.width / 2, midpoint[1] * c.size + canvas.height / 2];
+        const midpoint = v.scale(v.add(element.vertices[0].position, element.vertices[1].position), 0.5);
+        c.origin = [midpoint[0] * c.size - c.canvas.width / 2, midpoint[1] * c.size + c.canvas.height / 2];
     }
     c.set_canvas();
 }
@@ -302,7 +306,7 @@ $(".general-settings-section-grid > input").on("change", function() {
     if ($(this).parent().data("setting_type") === "rendering_styles") {
         switch ($(this).data("setting")) {
             case "background_color":
-                canvas.style.backgroundColor = $(this).val();
+                c.canvas.style.backgroundColor = $(this).val();
                 break;
             case "vertex_fill_color_1":
                 c.settings.vertex_fill_styles[0] = $(this).val();

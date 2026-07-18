@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="styles/colors.css" />
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/lenses_and_mirrors/main.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
-    <script src="scripts/vectors.js" defer></script>
-    <script src="scripts/canvas_control_base.js" defer></script>
-    <script src="scripts/lenses_and_mirrors/canvas_control.js" defer></script>
-    <script src="scripts/lenses_and_mirrors/main.js" defer></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "jquery": "https://cdn.jsdelivr.net/npm/jquery@4.0.0/+esm",
+            "vectors": "/scripts/vectors.js",
+            "canvas_control_base": "/scripts/canvas_control_base.js",
+            "canvas_control": "/scripts/lenses_and_mirrors/canvas_control.js"
+        }
+    }
+    </script>
+    <script type="module" src="scripts/lenses_and_mirrors/main.js"></script>
 </head>
 
 <body class="blue-dark-theme">

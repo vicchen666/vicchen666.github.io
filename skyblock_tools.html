@@ -7,9 +7,15 @@
     <link rel="stylesheet" href="styles/colors.css" />
     <link rel="stylesheet" href="styles/common.css" />
     <link rel="stylesheet" href="styles/skyblock_tools/main.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
-    <script src="scripts/skyblock_tools/main.js" defer></script>
-    <script src="scripts/skyblock_tools/fossil_finder.js" defer></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "jquery": "https://cdn.jsdelivr.net/npm/jquery@4.0.0/+esm"
+        }
+    }
+    </script>
+    <script type="module" src="scripts/skyblock_tools/main.js"></script>
+    <script type="module" src="scripts/skyblock_tools/fossil_finder.js"></script>
 </head>
 
 <body class="orange-theme">
@@ -54,13 +60,13 @@
                     <div class="ui-header">Fossil Excavator</div>
                 </div>
                 <div id="fossil-finder-selection" class="ui ui-chest invisible" style="position: absolute;"></div>
-                <button id="fossil-finder-reset" class="text-button" onclick="fossil_finder_reset()">Reset</button>
+                <button id="fossil-finder-reset" class="text-button">Reset</button>
                 <div style="display: flex; float: right;">
                     <div style="margin: 10px;">Possible Fossils: 0</div>
                 </div>
                 <div style="display: flex; align-items: center; float: right;">
                     <div>Fossil Excavation Progress:</div>
-                    <input id="fossil-finder-progress" type="number" min="1" max="99" oninput="fossil_finder_progress_oninput(this)">
+                    <input id="fossil-finder-progress" type="number" min="1" max="99">
                     <div>%</div>
                 </div>
             </section>

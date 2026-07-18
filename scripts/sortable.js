@@ -1,4 +1,6 @@
-function sortable(list, enable=true) {
+import $ from "jquery";
+
+export default function sortable(list, enable=true) {
     const items = $(list).children().toArray();
     if (enable) {
         list.classList.add("sortable-container");
@@ -13,6 +15,7 @@ function sortable(list, enable=true) {
 
         list.addEventListener("dragover", handle_drag_over);
     } else {
+        if (!list.classList?.contains("sortable-container")) return;
         list.classList.remove("sortable-container");
 
         items.forEach(item => {
@@ -26,6 +29,7 @@ function sortable(list, enable=true) {
         list.removeEventListener("dragover", handle_drag_over);
     }
 }
+
 function handle_drag_start(e) {
     e.currentTarget.classList.add("sortable-dragging");
 }
