@@ -14,7 +14,7 @@
 #button-home {
     margin-left: 10px;
 }
-#button-info, #button-download, #button-upload {
+#button-info, #button-download, #button-open {
     margin-right: 10px;
 }
 
@@ -258,7 +258,7 @@
 #info-box {
     flex-direction: column;
     z-index: 1;
-    width: 500px;
+    width: 700px;
     top: 220px;
     left: 50%;
     background-color: var(--primary-color);

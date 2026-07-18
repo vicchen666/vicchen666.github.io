@@ -361,12 +361,10 @@
     });
 
     $("#button-info").on("click", function() {
-        // $("#info-box").toggleClass("invisible");
         $("#info-box")[0].showModal();
     });
 
     $("#info-box-close").on("click", function() {
-        // $("#info-box").addClass("invisible");
         $("#info-box")[0].close();
     });
 }

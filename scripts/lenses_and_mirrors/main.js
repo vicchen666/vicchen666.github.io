@@ -385,10 +385,10 @@
         URL.revokeObjectURL(url);
     });
 
-    $("#button-upload").on("click", () => {
-        $("#input-upload").click();
+    $("#button-open").on("click", () => {
+        $("#input-open").click();
     });
-    $("#input-upload").on("change", function(event) {
+    $("#input-open").on("change", function(event) {
         const file = event.target.files[0];
         if (!file) return;
         $(this).val("");
@@ -397,16 +397,16 @@
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                upload_project(data);
+                open_project(data);
             } catch (err) {
                 console.error(err);
-                message("fail", "File upload failed! Invalid JSON file.");
+                message("fail", "Failed to open project! Invalid JSON file.");
             }
         }
         reader.readAsText(file);
     });
 
-    function upload_project(data) {
+    function open_project(data) {
         try {
             if (data.version === 1) {
                 const ray_settings = data.general_settings.ray_settings;
@@ -437,13 +437,13 @@
                 c.next_id = id;
                 c.set_canvas();
                 c.update_light_path();
-                message("success", "File uploaded successfully!")
+                message("success", "Project opened successfully!")
             } else {
                 throw new Error("No version data");
             }
         } catch (err) {
             console.error(err);
-            message("fail", "File upload failed! Invalid JSON structure.");
+            message("fail", "Failed to open project! Invalid JSON structure.");
         }
     }
 
