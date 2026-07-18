@@ -1,5 +1,8 @@
 // Requires vec_add, vec_sub, vec_scale from vector.js
-class CanvasControlBase {
+import $ from "jquery";
+import { vec_add, vec_sub, vec_scale } from "vectors";
+
+export default class CanvasControlBase {
     constructor({ animate = true, frame_interval = 10 } = {}) {
         this.animate = animate;
         this.frame_interval = frame_interval;
