@@ -4,7 +4,7 @@ import * as v from "vectors";
 
 const TAU = Math.PI * 2;
 
-class CanvasControl extends CanvasControlBase {
+export default class CanvasControl extends CanvasControlBase {
     constructor(canvas, options = {}) {
         super(canvas, options);
 
@@ -382,6 +382,3 @@ class CanvasControl extends CanvasControlBase {
         }
     }
 }
-
-const c = new CanvasControl($("#main-canvas > canvas")[0]);
-export default c;

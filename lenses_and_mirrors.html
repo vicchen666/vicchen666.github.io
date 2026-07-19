@@ -34,7 +34,7 @@
         </div>
     </header>
 
-    <main style="display: flex; flex-grow: 1; position: relative; overflow: hidden;">
+    <main style="display: flex; flex-grow: 1; overflow: hidden;">
         <aside id="main-sidebar">
             <header style="display: flex;">
                 <button class="tab clickable" style="border-width: 0 1px 1px 0;">
@@ -59,26 +59,25 @@
 
         <section id="main-canvas">
             <canvas></canvas>
-        </section>
-
-        <section id="general-settings-frame">
-            <button id="general-settings-icon" class="icon-button" title="General Settings">
-                <img src="images/svg_icons/gear.svg">
-            </button>
-            <div id="general-settings" class="invisible scrollbar">
-                <div id="general-settings-title">General Settings</div>
-                <div class="general-settings-section">
-                    <div class="general-settings-section-title">Ray Rendering</div>
-                    <div class="general-settings-section-grid" data-setting_type="ray_rendering">
-                        <div>Max&nbsp;Ray Length</div>
-                        <input type="number" step="any" data-setting="max_distance" value="3000">
-                        <div>Solid Length</div>
-                        <input type="number" step="any" data-setting="fill_length" value="20">
-                        <div>Gap Length</div>
-                        <input type="number" step="any" data-setting="sep_length" value="10">
-                    </div>
-                </div>
-            </div>
+            <section id="general-settings-frame">
+                <button id="general-settings-icon" class="icon-button" title="General Settings">
+                    <img src="images/svg_icons/gear.svg">
+                </button>
+                <section id="general-settings" class="invisible scrollbar">
+                    <header id="general-settings-title">General Settings</header>
+                    <section class="general-settings-section">
+                        <header class="general-settings-section-title">Ray Rendering</header>
+                        <section class="general-settings-section-grid" data-setting_type="ray_rendering">
+                            <div>Max&nbsp;Ray Length</div>
+                            <input type="number" step="any" data-setting="max_distance" value="3000">
+                            <div>Solid Length</div>
+                            <input type="number" step="any" data-setting="fill_length" value="20">
+                            <div>Gap Length</div>
+                            <input type="number" step="any" data-setting="sep_length" value="10">
+                        </section>
+                    </section>
+                </section>
+            </section>
         </section>
 
         <aside id="element-settings" class="invisible scrollbar"></aside>

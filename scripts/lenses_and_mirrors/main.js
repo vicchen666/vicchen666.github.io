@@ -1,6 +1,9 @@
 ﻿import $ from "jquery";
-import c from "canvas_control";
+import CanvasControl from "canvas_control";
 import * as v from "vectors";
+
+const TAU = Math.PI * 2;
+const c = new CanvasControl($("#main-canvas > canvas")[0]);
 
 window.addEventListener("beforeunload", e => {
     e.preventDefault();
@@ -108,8 +111,7 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
     if (element_id === selected_id) {
         c.selected_elements.selected = [];
         $(this).removeClass("selected");
-        $("#element-settings").addClass("invisible");
-        move_general_settings_icon("invisible");
+        toggle_element_settings(false);
     } else {
         c.selected_elements.selected = [element_id];
         $(".element-list-item > button").removeClass("selected");
@@ -202,8 +204,16 @@ function reload_element_settings(type, index) {
     .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
     .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
 
-    $("#element-settings").removeClass("invisible");
-    move_general_settings_icon("visible");
+    toggle_element_settings(true);
+}
+
+function toggle_element_settings(show) {
+    if (show) {
+        $("#element-settings").removeClass("invisible");
+    } else {
+        $("#element-settings").addClass("invisible");
+    }
+    c.set_canvas(true);
 }
 
 $("#element-settings").on("change", "> #element-settings-select-type", function() {
@@ -325,8 +335,7 @@ function delete_element(id) {
     }
 
     c.selected_elements.selected = [];
-    $("#element-settings").addClass("invisible");
-    move_general_settings_icon("invisible");
+    toggle_element_settings(false);
     c.update_light_path();
 }
 
@@ -450,8 +459,7 @@ function open_project(data) {
             c.origin = data.misc.canvas.origin;
             c.size = data.misc.canvas.scale;
 
-            $("#element-settings").addClass("invisible");
-            move_general_settings_icon("invisible");
+            toggle_element_settings(false);
             $("#element-list").text("");
             c.selected_elements = { selected: [], hovered: -1 };
             c.light_sources = [];

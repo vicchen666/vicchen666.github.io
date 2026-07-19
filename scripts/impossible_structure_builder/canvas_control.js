@@ -1,10 +1,11 @@
 ﻿import $ from "jquery";
 import CanvasControlBase from "canvas_control_base";
 import * as v from "vectors";
+import { reload_element_settings } from "utils";
 
 const TAU = Math.PI * 2;
 
-class CanvasControl extends CanvasControlBase {
+export default class CanvasControl extends CanvasControlBase {
     constructor(canvas, options={ animate: false }) {
         super(canvas, options);
 
@@ -720,6 +721,7 @@ class CanvasControl extends CanvasControlBase {
 
                 this.selected_elements.selected = [this.selected_elements.hovered];
                 this.selected_elements.hovered = -1;
+                reload_element_settings(this, this.selected_elements.selected[0]);
                 break;
             case "add-vertex-click":
                 if (e.which !== 1) return;
@@ -1650,5 +1652,3 @@ class Axis {
     }
 }
 
-const c = new CanvasControl($("#main-canvas > canvas")[0]);
-export default c;

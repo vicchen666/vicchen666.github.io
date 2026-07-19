@@ -20,6 +20,7 @@
 
 /* canvas */
 #main-canvas {
+    position: relative;
     flex-grow: 1;
 }
 #main-canvas canvas {
@@ -177,13 +178,11 @@
 #element-settings {
     display: flex;
     flex-direction: column;
-    position: absolute;
+    flex-shrink: 0;
     background-color: var(--secondary-color);
-    right: 0;
-    top: 0;
-    bottom: 0;
     border-left: 1px solid var(--section-border-color);
     padding: 10px;
+    overflow-x: hidden;
 }
 #element-settings * {
     font-size: 30px;
