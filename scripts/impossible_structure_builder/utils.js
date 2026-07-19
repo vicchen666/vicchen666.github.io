@@ -85,8 +85,8 @@ export function reload_element_settings(c, id) {
     }
     const settings = $("#element-settings");
     settings.text("");
-    settings.append($("<div>").data("id", id).attr("id", "element-settings-title").text(type.slice(0, 1).toUpperCase() + type.slice(1) + " Parameters"));
-    const settings_grid = $("<div>").attr("id", "element-settings-grid").appendTo(settings);
+    settings.append($("<header>").data("id", id).attr("id", "element-settings-title").text(type.slice(0, 1).toUpperCase() + type.slice(1) + " Parameters"));
+    const settings_grid = $("<section>").attr("id", "element-settings-grid").appendTo(settings);
     settings_grid.append($("<div>").text("Name"));
     settings_grid.append($("<input>").attr("type", "text").data("setting", "name").val(element.name));
 
@@ -116,7 +116,7 @@ export function reload_element_settings(c, id) {
         settings_grid.append($("<input>").attr("readonly", true).val(element.direction));
     }
 
-    settings.append($("<div>").css("display", "flex")
+    settings.append($("<section>").css("display", "flex")
     .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
     .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
 

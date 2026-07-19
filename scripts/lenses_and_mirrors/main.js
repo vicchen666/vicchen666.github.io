@@ -137,12 +137,12 @@ function reload_element_settings(type, index) {
     settings.text("");
     const type_select = $("<select>").attr("id","element-settings-select-type");
     if (type === "optical_elements") {
-        settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
+        settings.append($("<header>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
         optical_elements.forEach(e => {
             type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
         });
     } else {
-        settings.append($("<div>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
+        settings.append($("<header>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
         light_sources.forEach(e => {
             type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
         });
@@ -163,7 +163,7 @@ function reload_element_settings(type, index) {
             type_select.val(element.type);
     }
 
-    const settings_grid = $("<div>").attr("id", "element-settings-grid").appendTo(settings);
+    const settings_grid = $("<section>").attr("id", "element-settings-grid").appendTo(settings);
     for (const [key, value] of Object.entries(element)) {
         if (c.elements_settings[element.type].includes(key)) {
             switch (key) {
@@ -200,7 +200,7 @@ function reload_element_settings(type, index) {
             }
         }
     }
-    settings.append($("<div>").css("display", "flex")
+    settings.append($("<section>").css("display", "flex")
     .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
     .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
 
