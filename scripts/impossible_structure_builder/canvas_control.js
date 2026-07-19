@@ -5,8 +5,8 @@ import * as v from "vectors";
 const TAU = Math.PI * 2;
 
 class CanvasControl extends CanvasControlBase {
-    constructor(options = {animate: false}) {
-        super(options);
+    constructor(canvas, options={ animate: false }) {
+        super(canvas, options);
 
         // this.axes = [[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]]
         this.axes = [[0, 1], [Math.cos(TAU * 7/12)*.5, Math.sin(TAU * 7/12)*.5], [Math.cos(TAU * 12/12), Math.sin(TAU * 12/12)]];
@@ -977,6 +977,15 @@ class CanvasControl extends CanvasControlBase {
         }
         const order = $("<div>").text(this.render_order.indexOf(this.next_id) + 1);
         const button = $("<button>").data("id", this.next_id).text(element.name);
+        switch (this.tool_status.tool) {
+            case "move":
+            case "select":
+                button.removeClass("default-cursor");
+                break;
+            default:
+                button.addClass("default-cursor");
+                break;
+        }
         $("#element-list").append($("<li>").addClass("element-list-item").append(order).append(button));
         this.next_id++;
         this.update_element_order();
@@ -996,8 +1005,15 @@ class CanvasControl extends CanvasControlBase {
         this.update_element_order();
     }
 
-    update_element_order() {
-        $(".element-list-item").each((_, button) => {
+    update_element_order(according_to_html_order = false) {
+        if (according_to_html_order) {
+            this.render_order = [];
+            $(".element-list-item").not(".sortable-ghost").each((_, button) => {
+                const id = $(button).children("button").data("id");
+                this.render_order.push(id);
+            });
+        }
+        $(".element-list-item").not(".sortable-ghost").each((_, button) => {
             const id = $(button).children("button").data("id");
             $(button).children("div").text(this.render_order.indexOf(id) + 1);
         });

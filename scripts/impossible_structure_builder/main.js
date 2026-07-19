@@ -57,9 +57,10 @@ document.addEventListener("keydown", e => {
 $("#toolbar").on("click", ".tool-button", function() {
     $(this).addClass("selected");
     $(this).parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
-    $(this).siblings(".tool-submenu").addClass("invisible");
     select_tool($(this).data("tool"));
 }).on("mouseenter", ".tool-button", function() {
+    if ($(".sortable-ghost").length) return;
+
     $(this).parent().siblings().find(".tool-submenu").addClass("invisible");
     $(this).parent().find(".tool-submenu").removeClass("invisible");
 }).on("click", ".tool-submenu-button", function() {
@@ -93,6 +94,7 @@ function select_tool(tool) {
         }
     });
     c.selected_elements = { selected: [], hovered: -1 };
+    $(".tool-submenu").addClass("invisible");
     $("#element-settings").addClass("invisible");
     move_general_settings_icon("invisible");
     sortable($("#element-list")[0], false);
@@ -105,7 +107,7 @@ function select_tool(tool) {
             c.can_move_canvas = true;
             c.default_cursor = "move";
             buttons.removeClass("default-cursor");
-            sortable($("#element-list")[0], true);
+            sortable($("#element-list")[0], true, { drag_start: element_list_drag_start, drag_over: element_list_drag_over });
             break;
         case "select":
             c.tool_status.status = "select_element";
@@ -132,6 +134,16 @@ function select_tool(tool) {
     c.render_frame();
 }
 
+function element_list_drag_start(e, li) {
+    li.css("opacity", "1");
+    $(".tool-submenu").addClass("invisible");
+}
+
+function element_list_drag_over(e) {
+    c.update_element_order(true);
+    c.render_frame();
+}
+
 $("#element-list").on("click", "> .element-list-item > button", function() {
     if (c.tool_status.tool === "select") {
         if (c.selected_elements.selected.includes(String($(this).data("id")))) {
@@ -147,11 +159,15 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
         c.render_frame();
     }
 }).on("mouseenter", "> .element-list-item > button", function() {
+    if ($(".sortable-ghost").length) return;
     if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+
     c.selected_elements.hovered = String($(this).data("id"));
     c.render_frame();
 }).on("mouseleave", "> .element-list-item > button", function() {
+    if ($(".sortable-ghost").length) return;
     if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+
     c.selected_elements.hovered = -1;
     c.render_frame();
 });

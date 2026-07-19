@@ -5,8 +5,9 @@ import * as v from "vectors";
 const TAU = Math.PI * 2;
 
 class CanvasControl extends CanvasControlBase {
-    constructor(options = {}) {
-        super(options);
+    constructor(canvas, options = {}) {
+        super(canvas, options);
+
         this.default_cursor = "move";
         this.phase = 0;
         this.fill_length = 20;

@@ -1,97 +1,201 @@
+// import $ from "jquery";
+
+// const sortable_instances = new WeakMap();
+
+// export default function sortable(list, enable=true, { drag_start, drag_over, drag_end } = {}) {
+//     if (enable) {
+//         if (sortable_instances.has(list)) return;
+//         const items = $(list).children().toArray();
+//         const item_listeners = new Map();
+
+//         items.forEach(item => {
+//             const on_drag_start = (e) => {
+//                 handle_drag_start(e);
+//                 if (typeof drag_start === "function") {
+//                     drag_start(e);
+//                 }
+//             };
+//             const on_drag_end = (e) => {
+//                 handle_drag_end(e);
+//                 if (typeof drag_end === "function") {
+//                     drag_end(e);
+//                 }
+//             };
+
+//             item.draggable = true;
+//             item.classList.add("sortable-item");
+
+//             item.addEventListener("dragstart", on_drag_start);
+//             item.addEventListener("dragend", on_drag_end);
+
+//             item_listeners.set(item, { on_drag_start, on_drag_end });
+//         });
+
+//         const on_drag_over = (e) => {
+//             handle_drag_over(e);
+//             if (typeof drag_over === "function") {
+//                 drag_over(e);
+//             }
+//         }
+
+//         list.classList.add("sortable-container");
+//         list.addEventListener("dragover", handle_drag_over);
+
+//         sortable_instances.set(list, { items, item_listeners, on_drag_over });
+//     } else {
+//         const instance = sortable_instances.get(list);
+//         if (!instance) return;
+
+//         list.classList.remove("sortable-container");
+//         list.removeEventListener("dragover", instance.on_drag_over);
+
+//         for (const [item, listeners] of instance.item_listeners) {
+//             item.draggable = false;
+//             item.classList.remove("sortable-item", "sortable-dragging");
+
+//             item.removeEventListener("dragstart", listeners.on_drag_start);
+//             item.removeEventListener("dragend", listeners.on_drag_end);
+//         }
+
+//         sortable_instances.delete(list);
+//     }
+// }
+
+// function handle_drag_start(e) {
+//     e.currentTarget.classList.add("sortable-dragging");
+// }
+
+// function handle_drag_end(e) {
+//     e.currentTarget.classList.remove("sortable-dragging");
+// }
+
+// function handle_drag_over(e) {
+//     e.preventDefault();
+
+//     const list = e.currentTarget;
+//     const dragged_item = list.querySelector(".sortable-dragging");
+//     const pointed_element = document.elementFromPoint(e.clientX, e.clientY);
+//     const swap_item = pointed_element?.closest(".sortable-item");
+
+//     if (
+//         !dragged_item ||
+//         !swap_item ||
+//         swap_item === dragged_item ||
+//         swap_item.parentElement !== list
+//     ) return;
+
+//     // const box = swap_item.getBoundingClientRect();
+//     // const insert_after = e.clientY > box.top + box.height / 2;
+
+//     // list.insertBefore(
+//     //     dragged_item,
+//     //     insert_after ? swap_item.nextElementSibling : swap_item
+//     // );
+
+//     list.insertBefore(
+//         dragged_item,
+//         swap_item === dragged_item.nextSibling ? swap_item.nextSibling : swap_item
+//     );
+// }
+
+
+
 import $ from "jquery";
 
-export default function sortable(list, enable=true) {
-    const items = $(list).children().toArray();
+const sortable_instances = new WeakMap();
+
+export default function sortable(list, enable = true, { drag_start, drag_over, drag_end } = {}) {
     if (enable) {
-        list.classList.add("sortable-container");
+        if (sortable_instances.has(list)) return;
+
+        const items = $(list).children().toArray();
+        const item_listeners = new Map();
 
         items.forEach(item => {
-            item.draggable = true;
-            item.classList.add("sortable-item");
+            const on_mouse_down = (e) => {
+                e.preventDefault();
+                start_drag(e, item, list, { drag_start, drag_over, drag_end });
+            };
 
-            item.addEventListener("dragstart", handle_drag_start);
-            item.addEventListener("dragend", handle_drag_end);
+            item.classList.add("sortable-item");
+            item.addEventListener("mousedown", on_mouse_down);
+
+            item_listeners.set(item, { on_mouse_down });
         });
 
-        list.addEventListener("dragover", handle_drag_over);
+        list.classList.add("sortable-container");
+        sortable_instances.set(list, { items, item_listeners });
     } else {
-        if (!list.classList?.contains("sortable-container")) return;
+        const instance = sortable_instances.get(list);
+        if (!instance) return;
+
         list.classList.remove("sortable-container");
 
-        items.forEach(item => {
-            item.draggable = false;
+        for (const [item, listeners] of instance.item_listeners) {
             item.classList.remove("sortable-item", "sortable-dragging");
+            item.removeEventListener("mousedown", listeners.on_mouse_down);
+        }
 
-            item.removeEventListener("dragstart", handle_drag_start);
-            item.removeEventListener("dragend", handle_drag_end);
-        });
-
-        list.removeEventListener("dragover", handle_drag_over);
+        sortable_instances.delete(list);
     }
 }
 
-function handle_drag_start(e) {
-    e.currentTarget.classList.add("sortable-dragging");
-}
+function start_drag(e, item, list, { drag_start, drag_over, drag_end }) {
+    const rect = item.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
 
-function handle_drag_end(e) {
-    e.currentTarget.classList.remove("sortable-dragging");
-}
+    const ghost = $(item).clone();
+    ghost.css({
+        position: "fixed",
+        "z-index": "1000",
+        opacity: "0.5",
+        width: `${rect.width}px`,
+        height: `${rect.height}px`,
+        left: `${e.clientX - offsetX}px`,
+        top: `${e.clientY - offsetY}px`
+    }).removeClass("sortable-item").addClass("sortable-ghost");
+    $(list).prepend(ghost);
 
-function handle_drag_over(e) {
-    const list = e.currentTarget;
-    const dragged_item = list.querySelector(".sortable-dragging");
-    const pointed_element = document.elementFromPoint(e.clientX, e.clientY);
-    const swap_item = pointed_element?.closest(".sortable-item");
-
-    if (
-        !dragged_item ||
-        !swap_item ||
-        swap_item === dragged_item ||
-        swap_item.parentElement !== list
-    ) return;
-
-    const box = swap_item.getBoundingClientRect();
-    const insert_after = e.clientY > box.top + box.height / 2;
-
-    list.insertBefore(
-        dragged_item,
-        insert_after ? swap_item.nextElementSibling : swap_item
-    );
-
-    // list.insertBefore(
-    //     dragged_item,
-    //     swap_item === dragged_item.nextSibling ? swap_item.nextSibling : swap_item
-    // );
-}
-
-// function sortable(list, enable=true) {
-//     if (enable) {
-//         $(list).addClass("sortable-container");
-//         const items = $(list).children();
-//         items.attr("draggable", true).addClass("sortable-item");
-//         items[0].ondrag = handleDrag;
-//         items[0].ondragend = handleDrop;
-//     } else {
-//         $(list).removeClass("sortable-container");
-//         $(list).children().removeClass("sortable-item");
-//         $(list).children().attr("draggable", false);
-//     }
-// }
-// {
-//     function handleDrag(e) {
-//         const item = e.target;
-//         const list = item.parentNode;
+    item.classList.add("sortable-dragging");
     
-//         item.classList.add("sortable-dragging");
-//         const swap_item = document.elementFromPoint(e.clientX, e.clientY).closest(".sortable-item");
 
-//         if (swap_item === null || swap_item === item || swap_item.parentNode !== list) return;
-    
-//         list.insertBefore(item, swap_item === item.nextSibling ? swap_item.nextSibling : swap_item);
-//     }
+    if (typeof drag_start === "function") drag_start(e, ghost);
 
-//     function handleDrop(e) {
-//         e.target.classList.remove("sortable-dragging");
-//     }
-// }
+    const on_mouse_move = (moveEvent) => {
+        ghost.css({
+            left: `${moveEvent.clientX - offsetX}px`,
+            top: `${moveEvent.clientY - offsetY}px`
+        });
+
+        ghost.css("pointer-events", "none");
+        const pointed_element = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+        ghost.css("pointer-events", "auto");
+        const swap_item = pointed_element?.closest(".sortable-item");
+
+        if (
+            swap_item &&
+            swap_item !== item &&
+            swap_item.parentElement === list
+        ) {
+            list.insertBefore(
+                item,
+                swap_item === item.nextSibling ? swap_item.nextSibling : swap_item
+            );
+            if (typeof drag_over === "function") drag_over(moveEvent, ghost);
+        }
+    };
+
+    const on_mouse_up = (upEvent) => {
+        document.removeEventListener("mousemove", on_mouse_move);
+        document.removeEventListener("mouseup", on_mouse_up);
+
+        ghost.remove();
+        item.classList.remove("sortable-dragging");
+
+        if (typeof drag_end === "function") drag_end(upEvent, ghost);
+    };
+
+    document.addEventListener("mousemove", on_mouse_move);
+    document.addEventListener("mouseup", on_mouse_up);
+}
