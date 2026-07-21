@@ -14,6 +14,8 @@ export default class CanvasControl extends CanvasControlBase {
         // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
         // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
         this.axes = this.axes.map(axis => v.scale(axis, 100));
+        this.settings.vertex_hover_dist = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
+        this.settings.beam_hover_dist = Math.max(...this.axes.map(axis => v.len(axis)));
         this.vertices = {};
         this.beams = {};
         this.render_order = [];
@@ -31,6 +33,8 @@ export default class CanvasControl extends CanvasControlBase {
 
     settings = {
         vertex_connect_length_threshold: 1e-5,
+        vertex_hover_dist: 0,
+        beam_hover_dist: 0,
         preview_alpha: 0.5,
         axis_style: "white",
         axis_width: 5,
@@ -89,7 +93,7 @@ export default class CanvasControl extends CanvasControlBase {
             "add_vertex": e => {
                 this.preview_elements.vertices = [];
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-                this.preview_elements.vertices.push(new Vertex(canvas_point, { preview: true }));
+                this.preview_elements.vertices.push(this.create_vertex(canvas_point, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -128,14 +132,14 @@ export default class CanvasControl extends CanvasControlBase {
                 const point = v.point_to_seg_point(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                 let vertex;
                 if (point === beam.vertices[0].position || point === beam.vertices[1].position) {
-                    vertex = new Vertex(v.scale(v.add(beam.vertices[0].position, beam.vertices[1].position), 0.5), { preview: true });
+                    vertex = this.create_vertex(v.scale(v.add(beam.vertices[0].position, beam.vertices[1].position), 0.5), { preview: true });
                 } else {
-                    vertex = new Vertex(point, { preview: true });
+                    vertex = this.create_vertex(point, { preview: true });
                 }
 
                 this.preview_elements.vertices.push(vertex);
-                this.preview_elements.beams.push(new Beam([beam.vertices[0], vertex], beam.direction, { preview: true }));
-                this.preview_elements.beams.push(new Beam([beam.vertices[1], vertex], beam.direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([beam.vertices[0], vertex], beam.direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([beam.vertices[1], vertex], beam.direction, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -191,9 +195,9 @@ export default class CanvasControl extends CanvasControlBase {
                 };
 
                 const projected_direction = v.scale(unit_axes[nearest_axis.key], dot_prods[nearest_axis.key]);
-                const new_vertex = new Vertex(v.add(vertex.position, projected_direction), { preview: true });
+                const new_vertex = this.create_vertex(v.add(vertex.position, projected_direction), { preview: true });
                 this.preview_elements.vertices.push(new_vertex);
-                this.preview_elements.beams.push(new Beam([vertex, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -291,7 +295,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 if (nearest_id !== -1) {
                     this.selected_elements.hovered = nearest_id;
-                    this.preview_elements.beams.push(new Beam([this.vertices[this.selected_elements.selected[0]], this.vertices[nearest_id]], Math.abs(Number(nearest_direction)), { preview: true }));
+                    this.preview_elements.beams.push(this.create_beam([this.vertices[this.selected_elements.selected[0]], this.vertices[nearest_id]], Math.abs(Number(nearest_direction)), { preview: true }));
                     this.canvas.style.cursor = "pointer";
                 } else {
                     this.selected_elements.hovered = -1;
@@ -347,7 +351,7 @@ export default class CanvasControl extends CanvasControlBase {
                     return;
                 };
 
-                this.preview_elements.axes.push(new Axis(vertex, Number(nearest_axis.key), { preview: true }));
+                this.preview_elements.axes.push(this.create_axis(vertex, Number(nearest_axis.key), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -435,10 +439,10 @@ export default class CanvasControl extends CanvasControlBase {
                 };
 
                 this.preview_elements.axes[0].show = false;
-                const new_vertex = new Vertex(v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, unit_axes[nearest_axis.key]), { preview: true });
+                const new_vertex = this.create_vertex(v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, unit_axes[nearest_axis.key]), { preview: true });
                 this.preview_elements.vertices.push(new_vertex);
-                this.preview_elements.beams.push(new Beam([vertex1, new_vertex], Math.abs(direction1), { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex2, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex1, new_vertex], Math.abs(direction1), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -491,7 +495,7 @@ export default class CanvasControl extends CanvasControlBase {
                     return;
                 };
 
-                this.preview_elements.axes.push(new Axis(vertex, Number(nearest_axis.key), { preview: true }));
+                this.preview_elements.axes.push(this.create_axis(vertex, Number(nearest_axis.key), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -533,11 +537,11 @@ export default class CanvasControl extends CanvasControlBase {
                 this.selected_elements.hovered = nearest_id;
                 this.beams[nearest_id].show = false;
                 this.beams[nearest_id].destroy();
-                const vertex2 = new Vertex(v.ray_seg_intersection(vertex1.position, direction1_vec, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                const vertex2 = this.create_vertex(v.ray_seg_intersection(vertex1.position, direction1_vec, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
                 this.preview_elements.vertices.push(vertex2);
-                this.preview_elements.beams.push(new Beam([vertex1, vertex2], Math.abs(direction1), { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex2, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex2, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex1, vertex2], Math.abs(direction1), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame(); 
             },
@@ -605,12 +609,12 @@ export default class CanvasControl extends CanvasControlBase {
                 beam1.destroy();
                 this.beams[nearest_id].show = false;
                 this.beams[nearest_id].destroy();
-                const vertex = new Vertex(v.seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                const vertex = this.create_vertex(v.seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
                 this.preview_elements.vertices.push(vertex);
-                this.preview_elements.beams.push(new Beam([vertex, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex, beam1.vertices[0]], beam1.direction, { preview: true }));
-                this.preview_elements.beams.push(new Beam([vertex, beam1.vertices[1]], beam1.direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, beam1.vertices[0]], beam1.direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, beam1.vertices[1]], beam1.direction, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -947,7 +951,7 @@ export default class CanvasControl extends CanvasControlBase {
                         this.remove_element(this.beams[same_axis_beam.id]);
                         const vertex1 = beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? beam.vertices[1] : beam.vertices[0];
                         const vertex2 = same_axis_beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
-                        this.register_preview(new Beam([vertex1, vertex2], Math.abs(Number(dir))));
+                        this.register_preview(this.create_beam([vertex1, vertex2], Math.abs(Number(dir))));
                     }
                 });
                 this.remove_element(this.vertices[this.selected_elements.hovered]);
@@ -1037,7 +1041,7 @@ export default class CanvasControl extends CanvasControlBase {
         let centers_vertices = [];
         for (let i=0; i<8; i++) {
             for (let j=0; j<8; j++) {
-                centers_vertices.push(new Vertex(v.add(v.scale([0, 1], i * 500), v.scale([1, 0], j * 500))));
+                centers_vertices.push(this.create_vertex(v.add(v.scale([0, 1], i * 500), v.scale([1, 0], j * 500))));
             }
         }
         const toggle_beams = Array.from({ length: 2 ** 6 - 1 }, (_, i) => i + 1)
@@ -1052,8 +1056,8 @@ export default class CanvasControl extends CanvasControlBase {
 
         for (let i=0; i<63; i++) {
             toggle_beams[i].forEach(beam => {
-                const v = new Vertex(v.add(centers_vertices[i].position, v.scale(this.axes[(beam - 1) % 3], beam > 3 ? -10 : 10)));
-                const b = new Beam(beam < 4 ? [v, centers_vertices[i]] : [centers_vertices[i], v], (beam - 1) % 3 + 1);
+                const v = this.create_vertex(v.add(centers_vertices[i].position, v.scale(this.axes[(beam - 1) % 3], beam > 3 ? -10 : 10)));
+                const b = this.create_beam(beam < 4 ? [v, centers_vertices[i]] : [centers_vertices[i], v], (beam - 1) % 3 + 1);
                 beams.push(b);
                 vertices.push(v);
             });
@@ -1074,13 +1078,13 @@ export default class CanvasControl extends CanvasControlBase {
     display_penrose_triangle() {
         let vertices = [];
         let beams = [];
-        vertices.push(new Vertex([-300, 0]));
-        vertices.push(new Vertex(v.add(vertices[0].position, v.scale(this.axes[0], 5))));
-        vertices.push(new Vertex(v.add(vertices[0].position, v.scale(this.axes[1], -5))));
+        vertices.push(this.create_vertex([-300, 0]));
+        vertices.push(this.create_vertex(v.add(vertices[0].position, v.scale(this.axes[0], 5))));
+        vertices.push(this.create_vertex(v.add(vertices[0].position, v.scale(this.axes[1], -5))));
 
-        beams.push(new Beam([vertices[1], vertices[0]], 1));
-        beams.push(new Beam([vertices[0], vertices[2]], 2));
-        beams.push(new Beam([vertices[2], vertices[1]], 3));
+        beams.push(this.create_beam([vertices[1], vertices[0]], 1));
+        beams.push(this.create_beam([vertices[0], vertices[2]], 2));
+        beams.push(this.create_beam([vertices[2], vertices[1]], 3));
 
         this.ctx.lineCap = "round";
         this.ctx.lineJoin = "round";
@@ -1097,27 +1101,27 @@ export default class CanvasControl extends CanvasControlBase {
         let vertices = [];
         let beams = [];
 
-        vertices.push(new Vertex([0, 0]));
-        vertices.push(new Vertex(v.add(vertices[0].position, v.scale(this.axes[0], 10))));
-        vertices.push(new Vertex(v.add(vertices[0].position, v.scale(this.axes[1], 10))));
-        vertices.push(new Vertex(v.add(vertices[0].position, v.scale(this.axes[2], 10))));
-        vertices.push(new Vertex(v.add(vertices[1].position, v.scale(this.axes[1], 10))));
-        vertices.push(new Vertex(v.add(vertices[2].position, v.scale(this.axes[2], 10))));
-        vertices.push(new Vertex(v.add(vertices[3].position, v.scale(this.axes[0], 10))));
-        vertices.push(new Vertex(v.add(vertices[4].position, v.scale(this.axes[2], 10))));
+        vertices.push(this.create_vertex([0, 0]));
+        vertices.push(this.create_vertex(v.add(vertices[0].position, v.scale(this.axes[0], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[0].position, v.scale(this.axes[1], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[0].position, v.scale(this.axes[2], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[1].position, v.scale(this.axes[1], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[2].position, v.scale(this.axes[2], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[3].position, v.scale(this.axes[0], 10))));
+        vertices.push(this.create_vertex(v.add(vertices[4].position, v.scale(this.axes[2], 10))));
 
-        beams.push(new Beam([vertices[4], vertices[1]], 2));
-        beams.push(new Beam([vertices[6], vertices[1]], 3));
-        beams.push(new Beam([vertices[5], vertices[2]], 3));
-        beams.push(new Beam([vertices[4], vertices[2]], 1));
-        beams.push(new Beam([vertices[6], vertices[3]], 1));
-        beams.push(new Beam([vertices[5], vertices[3]], 2));
-        beams.push(new Beam([vertices[7], vertices[4]], 3));
-        beams.push(new Beam([vertices[7], vertices[5]], 1));
-        beams.push(new Beam([vertices[7], vertices[6]], 2));
-        beams.push(new Beam([vertices[1], vertices[0]], 1));
-        beams.push(new Beam([vertices[2], vertices[0]], 2));
-        beams.push(new Beam([vertices[3], vertices[0]], 3));
+        beams.push(this.create_beam([vertices[4], vertices[1]], 2));
+        beams.push(this.create_beam([vertices[6], vertices[1]], 3));
+        beams.push(this.create_beam([vertices[5], vertices[2]], 3));
+        beams.push(this.create_beam([vertices[4], vertices[2]], 1));
+        beams.push(this.create_beam([vertices[6], vertices[3]], 1));
+        beams.push(this.create_beam([vertices[5], vertices[3]], 2));
+        beams.push(this.create_beam([vertices[7], vertices[4]], 3));
+        beams.push(this.create_beam([vertices[7], vertices[5]], 1));
+        beams.push(this.create_beam([vertices[7], vertices[6]], 2));
+        beams.push(this.create_beam([vertices[1], vertices[0]], 1));
+        beams.push(this.create_beam([vertices[2], vertices[0]], 2));
+        beams.push(this.create_beam([vertices[3], vertices[0]], 3));
 
         this.ctx.lineJoin = "round";
         this.ctx.lineCap = "round";
@@ -1132,7 +1136,7 @@ export default class CanvasControl extends CanvasControlBase {
 
     display_sierpinski(level) {
         // Credit to NutronStar45 for the algorithm
-        let vertices = [new Vertex([0, 0])];
+        let vertices = [this.create_vertex([0, 0])];
         let vertexCount = 1;
         let beams = [];
 
@@ -1148,15 +1152,15 @@ export default class CanvasControl extends CanvasControlBase {
                 // Generate vertices
                 if (bottomRight === null) {
                     bottomRight = vertexCount++;
-                    vertices.push(new Vertex(v.add(vertices[bottomLeft].position, v.scale(this.axes[0], 10))));
+                    vertices.push(this.create_vertex(v.add(vertices[bottomLeft].position, v.scale(this.axes[0], 10))));
                 }
                 let top = vertexCount++;
-                vertices.push(new Vertex(v.add(vertices[bottomLeft].position, v.scale(this.axes[1], -10))));
+                vertices.push(this.create_vertex(v.add(vertices[bottomLeft].position, v.scale(this.axes[1], -10))));
 
                 // Generate beams
-                beams.push(new Beam([vertices[bottomLeft], vertices[bottomRight]], 1));
-                beams.push(new Beam([vertices[bottomLeft], vertices[top]], 2));
-                beams.push(new Beam([vertices[bottomRight], vertices[top]], 3));
+                beams.push(this.create_beam([vertices[bottomLeft], vertices[bottomRight]], 1));
+                beams.push(this.create_beam([vertices[bottomLeft], vertices[top]], 2));
+                beams.push(this.create_beam([vertices[bottomRight], vertices[top]], 3));
 
                 return [bottomRight, top];
             } else {
@@ -1213,6 +1217,16 @@ export default class CanvasControl extends CanvasControlBase {
         });
     }
 
+    create_vertex(position, { id=0, preview=false, show=true, name="" } = {}) {
+        return new Vertex(this, position, { id, preview, show, name });
+    }
+    create_beam(vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
+        return new Beam(this, vertices, direction, { id, preview, show, name });
+    }
+    create_axis(vertex, direction, { preview=false, show=true } = {}) {
+        return new Axis(this, vertex, direction, { preview, show });
+    }
+
     sync_settings() {
         Beam.axes = this.axes;
         Beam.hover_dist = Math.max(...this.axes.map(axis => v.len(axis)));
@@ -1246,13 +1260,15 @@ class Vertex {
     static fill_styles;
     static seal_cracks_line_width;
 
-    constructor(position, { id=0, preview=false, show=true } = {}) {
+    constructor(canvas_control, position, { id=0, preview=false, show=true, name="" } = {}) {
+        this.c = canvas_control;
         this.position = position;
         this.id = id;
         this.beams = {};
         this.edges = new Set();
         this.preview = preview;
         this.show = show;
+        this.name = name;
     }
 
     draw_outline() {
@@ -1455,12 +1471,14 @@ class Beam {
     static fill_styles;
     static seal_cracks_line_width;
 
-    constructor(vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
+    constructor(canvas_control, vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
+        this.c = canvas_control;
         this.vertices = vertices;
         this.direction = direction;
         this.id = id;
         this.preview = preview;
         this.show = show;
+        this.name = name;
         if (v.dot(v.sub(this.vertices[0].position, this.vertices[1].position), Beam.axes[this.direction - 1]) < 0) this.vertices.reverse();
         this.assign_vertices();
     }
@@ -1622,7 +1640,8 @@ class Axis {
     static stroke_style;
     static line_width;
 
-    constructor(vertex, direction, { preview=false, show=true, name="" } = {}) {
+    constructor(canvas_control, vertex, direction, { preview=false, show=true } = {}) {
+        this.c = canvas_control;
         this.vertex = vertex;
         this.direction = direction;
         this.preview = preview;

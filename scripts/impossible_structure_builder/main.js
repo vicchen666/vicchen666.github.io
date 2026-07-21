@@ -9,6 +9,7 @@ import * as utils from "utils";
 //     return "";
 // });
 
+// $("#init-box")[0].showModal();
 const c = new CanvasControl($("#main-canvas > canvas")[0]);
 
 document.addEventListener("keydown", e => {

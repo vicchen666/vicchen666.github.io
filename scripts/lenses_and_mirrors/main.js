@@ -343,14 +343,6 @@ $("#general-settings-icon").on("click", function() {
     $("#general-settings").toggleClass("invisible");
 });
 
-function move_general_settings_icon(state) {
-    if (state === "visible") {
-        $("#general-settings-frame").css("right", $("#element-settings").outerWidth() + 10);
-    } else {
-        $("#general-settings-frame").css("right", 10);
-    }
-}
-
 $(".general-settings-section-grid > input").on("change", function() {
     if ($(this).parent().data("setting_type") === "ray_rendering") {
         if (+$(this).val() < 0) {

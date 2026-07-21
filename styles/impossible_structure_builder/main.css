@@ -143,8 +143,7 @@ body {
 }
 .general-settings-section-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: min-content;
+    grid-template-columns: auto auto;
     align-items: center;
 }
 .general-settings-section-grid > * {
@@ -242,7 +241,7 @@ body {
 }
 #element-settings-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto;
     width: min-content;
 }
 #element-settings-grid > * {
@@ -304,6 +303,53 @@ body {
 #info-box-hotkeys th, #info-box-hotkeys td {
     border: 1px solid var(--section-border-color);
     padding: 5px;
+}
+
+/* init */
+#init-box {
+    flex-direction: column;
+    z-index: 1;
+    width: 700px;
+    top: 220px;
+    left: 50%;
+    background-color: var(--primary-color);
+    border: var(--section-border-color) 1px solid;
+    padding: 10px;
+    transform: translateX(-50%);
+    &[open] {
+        display: flex;
+    }
+}
+#init-box input {
+    background-color: var(--primary-color);
+}
+#init-box-title {
+    font-size: 40px;
+    margin-bottom: 5px;
+}
+.init-box-content {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--section-border-color);
+    padding: 10px;
+}
+.init-box-content-title {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+.init-box-content-text * {
+    font-size: 20px;
+}
+#init-box-axes {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    width: fit-content;
+}
+#init-box-axes > input {
+    max-width: 100px;
+}
+#init-box-axes > * {
+    margin: 5px;
 }
 
 /* message */

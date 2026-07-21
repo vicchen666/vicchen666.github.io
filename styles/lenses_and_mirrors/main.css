@@ -78,8 +78,7 @@
 }
 .general-settings-section-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: min-content;
+    grid-template-columns: auto auto;
     align-items: center;
 }
 .general-settings-section-grid > * {
@@ -195,7 +194,7 @@
 }
 #element-settings-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto;
     width: min-content;
 }
 #element-settings-grid > * {
