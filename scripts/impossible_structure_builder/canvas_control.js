@@ -14,18 +14,14 @@ export default class CanvasControl extends CanvasControlBase {
         // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
         // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
         this.axes = this.axes.map(axis => v.scale(axis, 100));
-        this.settings.vertex_hover_dist = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
-        this.settings.beam_hover_dist = Math.max(...this.axes.map(axis => v.len(axis)));
+        this.settings.hover_dist.vertex = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
+        this.settings.hover_dist.beam = Math.max(...this.axes.map(axis => v.len(axis)));
         this.vertices = {};
         this.beams = {};
         this.render_order = [];
         this.next_name = { vertex: 1, beam: 1 };
         this.preview_elements = { vertices: [], beams: [], axes: [] };
 
-        Vertex.ctx = this.ctx;
-        Beam.ctx = this.ctx;
-        Axis.ctx = this.ctx;
-        this.sync_settings();
         this.setup_listeners();
         this.set_canvas(true);
         this.draw();
@@ -33,6 +29,7 @@ export default class CanvasControl extends CanvasControlBase {
 
     settings = {
         vertex_connect_length_threshold: 1e-5,
+        hover_dist: { vertex: 0, beam: 0 },
         vertex_hover_dist: 0,
         beam_hover_dist: 0,
         preview_alpha: 0.5,
@@ -41,8 +38,7 @@ export default class CanvasControl extends CanvasControlBase {
         hovered_style: "#add8e680",
         selected_style: "#ade6b5cc",
         outline_style: "yellow",
-        vertex_fill_styles: ["white", "gray", "black"],
-        beam_fill_styles: ["white", "gray", "black"],
+        fill_styles: { vertex: ["white", "gray", "black"], beam: ["white", "gray", "black"] },
         seal_cracks_line_width: 1,
     };
 
@@ -55,7 +51,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
 
@@ -72,7 +68,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
 
@@ -106,7 +102,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
 
                     nearest_id = id;
@@ -152,7 +148,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (Object.keys(vertex.beams).length === 6) return;
 
@@ -210,7 +206,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (Object.keys(vertex.beams).length === 6) return;
 
@@ -239,7 +235,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (Object.keys(vertex.beams).length === 6) return;
 
@@ -266,7 +262,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_direction = 0;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
                     if (Object.keys(vertex.beams).length === 6) return;
@@ -311,7 +307,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (Object.keys(vertex.beams).length === 6) return;
 
@@ -365,7 +361,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
                     if (Object.keys(vertex.beams).length === 6) return;
@@ -455,7 +451,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (Object.keys(vertex.beams).length === 6) return;
 
@@ -519,7 +515,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
                     if (Object.values(vertex1.beams).includes(beam)) return;
                     if (v.ray_seg_intersection(vertex1.position, direction1_vec, beam.vertices[0].position, beam.vertices[1].position) === null) return;
@@ -554,7 +550,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
 
                     nearest_id = id;
@@ -589,7 +585,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
                     if (beam1.vertices.some(vertex => Object.values(vertex.beams).includes(beam))) return;
@@ -627,7 +623,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
 
                     nearest_id = id;
@@ -651,7 +647,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.vertices).forEach(([id, vertex]) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
-                    if (dist > Vertex.hover_dist) return;
+                    if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
 
                     nearest_id = id;
@@ -675,7 +671,7 @@ export default class CanvasControl extends CanvasControlBase {
                 let nearest_dist = Infinity;
                 Object.entries(this.beams).forEach(([id, beam]) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
-                    if (dist > Beam.hover_dist) return;
+                    if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
 
                     nearest_id = id;
@@ -696,10 +692,6 @@ export default class CanvasControl extends CanvasControlBase {
     render_frame() {
         this.highlight_selected_elements();
         this.ctx.clearRect(...v.scale(this.origin, 1 / this.size), this.canvas.width / this.size, -this.canvas.height / this.size);
-        Beam.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
-        Vertex.seal_cracks_line_width = this.settings.seal_cracks_line_width / this.size;
-        Axis.line_width = this.settings.axis_width / this.size;
-
         this.ctx.lineJoin = "round";
         this.ctx.lineCap = "round";
         this.ctx.lineWidth = 2 / this.size;
@@ -1226,40 +1218,9 @@ export default class CanvasControl extends CanvasControlBase {
     create_axis(vertex, direction, { preview=false, show=true } = {}) {
         return new Axis(this, vertex, direction, { preview, show });
     }
-
-    sync_settings() {
-        Beam.axes = this.axes;
-        Beam.hover_dist = Math.max(...this.axes.map(axis => v.len(axis)));
-        Beam.preview_alpha = this.settings.preview_alpha;
-        Beam.hovered_style = this.settings.hovered_style;
-        Beam.selected_style = this.settings.selected_style;
-        Beam.outline_style = this.settings.outline_style;
-        Beam.fill_styles = this.settings.beam_fill_styles;
-        Vertex.axes = this.axes;
-        Vertex.hover_dist = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
-        Vertex.preview_alpha = this.settings.preview_alpha;
-        Vertex.hovered_style = this.settings.hovered_style;
-        Vertex.selected_style = this.settings.selected_style;
-        Vertex.outline_style = this.settings.outline_style;
-        Vertex.fill_styles = this.settings.vertex_fill_styles;
-        Axis.axes = this.axes;
-        Axis.stroke_style = this.settings.axis_style;
-        Axis.preview_alpha = this.settings.preview_alpha;
-        Axis.line_width = this.settings.axis_width;
-    }
 }
 
 class Vertex {
-    static ctx;
-    static axes;
-    static hover_dist;
-    static preview_alpha;
-    static hovered_style;
-    static selected_style;
-    static outline_style;
-    static fill_styles;
-    static seal_cracks_line_width;
-
     constructor(canvas_control, position, { id=0, preview=false, show=true, name="" } = {}) {
         this.c = canvas_control;
         this.position = position;
@@ -1273,6 +1234,10 @@ class Vertex {
 
     draw_outline() {
         if (!this.show) return;
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
         const add_edges_1 = () => {
             Object.keys(this.beams).forEach(main_beam => {
                 main_beam = Number(main_beam);
@@ -1369,108 +1334,110 @@ class Vertex {
         // remove_edges();
         add_edges_2();
 
-        Vertex.ctx.strokeStyle = Vertex.outline_style;
-        Vertex.ctx.beginPath();
+        ctx.strokeStyle = settings.outline_style;
+        ctx.beginPath();
         this.edges.forEach(edgeKey => {
             const edge = edgeKey.split(",").map(Number);
             let position = this.position;
             for (let i=0; i<edge.length-1; i++) {
-                    position = v.sub(position, Vertex.axes[edge[i] - 1]);
+                    position = v.sub(position, c.axes[edge[i] - 1]);
             }
-            Vertex.ctx.moveTo(...position);
-                const line_end = v.sub(position, Vertex.axes[edge[edge.length - 1] - 1]);
-            Vertex.ctx.lineTo(...line_end);
+            ctx.moveTo(...position);
+                const line_end = v.sub(position, c.axes[edge[edge.length - 1] - 1]);
+            ctx.lineTo(...line_end);
         });
-        Vertex.ctx.closePath();
-        Vertex.ctx.stroke();
+        ctx.closePath();
+        ctx.stroke();
     }
 
     fill() {
         if (!this.show) return;
-        if (this.preview) Vertex.ctx.globalAlpha = Vertex.preview_alpha;
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        if (this.preview) ctx.globalAlpha = settings.preview_alpha;
         for (let i=0; i<3; i++) {
             if (String(i + 1) in this.beams) continue;
-            const main_axis = Vertex.axes[i];
-            const other_axes = Vertex.axes.filter((_, j) => j !== i);
-            Vertex.ctx.fillStyle = Vertex.fill_styles[i];
-            Vertex.ctx.beginPath();
+            const main_axis = c.axes[i];
+            const other_axes = c.axes.filter((_, j) => j !== i);
+            ctx.fillStyle = settings.fill_styles.vertex[i];
+            ctx.beginPath();
             let position = this.position;
-            Vertex.ctx.moveTo(...position);
+            ctx.moveTo(...position);
             position = v.sub(position, other_axes[0]);
-            Vertex.ctx.lineTo(...position);
+            ctx.lineTo(...position);
             position = v.sub(position, other_axes[1]);
-            Vertex.ctx.lineTo(...position);
+            ctx.lineTo(...position);
             position = v.add(position, other_axes[0]);
-            Vertex.ctx.lineTo(...position);
+            ctx.lineTo(...position);
             position = v.add(position, other_axes[1]);
-            Vertex.ctx.lineTo(...position);
-            Vertex.ctx.closePath();
-            Vertex.ctx.fill();
+            ctx.lineTo(...position);
+            ctx.closePath();
+            ctx.fill();
 
             // Draw outline to prevent cracks
-            Vertex.ctx.save();
-            Vertex.ctx.strokeStyle = Vertex.fill_styles[i];
-            Vertex.ctx.lineWidth = Vertex.seal_cracks_line_width;
-            Vertex.ctx.stroke();
-            Vertex.ctx.restore();
+            ctx.save();
+            ctx.strokeStyle = settings.fill_styles.vertex[i];
+            ctx.lineWidth = settings.seal_cracks_line_width / c.size;
+            ctx.stroke();
+            ctx.restore();
         }
-        if (this.preview) Vertex.ctx.globalAlpha = 1;
+        if (this.preview) ctx.globalAlpha = 1;
     }
 
     draw_hovered() {
         if (!this.show) return;
-        Vertex.ctx.fillStyle = Vertex.hovered_style;
-        Vertex.ctx.beginPath();
-        let position = v.sub(this.position, Vertex.axes[0]);
-        Vertex.ctx.moveTo(...position);
-        position = v.sub(position, Vertex.axes[1]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[0]);
-        Vertex.ctx.lineTo(...position);
-        position = v.sub(position, Vertex.axes[2]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[1]);
-        Vertex.ctx.lineTo(...position);
-        position = v.sub(position, Vertex.axes[0]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[2]);
-        Vertex.ctx.closePath();
-        Vertex.ctx.fill();
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        ctx.fillStyle = settings.hovered_style;
+        ctx.beginPath();
+        let position = v.sub(this.position, c.axes[0]);
+        ctx.moveTo(...position);
+        position = v.sub(position, c.axes[1]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[0]);
+        ctx.lineTo(...position);
+        position = v.sub(position, c.axes[2]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[1]);
+        ctx.lineTo(...position);
+        position = v.sub(position, c.axes[0]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[2]);
+        ctx.closePath();
+        ctx.fill();
     }
 
     draw_selected() {
         if (!this.show) return;
-        Vertex.ctx.fillStyle = Vertex.selected_style;
-        Vertex.ctx.beginPath();
-        let position = v.sub(this.position, Vertex.axes[0]);
-        Vertex.ctx.moveTo(...position);
-        position = v.sub(position, Vertex.axes[1]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[0]);
-        Vertex.ctx.lineTo(...position);
-        position = v.sub(position, Vertex.axes[2]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[1]);
-        Vertex.ctx.lineTo(...position);
-        position = v.sub(position, Vertex.axes[0]);
-        Vertex.ctx.lineTo(...position);
-        position = v.add(position, Vertex.axes[2]);
-        Vertex.ctx.closePath();
-        Vertex.ctx.fill();
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        ctx.fillStyle = settings.selected_style;
+        ctx.beginPath();
+        let position = v.sub(this.position, c.axes[0]);
+        ctx.moveTo(...position);
+        position = v.sub(position, c.axes[1]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[0]);
+        ctx.lineTo(...position);
+        position = v.sub(position, c.axes[2]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[1]);
+        ctx.lineTo(...position);
+        position = v.sub(position, c.axes[0]);
+        ctx.lineTo(...position);
+        position = v.add(position, c.axes[2]);
+        ctx.closePath();
+        ctx.fill();
     }
 }
 
 class Beam {
-    static ctx;
-    static axes;
-    static hover_dist;
-    static preview_alpha;
-    static hovered_style;
-    static selected_style;
-    static outline_style;
-    static fill_styles;
-    static seal_cracks_line_width;
-
     constructor(canvas_control, vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
         this.c = canvas_control;
         this.vertices = vertices;
@@ -1479,7 +1446,7 @@ class Beam {
         this.preview = preview;
         this.show = show;
         this.name = name;
-        if (v.dot(v.sub(this.vertices[0].position, this.vertices[1].position), Beam.axes[this.direction - 1]) < 0) this.vertices.reverse();
+        if (v.dot(v.sub(this.vertices[0].position, this.vertices[1].position), this.c.axes[this.direction - 1]) < 0) this.vertices.reverse();
         this.assign_vertices();
     }
 
@@ -1495,8 +1462,12 @@ class Beam {
 
     draw_outline() {
         if (!this.show) return;
-        const main_axis = Beam.axes[this.direction - 1];
-        const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        const main_axis = c.axes[this.direction - 1];
+        const other_axes = c.axes.filter((_, i) => i !== this.direction - 1);
         let starts = [];
         starts[0] = this.vertices[0].position;
         starts[0] = v.sub(starts[0], main_axis);
@@ -1510,22 +1481,26 @@ class Beam {
         ends[1] = v.sub(ends[0], other_axes[0]);
         ends[2] = v.sub(ends[0], other_axes[1]);
 
-        Beam.ctx.strokeStyle = Beam.outline_style;
+        ctx.strokeStyle = settings.outline_style;
         for (let i=0; i<3; i++) {
-            Beam.ctx.beginPath();
-            Beam.ctx.moveTo(...starts[i]);
-            Beam.ctx.lineTo(...ends[i]);
-            Beam.ctx.closePath();
-            Beam.ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(...starts[i]);
+            ctx.lineTo(...ends[i]);
+            ctx.closePath();
+            ctx.stroke();
         }
     }
 
     fill() {
         if (!this.show) return;
-        if (this.preview) Beam.ctx.globalAlpha = Beam.preview_alpha;
-        const main_axis = Beam.axes[this.direction - 1];
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        if (this.preview) ctx.globalAlpha = settings.preview_alpha;
+        const main_axis = c.axes[this.direction - 1];
         const other_axes_index = [1, 2, 3].filter(axis => axis !== this.direction);
-        const other_axes = other_axes_index.map(i => Beam.axes[i - 1]);
+        const other_axes = other_axes_index.map(i => c.axes[i - 1]);
         for (let i=0; i<2; i++) {
             // Draw the part of the other beams of the vertices[1] that is covered by the beam
             // Continue if the other beam does not exist
@@ -1533,113 +1508,115 @@ class Beam {
             // Continue if the other beam is not shown
             if(!this.vertices[1].beams[String(-other_axes_index[i])].show) continue;
             // Continue if the other beam is shorter than the axis of the beam
-            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position)) < v.len(Beam.axes[other_axes_index[i] - 1])) continue;
+            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position)) < v.len(c.axes[other_axes_index[i] - 1])) continue;
             const p1 = v.sub(this.vertices[1].position, other_axes[i]);
             const p2 = v.sub(this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position, other_axes[1 - i]);
             const overlapping_point = v.line_intersection(p1, main_axis, p2, other_axes[i]);
-            Beam.ctx.fillStyle = Beam.fill_styles[this.direction - 1];
-            Beam.ctx.save();
-            Beam.ctx.globalAlpha = this.vertices[1].beams[String(-other_axes_index[i])].preview ? Beam.preview_alpha : 1;
-            Beam.ctx.beginPath();
-            Beam.ctx.moveTo(...p1);
-            Beam.ctx.lineTo(...v.sub(p1, other_axes[1 - i]));
+            ctx.fillStyle = settings.fill_styles.beam[this.direction - 1];
+            ctx.save();
+            ctx.globalAlpha = this.vertices[1].beams[String(-other_axes_index[i])].preview ? settings.preview_alpha : 1;
+            ctx.beginPath();
+            ctx.moveTo(...p1);
+            ctx.lineTo(...v.sub(p1, other_axes[1 - i]));
             if (v.dot(v.sub(overlapping_point, p2), other_axes[i]) > 0) {
-                Beam.ctx.lineTo(...overlapping_point);
+                ctx.lineTo(...overlapping_point);
             } else {
                 const alt_overlapping_point = v.line_intersection(p1, main_axis, p2, other_axes[1 - i]);
-                Beam.ctx.lineTo(...p2)
-                Beam.ctx.lineTo(...alt_overlapping_point);
+                ctx.lineTo(...p2)
+                ctx.lineTo(...alt_overlapping_point);
             }
-            Beam.ctx.lineTo(...p1);
-            Beam.ctx.closePath();
-            Beam.ctx.fill();
-            Beam.ctx.restore();
+            ctx.lineTo(...p1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
         }
         for (let i=0; i<2; i++) {
             // Draw the part of the beam that is not covered by the other beam
-            if (v.len(v.sub(this.vertices[0].position, this.vertices[1].position)) < v.len(Beam.axes[this.direction - 1])) continue;
-            Beam.ctx.fillStyle = Beam.fill_styles[other_axes_index[i] - 1];
-            Beam.ctx.beginPath();
+            if (v.len(v.sub(this.vertices[0].position, this.vertices[1].position)) < v.len(c.axes[this.direction - 1])) continue;
+            ctx.fillStyle = settings.fill_styles.beam[other_axes_index[i] - 1];
+            ctx.beginPath();
             let position = this.vertices[1].position;
-            Beam.ctx.moveTo(...position);
+            ctx.moveTo(...position);
             if (String(other_axes_index[i]) in this.vertices[0].beams) {
                 // If the beam is covered by the other beam of the vertices[0]
                 const p1 = v.sub(this.vertices[0].position, main_axis);
                 const p2 = v.sub(this.vertices[1].position, other_axes[1 - i]);
                 const overlapping_point = v.line_intersection(p1, other_axes[i], p2, main_axis);
                 if (v.dot(v.sub(overlapping_point, p2), main_axis) > 0) {
-                    Beam.ctx.lineTo(...v.sub(position, other_axes[1 - i]));
-                    Beam.ctx.lineTo(...overlapping_point);
+                    ctx.lineTo(...v.sub(position, other_axes[1 - i]));
+                    ctx.lineTo(...overlapping_point);
                 } else {
                     // If the overlapping point is inside the vertices[1]
                     const alt_overlapping_point = v.line_intersection(p1, other_axes[i], p2, other_axes[1 - i]);
-                    Beam.ctx.lineTo(...alt_overlapping_point);
+                    ctx.lineTo(...alt_overlapping_point);
                 }
             } else {
-                Beam.ctx.lineTo(...v.sub(position, other_axes[1 - i]));
-                Beam.ctx.lineTo(...v.sub(v.sub(this.vertices[0].position, main_axis), other_axes[1 - i]));
+                ctx.lineTo(...v.sub(position, other_axes[1 - i]));
+                ctx.lineTo(...v.sub(v.sub(this.vertices[0].position, main_axis), other_axes[1 - i]));
             }
-            Beam.ctx.lineTo(...v.sub(this.vertices[0].position, main_axis));
-            Beam.ctx.lineTo(...this.vertices[1].position);
-            Beam.ctx.closePath();
-            Beam.ctx.fill();
+            ctx.lineTo(...v.sub(this.vertices[0].position, main_axis));
+            ctx.lineTo(...this.vertices[1].position);
+            ctx.closePath();
+            ctx.fill();
 
             // Draw outline to prevent cracks
-            Beam.ctx.save();
-            Beam.ctx.strokeStyle = Beam.fill_styles[other_axes_index[i] - 1];
-            Beam.ctx.lineWidth = Beam.seal_cracks_line_width;
-            Beam.ctx.stroke();
-            Beam.ctx.restore();
+            ctx.save();
+            ctx.strokeStyle = settings.fill_styles.beam[other_axes_index[i] - 1];
+            ctx.lineWidth = settings.seal_cracks_line_width / c.size;
+            ctx.stroke();
+            ctx.restore();
         }
-        if (this.preview) Beam.ctx.globalAlpha = 1;
+        if (this.preview) ctx.globalAlpha = 1;
     }
 
     draw_hovered() {
         if (!this.show) return;
-        Beam.ctx.fillStyle = Beam.hovered_style;
-        const main_axis = Beam.axes[this.direction - 1];
-        const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
-        Beam.ctx.beginPath();
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        ctx.fillStyle = settings.hovered_style;
+        const main_axis = c.axes[this.direction - 1];
+        const other_axes = c.axes.filter((_, i) => i !== this.direction - 1);
+        ctx.beginPath();
         let position = v.sub(v.sub(this.vertices[0].position, main_axis), other_axes[1]);
-        Beam.ctx.moveTo(...position);
+        ctx.moveTo(...position);
         position = v.sub(position, other_axes[0]);
-        Beam.ctx.lineTo(...position);
+        ctx.lineTo(...position);
         position = v.add(position, other_axes[1]);
-        Beam.ctx.lineTo(...position);
-        Beam.ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[0]));
-        Beam.ctx.lineTo(...this.vertices[1].position);
-        Beam.ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[1]));
-        Beam.ctx.closePath();
-        Beam.ctx.fill();
+        ctx.lineTo(...position);
+        ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[0]));
+        ctx.lineTo(...this.vertices[1].position);
+        ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[1]));
+        ctx.closePath();
+        ctx.fill();
     }
 
     draw_selected() {
         if (!this.show) return;
-        Beam.ctx.fillStyle = Beam.selected_style;
-        const main_axis = Beam.axes[this.direction - 1];
-        const other_axes = Beam.axes.filter((_, i) => i !== this.direction - 1);
-        Beam.ctx.beginPath();
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        ctx.fillStyle = settings.selected_style;
+        const main_axis = c.axes[this.direction - 1];
+        const other_axes = c.axes.filter((_, i) => i !== this.direction - 1);
+        ctx.beginPath();
         let position = v.sub(v.sub(this.vertices[0].position, main_axis), other_axes[1]);
-        Beam.ctx.moveTo(...position);
+        ctx.moveTo(...position);
         position = v.sub(position, other_axes[0]);
-        Beam.ctx.lineTo(...position);
+        ctx.lineTo(...position);
         position = v.add(position, other_axes[1]);
-        Beam.ctx.lineTo(...position);
-        Beam.ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[0]));
-        Beam.ctx.lineTo(...this.vertices[1].position);
-        Beam.ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[1]));
-        Beam.ctx.closePath();
-        Beam.ctx.fill();
+        ctx.lineTo(...position);
+        ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[0]));
+        ctx.lineTo(...this.vertices[1].position);
+        ctx.lineTo(...v.sub(this.vertices[1].position, other_axes[1]));
+        ctx.closePath();
+        ctx.fill();
     }
 }
 
 class Axis {
-    static ctx;
-    static axes;
-    static preview_alpha;
-    static stroke_style;
-    static line_width;
-
     constructor(canvas_control, vertex, direction, { preview=false, show=true } = {}) {
         this.c = canvas_control;
         this.vertex = vertex;
@@ -1650,24 +1627,28 @@ class Axis {
 
     draw() {
         if (this.direction === 0 || !this.show) return;
-        const vec_to_center = v.scale(v.add(v.add(Vertex.axes[0], Vertex.axes[1]), Vertex.axes[2]), 0.5);
+        const c = this.c;
+        const settings = c.settings;
+        const ctx = c.ctx;
+
+        const vec_to_center = v.scale(v.add(v.add(c.axes[0], c.axes[1]), c.axes[2]), 0.5);
         let position = v.sub(this.vertex.position, vec_to_center);
-        const unit_axis = this.direction > 0 ? v.unit(Axis.axes[this.direction - 1]) : v.scale(v.unit(Axis.axes[-this.direction - 1]), -1);
+        const unit_axis = this.direction > 0 ? v.unit(c.axes[this.direction - 1]) : v.scale(v.unit(c.axes[-this.direction - 1]), -1);
         position = v.add(position, v.scale(unit_axis, 200));
 
-        Axis.ctx.strokeStyle = Axis.stroke_style;
-        Axis.ctx.beginPath();
-        Axis.ctx.moveTo(...position);
+        ctx.strokeStyle = settings.axis_style;
+        ctx.beginPath();
+        ctx.moveTo(...position);
         position = v.add(position, v.scale(unit_axis, 100));
-        Axis.ctx.lineTo(...position);
-        Axis.ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), 150)));
-        Axis.ctx.lineTo(...position);
-        Axis.ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), -150)));
-        Axis.ctx.save();
-        if (this.preview) Axis.ctx.globalAlpha = Axis.preview_alpha;
-        Axis.ctx.lineWidth = Axis.line_width;
-        Axis.ctx.stroke();
-        Axis.ctx.restore();
+        ctx.lineTo(...position);
+        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), 150)));
+        ctx.lineTo(...position);
+        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), -150)));
+        ctx.save();
+        if (this.preview) ctx.globalAlpha = settings.preview_alpha;
+        ctx.lineWidth = settings.axis_width / c.size;
+        ctx.stroke();
+        ctx.restore();
     }
 }
 

@@ -140,25 +140,25 @@ $(".general-settings-section-grid > input").on("change", function() {
                 c.canvas.style.backgroundColor = $(this).val();
                 break;
             case "vertex_fill_color_1":
-                c.settings.vertex_fill_styles[0] = $(this).val();
+                c.settings.fill_styles.vertex[0] = $(this).val();
                 break;
             case "vertex_fill_color_2":
-                c.settings.vertex_fill_styles[1] = $(this).val();
+                c.settings.fill_styles.vertex[1] = $(this).val();
                 break;
             case "vertex_fill_color_3":
-                c.settings.vertex_fill_styles[2] = $(this).val();
+                c.settings.fill_styles.vertex[2] = $(this).val();
                 break;
             case "beam_fill_color_1":
-                c.settings.beam_fill_styles[0] = $(this).val();
+                c.settings.fill_styles.beam[0] = $(this).val();
                 break;
             case "beam_fill_color_2":
-                c.settings.beam_fill_styles[1] = $(this).val();
+                c.settings.fill_styles.beam[1] = $(this).val();
                 break;
             case "beam_fill_color_3":
-                c.settings.beam_fill_styles[2] = $(this).val();
+                c.settings.fill_styles.beam[2] = $(this).val();
                 break;
             case "hover_color": {
-                c.settings.hovered_style = build_style_with_alpha($(this).val(), parse_style_with_alpha(c.settings.hovered_style).alpha);
+                c.settings.hovered_style = utils.build_style_with_alpha($(this).val(), utils.parse_style_with_alpha(c.settings.hovered_style).alpha);
                 break;
             }
             case "hover_alpha": {
@@ -167,11 +167,11 @@ $(".general-settings-section-grid > input").on("change", function() {
                 } else if ($(this).val() > 1) {
                     $(this).val(1);
                 }
-                c.settings.hovered_style = build_style_with_alpha(parse_style_with_alpha(c.settings.hovered_style).color, $(this).val());
+                c.settings.hovered_style = utils.build_style_with_alpha(utils.parse_style_with_alpha(c.settings.hovered_style).color, $(this).val());
                 break;
             }
             case "select_color":
-                c.settings.selected_style = build_style_with_alpha($(this).val(), parse_style_with_alpha(c.settings.selected_style).alpha);
+                c.settings.selected_style = utils.build_style_with_alpha($(this).val(), utils.parse_style_with_alpha(c.settings.selected_style).alpha);
                 break;
             case "select_alpha":
                 if ($(this).val() < 0) {
@@ -179,7 +179,7 @@ $(".general-settings-section-grid > input").on("change", function() {
                 } else if ($(this).val() > 1) {
                     $(this).val(1);
                 }
-                c.settings.selected_style = build_style_with_alpha(parse_style_with_alpha(c.settings.selected_style).color, $(this).val());
+                c.settings.selected_style = utils.build_style_with_alpha(utils.parse_style_with_alpha(c.settings.selected_style).color, $(this).val());
                 break;
             case "axis_arrow_color":
                 c.settings.axis_style = $(this).val();
@@ -193,7 +193,6 @@ $(".general-settings-section-grid > input").on("change", function() {
                 c.settings.preview_alpha = +$(this).val();
                 break;
         }
-        c.sync_settings();
         c.render_frame();
     }
 });
