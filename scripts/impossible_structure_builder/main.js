@@ -77,12 +77,12 @@ $("#toolbar").on("click", ".tool-button", function() {
 
 $("#element-list").on("click", "> .element-list-item > button", function() {
     if (c.tool_status.tool === "select") {
-        if (c.selected_elements.selected.includes(String($(this).data("id")))) {
+        if (c.selected_elements.selected.includes($(this).data("id"))) {
             c.selected_elements.selected = [];
-            c.selected_elements.hovered = String($(this).data("id"));
+            c.selected_elements.hovered = $(this).data("id");
             utils.toggle_element_settings(c, false);
         } else {
-            c.selected_elements.selected = [String($(this).data("id"))];
+            c.selected_elements.selected = [$(this).data("id")];
             c.selected_elements.hovered = -1;
             utils.reload_element_settings(c, c.selected_elements.selected[0]);
         }
@@ -90,13 +90,13 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
     }
 }).on("mouseenter", "> .element-list-item > button", function() {
     if ($(".sortable-ghost").length) return;
-    if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+    if (c.selected_elements.selected.includes($(this).data("id"))) return;
 
-    c.selected_elements.hovered = String($(this).data("id"));
+    c.selected_elements.hovered = $(this).data("id");
     c.render_frame();
 }).on("mouseleave", "> .element-list-item > button", function() {
     if ($(".sortable-ghost").length) return;
-    if (c.selected_elements.selected.includes(String($(this).data("id")))) return;
+    if (c.selected_elements.selected.includes($(this).data("id"))) return;
 
     c.selected_elements.hovered = -1;
     c.render_frame();
@@ -105,11 +105,11 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
 $("#element-settings").on("input", "#element-settings-grid > input", function() {
     const id = $("#element-settings-title").data("id");
     let element, type;
-    if (id in c.vertices) {
-        element = c.vertices[id];
+    if (c.vertices.has(id)) {
+        element = c.vertices.get(id);
         type = "vertex";
-    } else if (id in c.beams) {
-        element = c.beams[id];
+    } else if (c.beams.has(id)) {
+        element = c.beams.get(id);
         type = "beam";
     }
 

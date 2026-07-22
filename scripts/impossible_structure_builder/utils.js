@@ -8,18 +8,18 @@ export function select_tool(c, tool) {
     c.default_cursor = "default";
     c.preview_elements.beams.forEach(beam => beam.destroy());
     c.preview_elements = { vertices: [], beams: [], axes: [] };
-    if (c.selected_elements.hovered in c.vertices) {
-        c.vertices[c.selected_elements.hovered].show = true;
-    } else if (c.selected_elements.hovered in c.beams) {
-        c.beams[c.selected_elements.hovered].show = true;
-        c.beams[c.selected_elements.hovered].assign_vertices();
+    if (c.vertices.has(c.selected_elements.hovered)) {
+        c.vertices.get(c.selected_elements.hovered).show = true;
+    } else if (c.beams.has(c.selected_elements.hovered)) {
+        c.beams.get(c.selected_elements.hovered).show = true;
+        c.beams.get(c.selected_elements.hovered).assign_vertices();
     }
     c.selected_elements.selected.forEach(id => {
-        if (id in c.vertices) {
-            c.vertices[id].show = true;
-        } else if (id in c.beams) {
-            c.beams[id].show = true;
-            c.beams[id].assign_vertices();
+        if (c.vertices.has(id)) {
+            c.vertices.get(id).show = true;
+        } else if (c.beams.has(id)) {
+            c.beams.get(id).show = true;
+            c.beams.get(id).assign_vertices();
         }
     });
     c.selected_elements = { selected: [], hovered: -1 };
@@ -76,11 +76,11 @@ export function element_list_drag_over(c, e) {
 
 export function reload_element_settings(c, id) {
     let element, type;
-    if (id in c.vertices) {
-        element = c.vertices[id];
+    if (c.vertices.has(id)) {
+        element = c.vertices.get(id);
         type = "vertex";
-    } else if (id in c.beams) {
-        element = c.beams[id];
+    } else if (c.beams.has(id)) {
+        element = c.beams.get(id);
         type = "beam";
     }
     const settings = $("#element-settings");
@@ -96,17 +96,17 @@ export function reload_element_settings(c, id) {
         settings_grid.append($("<div>").text("Y"));
         settings_grid.append($("<input>").attr("readonly", true).val(element.position[1]));
         settings_grid.append($("<div>").text("Axis 1 Positive"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["1"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("1")?.name ?? "None"));
         settings_grid.append($("<div>").text("Axis 2 Positive"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["2"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("2")?.name ?? "None"));
         settings_grid.append($("<div>").text("Axis 3 Positive"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["3"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("3")?.name ?? "None"));
         settings_grid.append($("<div>").text("Axis 1 Negative"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["-1"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("-1")?.name ?? "None"));
         settings_grid.append($("<div>").text("Axis 2 Negative"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["-2"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("-2")?.name ?? "None"));
         settings_grid.append($("<div>").text("Axis 3 Negative"));
-        settings_grid.append($("<input>").attr("readonly", true).val(element.beams["-3"]?.name ?? "None"));
+        settings_grid.append($("<input>").attr("readonly", true).val(element.beams.get("-3")?.name ?? "None"));
     } else if (type === "beam") {
         settings_grid.append($("<div>").text("Start Vertex"));
         settings_grid.append($("<input>").attr("readonly", true).val(element.vertices[0].name));
@@ -133,11 +133,11 @@ export function toggle_element_settings(c, show) {
 }
 
 export function center_element(c, id) {
-    if (id in c.vertices) {
-        const element = c.vertices[id];
+    if (c.vertices.has(id)) {
+        const element = c.vertices.get(id);
         c.origin = [element.position[0] * c.size - c.canvas.width / 2, element.position[1] * c.size + c.canvas.height / 2];
-    } else if (id in c.beams) {
-        const element = c.beams[id];
+    } else if (c.beams.has(id)) {
+        const element = c.beams.get(id);
         const midpoint = v.scale(v.add(element.vertices[0].position, element.vertices[1].position), 0.5);
         c.origin = [midpoint[0] * c.size - c.canvas.width / 2, midpoint[1] * c.size + c.canvas.height / 2];
     }
@@ -145,13 +145,13 @@ export function center_element(c, id) {
 }
 
 export function delete_element(c, id) {
-    if (id in c.vertices) {
-        Object.values(c.vertices[id].beams).forEach(beam => {
-            c.remove_element(c.beams[beam.id]);
+    if (c.vertices.has(id)) {
+        c.vertices.get(id).beams.forEach(beam => {
+            c.remove_element(c.beams.get(beam.id));
         });
-        c.remove_element(c.vertices[id]);
-    } else if (id in c.beams) {
-        c.remove_element(c.beams[id]);
+        c.remove_element(c.vertices.get(id));
+    } else if (c.beams.has(id)) {
+        c.remove_element(c.beams.get(id));
     }
 
     c.selected_elements.selected = [];

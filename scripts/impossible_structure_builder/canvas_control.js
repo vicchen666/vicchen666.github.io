@@ -5,6 +5,32 @@ import { reload_element_settings } from "utils";
 
 const TAU = Math.PI * 2;
 
+/**
+ * @template K, V
+ * @param {Map<K, V>} map
+ * @param {(value: V, key: K) => boolean} predicate
+ * @returns {Map<K, V>}
+ */
+function map_filter(map, predicate) {
+    return new Map(
+        [...map].filter(([key, value]) => predicate(value, key))
+    );
+}
+
+function map_includes(map, value) {
+    return [...map.values()].includes(value);
+}
+
+function map_reduce(map, reducer, initial_value) {
+    return [...map].reduce((accumulator, [key, value]) => reducer(accumulator, value, key), initial_value);
+}
+
+function map_map(map, mapper) {
+    return new Map(
+        [...map].map(([key, value]) => [key, mapper(value, key)])
+    );
+}
+
 export default class CanvasControl extends CanvasControlBase {
     constructor(canvas, options={ animate: false }) {
         super(canvas, options);
@@ -16,8 +42,8 @@ export default class CanvasControl extends CanvasControlBase {
         this.axes = this.axes.map(axis => v.scale(axis, 100));
         this.settings.hover_dist.vertex = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
         this.settings.hover_dist.beam = Math.max(...this.axes.map(axis => v.len(axis)));
-        this.vertices = {};
-        this.beams = {};
+        this.vertices = new Map();
+        this.beams = new Map();
         this.render_order = [];
         this.next_name = { vertex: 1, beam: 1 };
         this.preview_elements = { vertices: [], beams: [], axes: [] };
@@ -49,7 +75,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
@@ -66,7 +92,7 @@ export default class CanvasControl extends CanvasControlBase {
                     return;
                 }
 
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
@@ -100,7 +126,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
@@ -124,7 +150,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams = [];
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                const beam = this.beams[this.selected_elements.selected[0]];
+                const beam = this.beams.get(this.selected_elements.selected[0]);
                 const point = v.point_to_seg_point(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                 let vertex;
                 if (point === beam.vertices[0].position || point === beam.vertices[1].position) {
@@ -146,11 +172,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -169,31 +195,25 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams = [];
                 this.preview_elements.vertices = [];
 
-                const vertex = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
-                const unit_axes = Object.fromEntries(
-                    Object.entries({
-                        "1": v.unit(this.axes[0]),
-                        "2": v.unit(this.axes[1]),
-                        "3": v.unit(this.axes[2]),
-                        "-1": v.scale(v.unit(this.axes[0]), -1),
-                        "-2": v.scale(v.unit(this.axes[1]), -1),
-                        "-3": v.scale(v.unit(this.axes[2]), -1),
-                    }).filter(([key]) => !(key in vertex.beams))
-                );
+                const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
+                console.log("vertex", vertex);
+                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-                const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, v.dot(axis_vec, v.sub(canvas_point, vertex.position))]));
-                const nearest_axis = Object.entries(dot_prods)
-                    .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
-                if (dot_prods[nearest_axis.key] < 0) {
+                const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
+                const nearest_axis = map_reduce(dot_prods,
+                    (best, value, key) => value > best.value ? { key, value } : best,
+                    { key: null, value: -Infinity }
+                );
+                if (dot_prods.get(nearest_axis.key) < 0) {
                     this.render_frame();
                     return;
                 };
 
-                const projected_direction = v.scale(unit_axes[nearest_axis.key], dot_prods[nearest_axis.key]);
+                const projected_direction = v.scale(unit_axes.get(nearest_axis.key), dot_prods.get(nearest_axis.key));
                 const new_vertex = this.create_vertex(v.add(vertex.position, projected_direction), { preview: true });
                 this.preview_elements.vertices.push(new_vertex);
-                this.preview_elements.beams.push(this.create_beam([vertex, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, new_vertex], Math.abs(nearest_axis.key), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -204,11 +224,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -233,11 +253,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -256,32 +276,28 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams = [];
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
                 let nearest_direction = 0;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
-                    const direction = Object.entries({
-                        "1": v.unit(this.axes[0]),
-                        "2": v.unit(this.axes[1]),
-                        "3": v.unit(this.axes[2]),
-                        "-1": v.scale(v.unit(this.axes[0]), -1),
-                        "-2": v.scale(v.unit(this.axes[1]), -1),
-                        "-3": v.scale(v.unit(this.axes[2]), -1),
-                    }).filter(([key, axis_vec]) => {
-                        if (key in vertex1.beams) return false;
-                        if (String(-Number(key)) in vertex.beams) return false;
-                        return true;
-                    }).reduce((best, [key, axis_vec]) => {
-                        const dist = v.point_to_line_dist(vertex1.position, vertex.position, axis_vec);
-                        if (v.dot(v.sub(vertex.position, vertex1.position), axis_vec) < 0) return best;
-                        return dist < best.dist ? { key, dist } : best;
-                    }, { key: null, dist: Infinity });
+                    if (vertex.beams.size === 6) return;
+                    const directions = map_filter(
+                        this.create_unit_axes(),
+                        (_, key) => !vertex1.beams.has(key) && !vertex.beams.has(-key)
+                    );
+                    const direction = map_reduce(directions,
+                        (best, axis_vec, key) => {
+                            const dist = v.point_to_line_dist(vertex1.position, vertex.position, axis_vec);
+                            if (v.dot(v.sub(vertex.position, vertex1.position), axis_vec) < 0) return best;
+                            return dist < best.dist ? { key, dist } : best;
+                        },
+                        { key: null, dist: Infinity }
+                    );
                     if (direction.dist > this.settings.vertex_connect_length_threshold) return;
 
                     nearest_id = id;
@@ -291,7 +307,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 if (nearest_id !== -1) {
                     this.selected_elements.hovered = nearest_id;
-                    this.preview_elements.beams.push(this.create_beam([this.vertices[this.selected_elements.selected[0]], this.vertices[nearest_id]], Math.abs(Number(nearest_direction)), { preview: true }));
+                    this.preview_elements.beams.push(this.create_beam([this.vertices.get(this.selected_elements.selected[0]), this.vertices.get(nearest_id)], Math.abs(nearest_direction), { preview: true }));
                     this.canvas.style.cursor = "pointer";
                 } else {
                     this.selected_elements.hovered = -1;
@@ -305,11 +321,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -326,62 +342,49 @@ export default class CanvasControl extends CanvasControlBase {
             "select_axis": e => {
                 this.preview_elements.axes = [];
 
-                const vertex = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
-                const unit_axes = Object.fromEntries(
-                    Object.entries({
-                        "1": v.unit(this.axes[0]),
-                        "2": v.unit(this.axes[1]),
-                        "3": v.unit(this.axes[2]),
-                        "-1": v.scale(v.unit(this.axes[0]), -1),
-                        "-2": v.scale(v.unit(this.axes[1]), -1),
-                        "-3": v.scale(v.unit(this.axes[2]), -1),
-                    }).filter(([key]) => !(key in vertex.beams))
-                );
+                const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
+                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-                const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, v.dot(axis_vec, v.sub(canvas_point, vertex.position))]));
-                const nearest_axis = Object.entries(dot_prods)
-                    .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
-                if (dot_prods[nearest_axis.key] < 0) {
+                const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
+                const nearest_axis = map_reduce(dot_prods,
+                    (best, value, key) => value > best.value ? { key, value } : best,
+                    { key: null, value: -Infinity }
+                );
+                if (dot_prods.get(nearest_axis.key) < 0) {
                     this.render_frame();
                     return;
                 };
 
-                this.preview_elements.axes.push(this.create_axis(vertex, Number(nearest_axis.key), { preview: true }));
+                this.preview_elements.axes.push(this.create_axis(vertex, nearest_axis.key, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
             "select_vertex_2": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
                 const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
                     // Return if the axis of vertex 1 doesn't intersect with all the axis of the vertex
-                    if (Object.entries({
-                        "1": this.axes[0],
-                        "2": this.axes[1],
-                        "3": this.axes[2],
-                        "-1": v.scale(this.axes[0], -1),
-                        "-2": v.scale(this.axes[1], -1),
-                        "-3": v.scale(this.axes[2], -1),
-                    }).filter(([key, axis]) => {
-                        if (key in vertex.beams) return false;
-                        if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
+                    const intersecting_axes = map_filter(this.create_unit_axes(), (axis, key) => {
+                        if (vertex.beams.has(key)) return false;
+                        if (Math.abs(key) === Math.abs(direction1)) return false;
                         const intersection = v.ray_intersection(vertex1.position, direction1_vec, vertex.position, axis);
                         if (intersection === null) return false;
                         if (v.len(v.sub(vertex.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
                         if (v.len(v.sub(vertex1.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
                         return true;
-                    }).length === 0) return;
+                    });
+                    if (intersecting_axes.size === 0) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -402,43 +405,36 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams[this.preview_elements.beams.length - 1]?.destroy();
                 this.preview_elements.beams = [];
 
-                const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 2]];
-                const vertex2 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 2]);
+                const vertex2 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
                 const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
-                const unit_axes = Object.fromEntries(
-                    Object.entries({
-                        "1": v.unit(this.axes[0]),
-                        "2": v.unit(this.axes[1]),
-                        "3": v.unit(this.axes[2]),
-                        "-1": v.scale(v.unit(this.axes[0]), -1),
-                        "-2": v.scale(v.unit(this.axes[1]), -1),
-                        "-3": v.scale(v.unit(this.axes[2]), -1),
-                    }).filter(([key, axis_vec]) => {
-                        if (key in vertex2.beams) return false;
-                        if (Math.abs(Number(key)) === Math.abs(direction1)) return false;
-                        const intersection = v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, axis_vec);
-                        if (intersection === null) return false;
-                        if (v.len(v.sub(vertex2.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
-                        if (v.len(v.sub(vertex1.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
-                        return true;
-                    })
-                );
+                const unit_axes = map_filter(this.create_unit_axes(), (axis_vec, key) => {
+                    if (vertex2.beams.has(key)) return false;
+                    if (Math.abs(key) === Math.abs(direction1)) return false;
+                    const intersection = v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, axis_vec);
+                    if (intersection === null) return false;
+                    if (v.len(v.sub(vertex2.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
+                    if (v.len(v.sub(vertex1.position, intersection)) < this.settings.vertex_connect_length_threshold) return false;
+                    return true;
+                });
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-                const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, v.dot(axis_vec, v.sub(canvas_point, vertex2.position))]));
-                const nearest_axis = Object.entries(dot_prods)
-                    .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
-                if (dot_prods[nearest_axis.key] < 0) {
+                const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex2.position)));
+                const nearest_axis = map_reduce(dot_prods,
+                    (best, value, key) => value > best.value ? { key, value } : best,
+                    { key: null, value: -Infinity }
+                );
+                if (dot_prods.get(nearest_axis.key) < 0) {
                     this.render_frame();
                     return;
                 };
 
                 this.preview_elements.axes[0].show = false;
-                const new_vertex = this.create_vertex(v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, unit_axes[nearest_axis.key]), { preview: true });
+                const new_vertex = this.create_vertex(v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, unit_axes.get(nearest_axis.key)), { preview: true });
                 this.preview_elements.vertices.push(new_vertex);
                 this.preview_elements.beams.push(this.create_beam([vertex1, new_vertex], Math.abs(direction1), { preview: true }));
-                this.preview_elements.beams.push(this.create_beam([vertex2, new_vertex], Math.abs(Number(nearest_axis.key)), { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, new_vertex], Math.abs(nearest_axis.key), { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -449,11 +445,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
-                    if (Object.keys(vertex.beams).length === 6) return;
+                    if (vertex.beams.size === 6) return;
 
                     nearest_id = id;
                     nearest_dist = dist;
@@ -470,28 +466,21 @@ export default class CanvasControl extends CanvasControlBase {
             "select_axis": e => {
                 this.preview_elements.axes = [];
 
-                const vertex = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
-                const unit_axes = Object.fromEntries(
-                    Object.entries({
-                        "1": v.unit(this.axes[0]),
-                        "2": v.unit(this.axes[1]),
-                        "3": v.unit(this.axes[2]),
-                        "-1": v.scale(v.unit(this.axes[0]), -1),
-                        "-2": v.scale(v.unit(this.axes[1]), -1),
-                        "-3": v.scale(v.unit(this.axes[2]), -1),
-                    }).filter(([key]) => !(key in vertex.beams))
-                );
+                const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
+                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
-                const dot_prods = Object.fromEntries(Object.entries(unit_axes).map(([key, axis_vec]) => [key, v.dot(axis_vec, v.sub(canvas_point, vertex.position))]));
-                const nearest_axis = Object.entries(dot_prods)
-                    .reduce((best, [key, value]) => value > best.value ? { key, value } : best, { key: null, value: -Infinity });
-                if (dot_prods[nearest_axis.key] < 0) {
+                const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
+                const nearest_axis = map_reduce(dot_prods,
+                    (best, value, key) => value > best.value ? { key, value } : best,
+                    { key: null, value: -Infinity }
+                );
+                if (dot_prods.get(nearest_axis.key) < 0) {
                     this.render_frame();
                     return;
                 };
 
-                this.preview_elements.axes.push(this.create_axis(vertex, Number(nearest_axis.key), { preview: true }));
+                this.preview_elements.axes.push(this.create_axis(vertex, nearest_axis.key, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame();
             },
@@ -502,22 +491,22 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams[this.preview_elements.beams.length - 2]?.destroy();
                 this.preview_elements.beams[this.preview_elements.beams.length - 3]?.destroy();
                 this.preview_elements.beams = [];
-                if (this.selected_elements.hovered in this.beams) {
-                    this.beams[this.selected_elements.hovered].show = true;
-                    this.beams[this.selected_elements.hovered].assign_vertices();
+                if (this.beams.has(this.selected_elements.hovered)) {
+                    this.beams.get(this.selected_elements.hovered).show = true;
+                    this.beams.get(this.selected_elements.hovered).assign_vertices();
                 }
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                const vertex1 = this.vertices[this.selected_elements.selected[this.selected_elements.selected.length - 1]];
+                const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
                 const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
-                    if (Object.values(vertex1.beams).includes(beam)) return;
+                    if (map_includes(vertex1.beams, beam)) return;
                     if (v.ray_seg_intersection(vertex1.position, direction1_vec, beam.vertices[0].position, beam.vertices[1].position) === null) return;
 
                     nearest_id = id;
@@ -531,13 +520,13 @@ export default class CanvasControl extends CanvasControlBase {
 
                 this.preview_elements.axes[0].show = false;
                 this.selected_elements.hovered = nearest_id;
-                this.beams[nearest_id].show = false;
-                this.beams[nearest_id].destroy();
-                const vertex2 = this.create_vertex(v.ray_seg_intersection(vertex1.position, direction1_vec, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                this.beams.get(nearest_id).show = false;
+                this.beams.get(nearest_id).destroy();
+                const vertex2 = this.create_vertex(v.ray_seg_intersection(vertex1.position, direction1_vec, this.beams.get(nearest_id).vertices[0].position, this.beams.get(nearest_id).vertices[1].position), { preview: true });
                 this.preview_elements.vertices.push(vertex2);
                 this.preview_elements.beams.push(this.create_beam([vertex1, vertex2], Math.abs(direction1), { preview: true }));
-                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
-                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams.get(nearest_id).vertices[0]], this.beams.get(nearest_id).direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex2, this.beams.get(nearest_id).vertices[1]], this.beams.get(nearest_id).direction, { preview: true }));
                 this.canvas.style.cursor = "pointer";
                 this.render_frame(); 
             },
@@ -548,7 +537,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
@@ -572,23 +561,23 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.beams[this.preview_elements.beams.length - 3]?.destroy();
                 this.preview_elements.beams[this.preview_elements.beams.length - 4]?.destroy();
                 this.preview_elements.beams = [];
-                this.beams[this.selected_elements.selected[0]].show = true;
-                this.beams[this.selected_elements.selected[0]].assign_vertices();
-                if (this.selected_elements.hovered in this.beams) {
-                    this.beams[this.selected_elements.hovered].show = true;
-                    this.beams[this.selected_elements.hovered].assign_vertices();
+                this.beams.get(this.selected_elements.selected[0]).show = true;
+                this.beams.get(this.selected_elements.selected[0]).assign_vertices();
+                if (this.beams.has(this.selected_elements.hovered)) {
+                    this.beams.get(this.selected_elements.hovered).show = true;
+                    this.beams.get(this.selected_elements.hovered).assign_vertices();
                 }
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
-                const beam1 = this.beams[this.selected_elements.selected[0]];
+                const beam1 = this.beams.get(this.selected_elements.selected[0]);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
                     if (this.selected_elements.selected.includes(id)) return;
-                    if (beam1.vertices.some(vertex => Object.values(vertex.beams).includes(beam))) return;
+                    if (beam1.vertices.some(vertex => map_includes(vertex.beams, beam))) return;
                     if (v.seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, beam.vertices[0].position, beam.vertices[1].position) === null) return;
 
                     nearest_id = id;
@@ -603,12 +592,12 @@ export default class CanvasControl extends CanvasControlBase {
                 this.selected_elements.hovered = nearest_id;
                 beam1.show = false;
                 beam1.destroy();
-                this.beams[nearest_id].show = false;
-                this.beams[nearest_id].destroy();
-                const vertex = this.create_vertex(v.seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, this.beams[nearest_id].vertices[0].position, this.beams[nearest_id].vertices[1].position), { preview: true });
+                this.beams.get(nearest_id).show = false;
+                this.beams.get(nearest_id).destroy();
+                const vertex = this.create_vertex(v.seg_intersection(beam1.vertices[0].position, beam1.vertices[1].position, this.beams.get(nearest_id).vertices[0].position, this.beams.get(nearest_id).vertices[1].position), { preview: true });
                 this.preview_elements.vertices.push(vertex);
-                this.preview_elements.beams.push(this.create_beam([vertex, this.beams[nearest_id].vertices[0]], this.beams[nearest_id].direction, { preview: true }));
-                this.preview_elements.beams.push(this.create_beam([vertex, this.beams[nearest_id].vertices[1]], this.beams[nearest_id].direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, this.beams.get(nearest_id).vertices[0]], this.beams.get(nearest_id).direction, { preview: true }));
+                this.preview_elements.beams.push(this.create_beam([vertex, this.beams.get(nearest_id).vertices[1]], this.beams.get(nearest_id).direction, { preview: true }));
                 this.preview_elements.beams.push(this.create_beam([vertex, beam1.vertices[0]], beam1.direction, { preview: true }));
                 this.preview_elements.beams.push(this.create_beam([vertex, beam1.vertices[1]], beam1.direction, { preview: true }));
                 this.canvas.style.cursor = "pointer";
@@ -621,7 +610,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
@@ -645,7 +634,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.vertices).forEach(([id, vertex]) => {
+                this.vertices.forEach((vertex, id) => {
                     const dist = v.len(v.sub(vertex.position, canvas_point));
                     if (dist > this.settings.hover_dist.vertex) return;
                     if (dist > nearest_dist) return;
@@ -669,7 +658,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
-                Object.entries(this.beams).forEach(([id, beam]) => {
+                this.beams.forEach((beam, id) => {
                     const dist = v.point_to_seg_dist(canvas_point, beam.vertices[0].position, beam.vertices[1].position);
                     if (dist > this.settings.hover_dist.beam) return;
                     if (dist > nearest_dist) return;
@@ -696,9 +685,9 @@ export default class CanvasControl extends CanvasControlBase {
         this.ctx.lineCap = "round";
         this.ctx.lineWidth = 2 / this.size;
 
-        const combined_object = {...this.beams, ...this.vertices};
         this.render_order.forEach(key => {
-            combined_object[key].fill();
+            const element = this.beams.get(key) || this.vertices.get(key);
+            element?.fill();
         });
 
         this.draw_tools();
@@ -734,15 +723,15 @@ export default class CanvasControl extends CanvasControlBase {
 
                         this.selected_elements.selected.push(this.selected_elements.hovered);
                         this.selected_elements.hovered = -1;
-                        this.beams[this.selected_elements.selected[0]].show = false;
-                        this.beams[this.selected_elements.selected[0]].destroy();
+                        this.beams.get(this.selected_elements.selected[0]).show = false;
+                        this.beams.get(this.selected_elements.selected[0]).destroy();
 
                         this.tool_status.status = "add_vertex";
                         break;
                     case "add_vertex":
                         if (this.preview_elements.vertices.length !== 1) return;
 
-                        this.remove_element(this.beams[this.selected_elements.selected[0]]);
+                        this.remove_element(this.beams.get(this.selected_elements.selected[0]));
                         this.register_preview(this.preview_elements.beams[0]);
                         this.register_preview(this.preview_elements.beams[1]);
                         this.register_preview(this.preview_elements.vertices[0]);
@@ -879,7 +868,7 @@ export default class CanvasControl extends CanvasControlBase {
                     case "select_beam":
                         if (this.selected_elements.hovered === -1) return;
 
-                        this.remove_element(this.beams[this.selected_elements.hovered]);
+                        this.remove_element(this.beams.get(this.selected_elements.hovered));
                         this.register_preview(this.preview_elements.beams[0]);
                         this.register_preview(this.preview_elements.beams[1]);
                         this.register_preview(this.preview_elements.beams[2]);
@@ -906,8 +895,8 @@ export default class CanvasControl extends CanvasControlBase {
                     case "select_beam_2":
                         if (this.selected_elements.hovered === -1) return;
 
-                        this.remove_element(this.beams[this.selected_elements.selected[0]]);
-                        this.remove_element(this.beams[this.selected_elements.hovered]);
+                        this.remove_element(this.beams.get(this.selected_elements.selected[0]));
+                        this.remove_element(this.beams.get(this.selected_elements.hovered));
                         this.register_preview(this.preview_elements.beams[0]);
                         this.register_preview(this.preview_elements.beams[1]);
                         this.register_preview(this.preview_elements.beams[2]);
@@ -925,35 +914,36 @@ export default class CanvasControl extends CanvasControlBase {
                 if (e.which !== 1) return;
                 if (this.selected_elements.hovered === -1) return;
 
-                Object.values(this.vertices[this.selected_elements.hovered].beams).forEach(beam => {
-                    this.remove_element(this.beams[beam.id]);
+                this.vertices.get(this.selected_elements.hovered).beams.forEach(beam => {
+                    this.remove_element(this.beams.get(beam.id));
                 });
-                this.remove_element(this.vertices[this.selected_elements.hovered]);
+                this.remove_element(this.vertices.get(this.selected_elements.hovered));
                 this.selected_elements.hovered = -1;
                 break;
             case "dissolve-vertex":
                 if (e.which !== 1) return;
                 if (this.selected_elements.hovered === -1) return;
 
-                Object.entries(this.vertices[this.selected_elements.hovered].beams).forEach(([dir, beam]) => {
-                    if (!this.beams[beam.id]) return;
-                    this.remove_element(this.beams[beam.id]);
-                    const same_axis_beam = this.vertices[this.selected_elements.hovered].beams[String(-Number(dir))];
+                this.vertices.get(this.selected_elements.hovered).beams.forEach((beam, dir) => {
+                    if (!this.beams.has(beam.id)) return;
+                    this.remove_element(this.beams.get(beam.id));
+                    const same_axis_beam = this.vertices.get(this.selected_elements.hovered).beams.get(-dir);
                     if (same_axis_beam) {
-                        this.remove_element(this.beams[same_axis_beam.id]);
-                        const vertex1 = beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? beam.vertices[1] : beam.vertices[0];
-                        const vertex2 = same_axis_beam.vertices[0] === this.vertices[this.selected_elements.hovered] ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
+                        this.remove_element(this.beams.get(same_axis_beam.id));
+                        const hovered_vertex = this.vertices.get(this.selected_elements.hovered);
+                        const vertex1 = beam.vertices[0] === hovered_vertex ? beam.vertices[1] : beam.vertices[0];
+                        const vertex2 = same_axis_beam.vertices[0] === hovered_vertex ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
                         this.register_preview(this.create_beam([vertex1, vertex2], Math.abs(Number(dir))));
                     }
                 });
-                this.remove_element(this.vertices[this.selected_elements.hovered]);
+                this.remove_element(this.vertices.get(this.selected_elements.hovered));
                 this.selected_elements.hovered = -1;
                 break;
             case "delete-beam":
                 if (e.which !== 1) return;
                 if (this.selected_elements.hovered === -1) return;
                 
-                this.remove_element(this.beams[this.selected_elements.hovered]);
+                this.remove_element(this.beams.get(this.selected_elements.hovered));
                 this.selected_elements.hovered = -1;
                 break;
         }
@@ -968,10 +958,10 @@ export default class CanvasControl extends CanvasControlBase {
         this.render_order.push(this.next_id);
         if (element instanceof Vertex) {
             element.name = `Vertex ${this.next_name.vertex++}`;
-            this.vertices[this.next_id] = element;
+            this.vertices.set(this.next_id, element);
         } else if (element instanceof Beam) {
             element.name = `Beam ${this.next_name.beam++}`;
-            this.beams[this.next_id] = element;
+            this.beams.set(this.next_id, element);
         }
         const order = $("<div>").text(this.render_order.indexOf(this.next_id) + 1);
         const button = $("<button>").data("id", this.next_id).text(element.name);
@@ -992,10 +982,10 @@ export default class CanvasControl extends CanvasControlBase {
     remove_element(element) {
         this.render_order.splice(this.render_order.indexOf(element.id), 1);
         if (element instanceof Vertex) {
-            delete this.vertices[element.id];
+            this.vertices.delete(element.id);
         } else if (element instanceof Beam) {
             element.destroy();
-            delete this.beams[element.id];
+            this.beams.delete(element.id);
         }
         $('.element-list-item > button').filter(function () {
             return $(this).data('id') === element.id;
@@ -1019,7 +1009,7 @@ export default class CanvasControl extends CanvasControlBase {
 
     highlight_selected_elements() {
         $(".element-list-item > button").each((_, button) => {
-            const id = String($(button).data("id"));
+            const id = $(button).data("id");
             button.classList.remove("hovered", "selected");
             if (id === this.selected_elements.hovered) {
                 $(button).addClass("hovered");
@@ -1184,14 +1174,14 @@ export default class CanvasControl extends CanvasControlBase {
     }
 
     draw_tools() {
-        Object.entries(this.beams).forEach(([id, beam]) => {
+        this.beams.forEach((beam, id) => {
             if (id === this.selected_elements.hovered) {
                 beam.draw_hovered();
             } else if (this.selected_elements.selected.includes(id)) {
                 beam.draw_selected();
             }
         });
-        Object.entries(this.vertices).forEach(([id, vertex]) => {
+        this.vertices.forEach((vertex, id) => {
             if (id === this.selected_elements.hovered) {
                 vertex.draw_hovered();
             } else if (this.selected_elements.selected.includes(id)) {
@@ -1207,6 +1197,17 @@ export default class CanvasControl extends CanvasControlBase {
         this.preview_elements.vertices.forEach(vertex => {
             vertex.fill();
         });
+    }
+
+    create_unit_axes() {
+        return new Map([
+            [1, v.unit(this.axes[0])],
+            [2, v.unit(this.axes[1])],
+            [3, v.unit(this.axes[2])],
+            [-1, v.scale(v.unit(this.axes[0]), -1)],
+            [-2, v.scale(v.unit(this.axes[1]), -1)],
+            [-3, v.scale(v.unit(this.axes[2]), -1)],
+        ]);
     }
 
     create_vertex(position, { id=0, preview=false, show=true, name="" } = {}) {
@@ -1225,7 +1226,7 @@ class Vertex {
         this.c = canvas_control;
         this.position = position;
         this.id = id;
-        this.beams = {};
+        this.beams = new Map();
         this.edges = new Set();
         this.preview = preview;
         this.show = show;
@@ -1239,7 +1240,7 @@ class Vertex {
         const ctx = c.ctx;
 
         const add_edges_1 = () => {
-            Object.keys(this.beams).forEach(main_beam => {
+            this.beams.forEach((_, main_beam) => {
                 main_beam = Number(main_beam);
                 const main_axis = Math.abs(main_beam);
                 const other_axes = [1, 2, 3].filter(axis => axis !== Math.abs(main_beam));
@@ -1264,12 +1265,12 @@ class Vertex {
         }
 
         const remove_edges = () => {
-            Object.keys(this.beams).forEach(main_beam => {
+            this.beams.forEach((_, main_beam) => {
                 main_beam = Number(main_beam);
                 const main_axis = Math.abs(main_beam);
                 const other_axes = [1, 2, 3].filter(axis => axis !== main_axis);
                 if (main_beam > 0) {
-                    Object.keys(this.beams).forEach(secondary_beam => {
+                    this.beams.forEach((_, secondary_beam) => {
                         secondary_beam = Number(secondary_beam);
                         if (secondary_beam !== main_beam) {
                             const secondary_axis = Math.abs(secondary_beam);
@@ -1287,7 +1288,7 @@ class Vertex {
                         }
                     });
                 } else {
-                    Object.keys(this.beams).forEach(secondary_beam => {
+                    this.beams.forEach((_, secondary_beam) => {
                         secondary_beam = Number(secondary_beam);
                         if (secondary_beam !== main_beam) {
                             const secondary_axis = Math.abs(secondary_beam);
@@ -1313,12 +1314,12 @@ class Vertex {
         }
 
         const add_edges_2 = () => {
-            Object.keys(this.beams).forEach(main_beam => {
+            this.beams.forEach((_, main_beam) => {
                 main_beam = Number(main_beam);
                 const main_axis = Math.abs(main_beam);
                 const other_axes = [1, 2, 3].filter(axis => axis !== Math.abs(main_beam));
                 if (main_beam > 0) {
-                    Object.keys(this.beams).forEach(secondary_beam => {
+                    this.beams.forEach((_, secondary_beam) => {
                         secondary_beam = Number(secondary_beam);
                         if (secondary_beam > 0 && secondary_beam !== main_beam) {
                             const secondary_axis = Math.abs(secondary_beam);
@@ -1358,7 +1359,7 @@ class Vertex {
 
         if (this.preview) ctx.globalAlpha = settings.preview_alpha;
         for (let i=0; i<3; i++) {
-            if (String(i + 1) in this.beams) continue;
+            if (this.beams.has(i + 1)) continue;
             const main_axis = c.axes[i];
             const other_axes = c.axes.filter((_, j) => j !== i);
             ctx.fillStyle = settings.fill_styles.vertex[i];
@@ -1451,13 +1452,13 @@ class Beam {
     }
 
     assign_vertices() {
-        this.vertices[0].beams[String(-this.direction)] = this;
-        this.vertices[1].beams[String(this.direction)] = this;
+        this.vertices[0].beams.set(-this.direction, this);
+        this.vertices[1].beams.set(this.direction, this);
     }
 
     destroy() {
-        if (this.vertices[0].beams[String(-this.direction)] === this) delete this.vertices[0].beams[String(-this.direction)];
-        if (this.vertices[1].beams[String(this.direction)] === this) delete this.vertices[1].beams[String(this.direction)];
+        if (this.vertices[0].beams.get(-this.direction) === this) this.vertices[0].beams.delete(-this.direction);
+        if (this.vertices[1].beams.get(this.direction) === this) this.vertices[1].beams.delete(this.direction);
     }
 
     draw_outline() {
@@ -1504,17 +1505,17 @@ class Beam {
         for (let i=0; i<2; i++) {
             // Draw the part of the other beams of the vertices[1] that is covered by the beam
             // Continue if the other beam does not exist
-            if (!(String(-other_axes_index[i]) in this.vertices[1].beams)) continue;
+            if (!this.vertices[1].beams.has(-other_axes_index[i])) continue;
             // Continue if the other beam is not shown
-            if(!this.vertices[1].beams[String(-other_axes_index[i])].show) continue;
+            if(!this.vertices[1].beams.get(-other_axes_index[i]).show) continue;
             // Continue if the other beam is shorter than the axis of the beam
-            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position)) < v.len(c.axes[other_axes_index[i] - 1])) continue;
+            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams.get(-other_axes_index[i]).vertices[1].position)) < v.len(c.axes[other_axes_index[i] - 1])) continue;
             const p1 = v.sub(this.vertices[1].position, other_axes[i]);
-            const p2 = v.sub(this.vertices[1].beams[String(-other_axes_index[i])].vertices[1].position, other_axes[1 - i]);
+            const p2 = v.sub(this.vertices[1].beams.get(-other_axes_index[i]).vertices[1].position, other_axes[1 - i]);
             const overlapping_point = v.line_intersection(p1, main_axis, p2, other_axes[i]);
             ctx.fillStyle = settings.fill_styles.beam[this.direction - 1];
             ctx.save();
-            ctx.globalAlpha = this.vertices[1].beams[String(-other_axes_index[i])].preview ? settings.preview_alpha : 1;
+            ctx.globalAlpha = this.vertices[1].beams.get(-other_axes_index[i]).preview ? settings.preview_alpha : 1;
             ctx.beginPath();
             ctx.moveTo(...p1);
             ctx.lineTo(...v.sub(p1, other_axes[1 - i]));
@@ -1537,7 +1538,7 @@ class Beam {
             ctx.beginPath();
             let position = this.vertices[1].position;
             ctx.moveTo(...position);
-            if (String(other_axes_index[i]) in this.vertices[0].beams) {
+            if (this.vertices[0].beams.has(other_axes_index[i])) {
                 // If the beam is covered by the other beam of the vertices[0]
                 const p1 = v.sub(this.vertices[0].position, main_axis);
                 const p2 = v.sub(this.vertices[1].position, other_axes[1 - i]);
