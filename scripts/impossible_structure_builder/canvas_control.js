@@ -196,8 +196,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.vertices = [];
 
                 const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
-                console.log("vertex", vertex);
-                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
+                const unit_axes = map_filter(this.generate_axis_map(true), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
                 const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
@@ -287,7 +286,7 @@ export default class CanvasControl extends CanvasControlBase {
                     if (this.selected_elements.selected.includes(id)) return;
                     if (vertex.beams.size === 6) return;
                     const directions = map_filter(
-                        this.create_unit_axes(),
+                        this.generate_axis_map(true),
                         (_, key) => !vertex1.beams.has(key) && !vertex.beams.has(-key)
                     );
                     const direction = map_reduce(directions,
@@ -343,7 +342,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.axes = [];
 
                 const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
-                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
+                const unit_axes = map_filter(this.generate_axis_map(true), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
                 const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
@@ -365,7 +364,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
-                const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
+                const direction1_vec = this.generate_axis_map().get(direction1);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
                 this.vertices.forEach((vertex, id) => {
@@ -375,7 +374,7 @@ export default class CanvasControl extends CanvasControlBase {
                     if (this.selected_elements.selected.includes(id)) return;
                     if (vertex.beams.size === 6) return;
                     // Return if the axis of vertex 1 doesn't intersect with all the axis of the vertex
-                    const intersecting_axes = map_filter(this.create_unit_axes(), (axis, key) => {
+                    const intersecting_axes = map_filter(this.generate_axis_map(true), (axis, key) => {
                         if (vertex.beams.has(key)) return false;
                         if (Math.abs(key) === Math.abs(direction1)) return false;
                         const intersection = v.ray_intersection(vertex1.position, direction1_vec, vertex.position, axis);
@@ -408,8 +407,8 @@ export default class CanvasControl extends CanvasControlBase {
                 const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 2]);
                 const vertex2 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
-                const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
-                const unit_axes = map_filter(this.create_unit_axes(), (axis_vec, key) => {
+                const direction1_vec = this.generate_axis_map().get(direction1);
+                const unit_axes = map_filter(this.generate_axis_map(true), (axis_vec, key) => {
                     if (vertex2.beams.has(key)) return false;
                     if (Math.abs(key) === Math.abs(direction1)) return false;
                     const intersection = v.ray_intersection(vertex1.position, direction1_vec, vertex2.position, axis_vec);
@@ -467,7 +466,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.preview_elements.axes = [];
 
                 const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
-                const unit_axes = map_filter(this.create_unit_axes(), (_, key) => !vertex.beams.has(key));
+                const unit_axes = map_filter(this.generate_axis_map(true), (_, key) => !vertex.beams.has(key));
 
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
                 const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
@@ -499,7 +498,7 @@ export default class CanvasControl extends CanvasControlBase {
 
                 const vertex1 = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
                 const direction1 = this.preview_elements.axes[0].direction;
-                const direction1_vec = direction1 > 0 ? this.axes[direction1 - 1] : v.scale(this.axes[-direction1 - 1], -1);
+                const direction1_vec = this.generate_axis_map().get(direction1);
                 let nearest_id = -1;
                 let nearest_dist = Infinity;
                 this.beams.forEach((beam, id) => {
@@ -1199,23 +1198,25 @@ export default class CanvasControl extends CanvasControlBase {
         });
     }
 
-    create_unit_axes() {
+    generate_axis_map(unit=false) {
         return new Map([
-            [1, v.unit(this.axes[0])],
-            [2, v.unit(this.axes[1])],
-            [3, v.unit(this.axes[2])],
-            [-1, v.scale(v.unit(this.axes[0]), -1)],
-            [-2, v.scale(v.unit(this.axes[1]), -1)],
-            [-3, v.scale(v.unit(this.axes[2]), -1)],
+            [1, unit ? v.unit(this.axes[0]) : this.axes[0]],
+            [2, unit ? v.unit(this.axes[1]) : this.axes[1]],
+            [3, unit ? v.unit(this.axes[2]) : this.axes[2]],
+            [-1, unit ? v.scale(v.unit(this.axes[0]), -1) : v.scale(this.axes[0], -1)],
+            [-2, unit ? v.scale(v.unit(this.axes[1]), -1) : v.scale(this.axes[1], -1)],
+            [-3, unit ? v.scale(v.unit(this.axes[2]), -1) : v.scale(this.axes[2], -1)],
         ]);
     }
 
     create_vertex(position, { id=0, preview=false, show=true, name="" } = {}) {
         return new Vertex(this, position, { id, preview, show, name });
     }
+
     create_beam(vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
         return new Beam(this, vertices, direction, { id, preview, show, name });
     }
+
     create_axis(vertex, direction, { preview=false, show=true } = {}) {
         return new Axis(this, vertex, direction, { preview, show });
     }
@@ -1447,7 +1448,7 @@ class Beam {
         this.preview = preview;
         this.show = show;
         this.name = name;
-        if (v.dot(v.sub(this.vertices[0].position, this.vertices[1].position), this.c.axes[this.direction - 1]) < 0) this.vertices.reverse();
+        if (v.dot(v.sub(this.vertices[0].position, this.vertices[1].position), this.c.generate_axis_map().get(this.direction)) < 0) this.vertices.reverse();
         this.assign_vertices();
     }
 
@@ -1467,8 +1468,9 @@ class Beam {
         const settings = c.settings;
         const ctx = c.ctx;
 
-        const main_axis = c.axes[this.direction - 1];
-        const other_axes = c.axes.filter((_, i) => i !== this.direction - 1);
+        const axis_map = c.generate_axis_map();
+        const main_axis = axis_map.get(this.direction);
+        const other_axes = [1, 2, 3].filter(axis => axis !== this.direction).map(axis => axis_map.get(axis));
         let starts = [];
         starts[0] = this.vertices[0].position;
         starts[0] = v.sub(starts[0], main_axis);
@@ -1499,9 +1501,10 @@ class Beam {
         const ctx = c.ctx;
 
         if (this.preview) ctx.globalAlpha = settings.preview_alpha;
-        const main_axis = c.axes[this.direction - 1];
+        const axis_map = c.generate_axis_map();
+        const main_axis = axis_map.get(this.direction);
         const other_axes_index = [1, 2, 3].filter(axis => axis !== this.direction);
-        const other_axes = other_axes_index.map(i => c.axes[i - 1]);
+        const other_axes = other_axes_index.map(i => axis_map.get(i));
         for (let i=0; i<2; i++) {
             // Draw the part of the other beams of the vertices[1] that is covered by the beam
             // Continue if the other beam does not exist
@@ -1509,7 +1512,7 @@ class Beam {
             // Continue if the other beam is not shown
             if(!this.vertices[1].beams.get(-other_axes_index[i]).show) continue;
             // Continue if the other beam is shorter than the axis of the beam
-            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams.get(-other_axes_index[i]).vertices[1].position)) < v.len(c.axes[other_axes_index[i] - 1])) continue;
+            if (v.len(v.sub(this.vertices[1].position, this.vertices[1].beams.get(-other_axes_index[i]).vertices[1].position)) < v.len(axis_map.get(other_axes_index[i]))) continue;
             const p1 = v.sub(this.vertices[1].position, other_axes[i]);
             const p2 = v.sub(this.vertices[1].beams.get(-other_axes_index[i]).vertices[1].position, other_axes[1 - i]);
             const overlapping_point = v.line_intersection(p1, main_axis, p2, other_axes[i]);
@@ -1533,7 +1536,7 @@ class Beam {
         }
         for (let i=0; i<2; i++) {
             // Draw the part of the beam that is not covered by the other beam
-            if (v.len(v.sub(this.vertices[0].position, this.vertices[1].position)) < v.len(c.axes[this.direction - 1])) continue;
+            if (v.len(v.sub(this.vertices[0].position, this.vertices[1].position)) < v.len(axis_map.get(this.direction))) continue;
             ctx.fillStyle = settings.fill_styles.beam[other_axes_index[i] - 1];
             ctx.beginPath();
             let position = this.vertices[1].position;
@@ -1634,7 +1637,7 @@ class Axis {
 
         const vec_to_center = v.scale(v.add(v.add(c.axes[0], c.axes[1]), c.axes[2]), 0.5);
         let position = v.sub(this.vertex.position, vec_to_center);
-        const unit_axis = this.direction > 0 ? v.unit(c.axes[this.direction - 1]) : v.scale(v.unit(c.axes[-this.direction - 1]), -1);
+        const unit_axis = c.generate_axis_map(true).get(this.direction);
         position = v.add(position, v.scale(unit_axis, 200));
 
         ctx.strokeStyle = settings.axis_style;
