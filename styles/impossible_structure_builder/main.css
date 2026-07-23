@@ -340,16 +340,25 @@ body {
 .init-box-content-text * {
     font-size: 20px;
 }
-#init-box-axes {
+#init-box-axes-grid {
     display: grid;
     grid-template-columns: auto auto auto;
     width: fit-content;
 }
-#init-box-axes > input {
+#init-box-axes-grid > input {
     max-width: 100px;
 }
-#init-box-axes > * {
+#init-box-axes-grid > * {
     margin: 5px;
+}
+#init-box-axes-canvas {
+    display: flex;
+    padding: 10px;
+}
+#init-box-axes-canvas > canvas {
+    width: 300px;
+    height: 300px;
+    background-color: var(--primary-darker-color);
 }
 
 /* message */

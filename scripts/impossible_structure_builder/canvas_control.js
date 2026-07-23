@@ -40,14 +40,21 @@ export default class CanvasControl extends CanvasControlBase {
         // this.axes = [[0, 1], [Math.cos(TAU * 5/8)*.5, Math.sin(TAU * 5/8)*.5], [1, 0]];
         // this.axes = [[0, 1], [Math.cos(TAU * 7/12), Math.sin(TAU * 7/12)], [Math.cos(TAU * 11/12), Math.sin(TAU * 11/12)]];
         this.axes = this.axes.map(axis => v.scale(axis, 100));
-        this.settings.hover_dist.vertex = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
-        this.settings.hover_dist.beam = Math.max(...this.axes.map(axis => v.len(axis)));
+
         this.vertices = new Map();
         this.beams = new Map();
         this.render_order = [];
         this.next_name = { vertex: 1, beam: 1 };
         this.preview_elements = { vertices: [], beams: [], axes: [] };
+    }
 
+    set_axes(axes) {
+        this.axes = axes;
+        this.settings.hover_dist.vertex = Math.max(...this.axes.map(axis => v.len(axis))) * 2 ** .5;
+        this.settings.hover_dist.beam = Math.max(...this.axes.map(axis => v.len(axis)));
+    }
+
+    activate() {
         this.setup_listeners();
         this.set_canvas(true);
         this.draw();
@@ -1018,6 +1025,7 @@ export default class CanvasControl extends CanvasControlBase {
         });
     }
 
+
     display_all_possibilities() {
         let centers_vertices = [];
         for (let i=0; i<8; i++) {
@@ -1170,6 +1178,59 @@ export default class CanvasControl extends CanvasControlBase {
 
         // beams.forEach(beam => beam.draw_outline());
         // vertices.forEach(vertex => vertex.draw_outline());
+    }
+
+
+    display_init_vertex(hovered_axis=-1) {
+        const vertex = this.create_vertex([0, 0]);
+        this.vertices.set(0, vertex);
+        this.render_order.push(0);
+
+        const vec_to_center = v.scale(v.add(v.add(this.axes[0], this.axes[1]), this.axes[2]), 0.5);
+        const length = this.axes.reduce((max, axis) => Math.max(max, v.len(v.sub(axis, vec_to_center))), 0);
+        let tips = [];
+        this.axes.forEach((axis, index) => {
+            const unit_axis = v.unit(axis);
+            let position = v.sub(vertex.position, vec_to_center);
+            position = v.add(position, v.scale(unit_axis, length * 1.5));
+            position = v.add(position, v.scale(unit_axis, v.len(axis)));
+            tips.push(position);
+        });
+
+        const min_x = Math.min(...tips.map(tip => tip[0]));
+        const max_x = Math.max(...tips.map(tip => tip[0]));
+        const min_y = Math.min(...tips.map(tip => tip[1]));
+        const max_y = Math.max(...tips.map(tip => tip[1]));
+
+        const side_length = Math.max(max_x - min_x, max_y - min_y);
+        this.origin = [min_x, max_y];
+        this.size = this.canvas.clientHeight / side_length;
+        this.set_canvas();
+
+        const settings = this.settings;
+        const ctx = this.ctx;
+        ctx.lineWidth = settings.axis_width / this.size;
+
+        this.axes.forEach((axis, index) => {
+            ctx.strokeStyle = settings.axis_style;
+            if (hovered_axis === index + 1) ctx.strokeStyle = settings.selected_style;
+
+            const unit_axis = v.unit(axis);
+            let position = v.sub(vertex.position, vec_to_center);
+            position = v.add(position, v.scale(unit_axis, length * 1.5));
+            ctx.beginPath();
+            ctx.moveTo(...position);
+            position = v.add(position, v.scale(unit_axis, v.len(axis)));
+            ctx.lineTo(...position);
+            ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, length / 3), 150)));
+            ctx.lineTo(...position);
+            ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, length / 3), -150)));
+            ctx.stroke();
+        });
+    }
+
+    display_init_penrose_triangle() {
+
     }
 
     draw_tools() {
@@ -1636,18 +1697,20 @@ class Axis {
         const ctx = c.ctx;
 
         const vec_to_center = v.scale(v.add(v.add(c.axes[0], c.axes[1]), c.axes[2]), 0.5);
+        const length = c.axes.reduce((max, axis) => Math.max(max, v.len(v.sub(axis, vec_to_center))), 0);
         let position = v.sub(this.vertex.position, vec_to_center);
         const unit_axis = c.generate_axis_map(true).get(this.direction);
-        position = v.add(position, v.scale(unit_axis, 200));
+
+        position = v.add(position, v.scale(unit_axis, length * 2));
 
         ctx.strokeStyle = settings.axis_style;
         ctx.beginPath();
         ctx.moveTo(...position);
-        position = v.add(position, v.scale(unit_axis, 100));
+        position = v.add(position, v.scale(unit_axis, length));
         ctx.lineTo(...position);
-        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), 150)));
+        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, length / 3), 150)));
         ctx.lineTo(...position);
-        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, 30), -150)));
+        ctx.lineTo(...v.add(position, v.rotate(v.scale(unit_axis, length / 3), -150)));
         ctx.save();
         if (this.preview) ctx.globalAlpha = settings.preview_alpha;
         ctx.lineWidth = settings.axis_width / c.size;

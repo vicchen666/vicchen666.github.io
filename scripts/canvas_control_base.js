@@ -2,7 +2,7 @@ import $ from "jquery";
 import * as v from "vectors";
 
 export default class CanvasControlBase {
-    constructor(canvas, { animate = true, frame_interval = 10 } = {}) {
+    constructor(canvas, { moveable=true, animate=true, frame_interval=10 } = {}) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
         this.animate = animate;
@@ -10,6 +10,7 @@ export default class CanvasControlBase {
         this.animation = null;
         this.default_cursor = "default";
         this.tool_status = { tool: "move", status: "idle"};
+        this.moveable = moveable;
         this.grabbing_canvas = false;
         this.origin = [-this.canvas.clientWidth / 2, this.canvas.clientHeight / 2];
         this.size = 1;
@@ -22,12 +23,23 @@ export default class CanvasControlBase {
     }
 
     setup_listeners() {
+        if (!this.moveable) return;
         this.canvas.addEventListener("wheel", e => this.handle_wheel(e));
         this.canvas.addEventListener("mouseleave", e => this.handle_mouseleave(e));
         this.canvas.addEventListener("mousedown", e => this.handle_mousedown(e));
         window.addEventListener("mousemove", e => this.handle_mousemove(e));
         window.addEventListener("mouseup", () => this.handle_mouseup());
         window.addEventListener("resize", () => this.handle_resize());
+    }
+
+    remove_listeners() {
+        if (!this.moveable) return;
+        this.canvas.removeEventListener("wheel", this.handle_wheel);
+        this.canvas.removeEventListener("mouseleave", this.handle_mouseleave);
+        this.canvas.removeEventListener("mousedown", this.handle_mousedown);
+        window.removeEventListener("mousemove", this.handle_mousemove);
+        window.removeEventListener("mouseup", this.handle_mouseup);
+        window.removeEventListener("resize", this.handle_resize);
     }
 
     mouse_to_canvas(x, y) {
@@ -100,6 +112,7 @@ export default class CanvasControlBase {
     }
 
     set_canvas(adjust_size=false) {
+        console.log(this.size, this.origin);
         if (adjust_size) {
             this.canvas.height = this.canvas.clientHeight;
             this.canvas.width = this.canvas.clientWidth;
@@ -138,5 +151,6 @@ export default class CanvasControlBase {
 
     destroy() {
         this.stop_animation();
+        this.remove_listeners();
     }
 }

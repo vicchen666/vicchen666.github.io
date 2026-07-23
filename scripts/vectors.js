@@ -102,3 +102,8 @@ export function point_to_seg_point(point, start, end) {
 export function point_to_seg_dist(point, start, end) {
     return len(sub(point, point_to_seg_point(point, start, end)));
 }
+// Only for 2D
+export function polar_to_cartesian(r, theta) {
+    const rad = theta * TAU / 360;
+    return [r * Math.cos(rad), r * Math.sin(rad)];
+}
