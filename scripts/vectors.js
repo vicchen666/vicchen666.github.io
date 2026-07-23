@@ -28,6 +28,10 @@ export function rotate(v, d) {
     const rad = d * TAU / 360;
     return [v[0] * Math.cos(rad) + v[1] * -Math.sin(rad), v[0] * Math.sin(rad) + v[1] * Math.cos(rad)];
 }
+export function round(v, precision=0) {
+    const factor = 10 ** precision;
+    return v.map(val => Math.round(val * factor) / factor);
+}
 
 // Vector tools
 /**
@@ -106,4 +110,22 @@ export function point_to_seg_dist(point, start, end) {
 export function polar_to_cartesian(r, theta) {
     const rad = theta * TAU / 360;
     return [r * Math.cos(rad), r * Math.sin(rad)];
+}
+// Only for 2D
+export function cartesian_to_polar(v) {
+    const x = v[0];
+    const y = v[1];
+    const r = Math.sqrt(x ** 2 + y ** 2);
+    const theta = Math.atan2(y, x) * 360 / TAU;
+    return [r, theta];
+}
+
+export function get_bounding_box(points) {
+    if (!points.length) return null;
+    let box = { min: [], max: [] };
+    for (let i = 0; i < points[0].length; i++) {
+        box.min[i] = Math.min(...points.map(p => p[i]));
+        box.max[i] = Math.max(...points.map(p => p[i]));
+    }
+    return box;
 }

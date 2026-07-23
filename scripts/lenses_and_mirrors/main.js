@@ -70,7 +70,8 @@ $(".tab").on("click", function() {
 });
 
 $(".element-add-item > button").on("click", function() {
-    const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round(c.origin[0] + c.canvas.width / (2 * c.size)), Math.round(c.origin[1] - c.canvas.height / (2 * c.size))], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
+    const position = v.round(c.get_canvas_center());
+    const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: position, size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
     switch($(this).parent().index()) {
         case 1:
             element.focal_length = -200;
@@ -317,7 +318,7 @@ function center_element(id) {
         type = "optical_elements";
         index = c.optical_elements.findIndex(e => e.id === id);
     }
-    c.origin = [c[type][index].position[0] - c.canvas.width / (2 * c.size), c[type][index].position[1] + c.canvas.height / (2 * c.size)];
+    c.center_on(c[type][index].position);
     c.set_canvas();
 }
 

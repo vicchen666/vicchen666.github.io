@@ -135,11 +135,11 @@ export function toggle_element_settings(c, show) {
 export function center_element(c, id) {
     if (c.vertices.has(id)) {
         const element = c.vertices.get(id);
-        c.origin = [element.position[0] - c.canvas.width / (2 * c.size), element.position[1] + c.canvas.height / (2 * c.size)];
+        c.center_on(element.position);
     } else if (c.beams.has(id)) {
         const element = c.beams.get(id);
         const midpoint = v.scale(v.add(element.vertices[0].position, element.vertices[1].position), 0.5);
-        c.origin = [midpoint[0] - c.canvas.width / (2 * c.size), midpoint[1] + c.canvas.height / (2 * c.size)];
+        c.center_on(midpoint);
     }
     c.set_canvas();
 }

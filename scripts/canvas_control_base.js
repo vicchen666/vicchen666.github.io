@@ -2,7 +2,7 @@ import $ from "jquery";
 import * as v from "vectors";
 
 export default class CanvasControlBase {
-    constructor(canvas, { moveable=true, animate=true, frame_interval=10 } = {}) {
+    constructor(canvas, { name="main", moveable=true, animate=true, frame_interval=10 } = {}) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d");
         this.animate = animate;
@@ -20,6 +20,7 @@ export default class CanvasControlBase {
         this.next_name = {};
         this.selected_elements = { selected: [], hovered: -1 };
         this.preview_elements = {};
+        this.name = name;
     }
 
     setup_listeners() {
@@ -147,6 +148,36 @@ export default class CanvasControlBase {
 
     render_frame() {
         // Implemented by subclasses.
+    }
+
+    clear() {
+        this.ctx.clearRect(...this.origin, this.canvas.width / this.size, -this.canvas.height / this.size);
+    }
+
+    center_on(coordinates, x_percentage=0.5, y_percentage=0.5) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.origin = v.sub(coordinates, [rect.width * x_percentage / this.size, -rect.height * y_percentage / this.size]);
+        this.set_canvas();
+    }
+
+    get_canvas_center(x_percentage=0.5, y_percentage=0.5) {
+        const rect = this.canvas.getBoundingClientRect();
+        return v.add(this.origin, [rect.width * x_percentage / (this.size), -rect.height * y_percentage / (this.size)]);
+    }
+
+    // Choose the largest size that fits the bounding box in the canvas, and center the bounding box in the canvas.
+    // Uses v.get_bounding_box to get the bounding box of the points.
+    set_bounding_box(box, padding_percentage=0) {
+        const rect = this.canvas.getBoundingClientRect();
+        const box_width = box.max[0] - box.min[0];
+        const box_height = box.max[1] - box.min[1];
+        this.size = Math.min(rect.width / box_width, rect.height / box_height);
+        this.size *= 1 - padding_percentage;
+        this.origin = [
+            (box.min[0] + box.max[0]) / 2 - rect.width / (2 * this.size),
+            (box.min[1] + box.max[1]) / 2 + rect.height / (2 * this.size)
+        ];
+        this.set_canvas();
     }
 
     destroy() {

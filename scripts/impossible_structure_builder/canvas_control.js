@@ -686,7 +686,7 @@ export default class CanvasControl extends CanvasControlBase {
 
     render_frame() {
         this.highlight_selected_elements();
-        this.ctx.clearRect(...this.origin, this.canvas.width / this.size, -this.canvas.height / this.size);
+        this.clear();
         this.ctx.lineJoin = "round";
         this.ctx.lineCap = "round";
         this.ctx.lineWidth = 2 / this.size;
@@ -1197,15 +1197,18 @@ export default class CanvasControl extends CanvasControlBase {
             tips.push(position);
         });
 
-        const min_x = Math.min(...tips.map(tip => tip[0]));
-        const max_x = Math.max(...tips.map(tip => tip[0]));
-        const min_y = Math.min(...tips.map(tip => tip[1]));
-        const max_y = Math.max(...tips.map(tip => tip[1]));
+        const bounding_box = v.get_bounding_box(tips);
+        this.set_bounding_box(bounding_box, 0.1);
 
-        const side_length = Math.max(max_x - min_x, max_y - min_y);
-        this.origin = [min_x, max_y];
-        this.size = this.canvas.clientHeight / side_length;
-        this.set_canvas();
+        // const min_x = Math.min(...tips.map(tip => tip[0]));
+        // const max_x = Math.max(...tips.map(tip => tip[0]));
+        // const min_y = Math.min(...tips.map(tip => tip[1]));
+        // const max_y = Math.max(...tips.map(tip => tip[1]));
+
+        // const side_length = Math.max(max_x - min_x, max_y - min_y);
+        // this.origin = [min_x, max_y];
+        // this.size = this.canvas.clientHeight / side_length;
+        // this.set_canvas();
 
         const settings = this.settings;
         const ctx = this.ctx;
