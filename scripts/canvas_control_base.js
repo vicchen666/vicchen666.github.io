@@ -12,8 +12,8 @@ export default class CanvasControlBase {
         this.tool_status = { tool: "move", status: "idle"};
         this.moveable = moveable;
         this.grabbing_canvas = false;
-        this.origin = [-this.canvas.clientWidth / 2, this.canvas.clientHeight / 2];
         this.size = 1;
+        this.origin = [-this.canvas.clientWidth / (2 * this.size), this.canvas.clientHeight / (2 * this.size)];
         this.mouse_x = 0;
         this.mouse_y = 0;
         this.next_id = 0;
@@ -44,14 +44,14 @@ export default class CanvasControlBase {
 
     mouse_to_canvas(x, y) {
         const rect = this.canvas.getBoundingClientRect();
-        const canvas_point = v.scale(v.add(this.origin, v.sub([x, -y], [rect.left, -rect.top])), 1 / this.size);
+        const canvas_point = v.add(this.origin, v.scale(v.sub([x, -y], [rect.left, -rect.top]), 1 / this.size));
         return canvas_point;
     }
 
     handle_wheel(e) {
         const rect = this.canvas.getBoundingClientRect();
         const canvas_point = v.sub([e.clientX, -e.clientY], [rect.left, -rect.top]);
-        const origin = v.sub(v.scale(v.add(this.origin, canvas_point), e.deltaY > 0 ? 1 / 1.1 : 1.1), canvas_point);
+        const origin = v.sub(v.add(this.origin, v.scale(canvas_point, 1 / this.size)), v.scale(canvas_point, 1 / (this.size * (e.deltaY > 0 ? 1 / 1.1 : 1.1))));
         this.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
         this.origin = origin;
         this.set_canvas();
@@ -89,7 +89,7 @@ export default class CanvasControlBase {
             this.tool_preview[this.tool_status.tool]?.[this.tool_status.status]?.(e);
         }
         if (!this.grabbing_canvas) return;
-        this.origin = v.add(this.origin, [this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)]);
+        this.origin = v.add(this.origin, v.scale([this.mouse_x - e.clientX, -(this.mouse_y - e.clientY)], 1 / this.size));
         this.mouse_x = e.clientX;
         this.mouse_y = e.clientY;
         this.set_canvas();
@@ -119,7 +119,7 @@ export default class CanvasControlBase {
         }
         this.ctx.setTransform(
             this.size, 0, 0, -this.size,
-            -this.origin[0], this.origin[1]
+            -this.origin[0] * this.size, this.origin[1] * this.size
         );
         this.render_frame();
     }

@@ -82,7 +82,7 @@ export default class CanvasControl extends CanvasControlBase {
     }
 
     render_frame() {
-        this.ctx.clearRect(...v.scale(this.origin, 1 / this.size), this.canvas.width / this.size, -this.canvas.height / this.size);
+        this.ctx.clearRect(...this.origin, this.canvas.width / this.size, -this.canvas.height / this.size);
         this.draw_light(this.fill_length, this.sep_length, this.phase, this.light_path);
         this.draw_elements(this.light_sources, this.optical_elements, this.selected_elements);
         this.phase = (this.phase + 1) % (this.fill_length + this.sep_length);

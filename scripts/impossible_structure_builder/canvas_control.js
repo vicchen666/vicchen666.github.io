@@ -686,7 +686,7 @@ export default class CanvasControl extends CanvasControlBase {
 
     render_frame() {
         this.highlight_selected_elements();
-        this.ctx.clearRect(...v.scale(this.origin, 1 / this.size), this.canvas.width / this.size, -this.canvas.height / this.size);
+        this.ctx.clearRect(...this.origin, this.canvas.width / this.size, -this.canvas.height / this.size);
         this.ctx.lineJoin = "round";
         this.ctx.lineCap = "round";
         this.ctx.lineWidth = 2 / this.size;

@@ -70,7 +70,7 @@ $(".tab").on("click", function() {
 });
 
 $(".element-add-item > button").on("click", function() {
-    const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round((c.origin[0] + c.canvas.width / 2) / c.size), Math.round((c.origin[1] - c.canvas.height / 2) / c.size)], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
+    const element = {id: c.next_id, name:`New ${$(this).text()}`, type: "lens", position: [Math.round(c.origin[0] + c.canvas.width / (2 * c.size)), Math.round(c.origin[1] - c.canvas.height / (2 * c.size))], size: 400, rotation: -90, unit_vector: [0, -1], angle: 90, focal_length: 200, density: 100};
     switch($(this).parent().index()) {
         case 1:
             element.focal_length = -200;
@@ -317,7 +317,7 @@ function center_element(id) {
         type = "optical_elements";
         index = c.optical_elements.findIndex(e => e.id === id);
     }
-    c.origin = [c[type][index].position[0] * c.size - c.canvas.width / 2, c[type][index].position[1] * c.size + c.canvas.height / 2];
+    c.origin = [c[type][index].position[0] - c.canvas.width / (2 * c.size), c[type][index].position[1] + c.canvas.height / (2 * c.size)];
     c.set_canvas();
 }
 
@@ -376,7 +376,7 @@ $("#button-download").on("click", () => {
 
 function download_project() {
     const data = {
-        version: 1,
+        version: 2,
         general_settings: {
             ray_settings: {
                 max_ray_length: c.max_distance,
@@ -442,14 +442,16 @@ $("#input-open").on("change", function(event) {
 
 function open_project(data) {
     try {
-        if (data.version === 1) {
+        if (data.version === 1 || data.version === 2) {
             const ray_settings = data.general_settings.ray_settings;
             c.max_distance = ray_settings.max_ray_length;
             c.fill_length = ray_settings.solid_length;
             c.sep_length= ray_settings.gap_length;
             reload_general_settings();
-            c.origin = data.misc.canvas.origin;
             c.size = data.misc.canvas.scale;
+            c.origin = data.version === 1
+                ? data.misc.canvas.origin.map(value => value / c.size)
+                : data.misc.canvas.origin;
 
             toggle_element_settings(false);
             $("#element-list").text("");
