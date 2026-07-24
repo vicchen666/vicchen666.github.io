@@ -12,14 +12,14 @@ const TAU = Math.PI * 2;
 
 $("#init-box")[0].showModal();
 const init = {
-    "init-vertex": new CanvasControl($("#init-box-axes-canvas-vertex")[0], { name: "init-vertex", moveable: false, animate: false }),
-    "init-penrose": new CanvasControl($("#init-box-axes-canvas-penrose")[0], { name: "init-penrose", moveable: false, animate: false }),
+    "init-vertex": new CanvasControl($("#init-box-axes-canvas-vertex")[0], { name: "init_vertex", moveable: false, animate: false }),
+    "init-penrose": new CanvasControl($("#init-box-axes-canvas-penrose")[0], { name: "init_penrose", moveable: false, animate: false }),
     "axes": [],
     "status": ["valid"]
 };
-// init_canvas.forEach(canvas => {
-//     canvas.set_axes([[Math.cos(TAU * 1/6), Math.sin(TAU * 1/6)], [-1, 0], [Math.cos(TAU * 5/6), Math.sin(TAU * 5/6)]]);
-// });
+init["init-vertex"].activate();
+init["init-penrose"].activate();
+
 const c = new CanvasControl($("#main-canvas > canvas")[0]);
 
 document.addEventListener("keydown", e => {
@@ -74,43 +74,46 @@ $("#init-box-axes-grid").on("input", "> input", function() {
         const setting = $(this).data("setting");
         const value = +$(this).val();
 
+        if (!axes_polar[axis - 1]) axes_polar[axis - 1] = {};
+
         if (setting === "length" && value <= 0) {
             init.status = ["invalid", "Length must be greater than 0"];
-            $("#init-box-confirm").css("color", "var(--error-color)");
-            $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
-            return;
+            axes_polar[axis - 1][setting] = 1;
+        } else {
+            axes_polar[axis - 1][setting] = value;
         }
-
-        if (!axes_polar[axis - 1]) axes_polar[axis - 1] = {};
-        axes_polar[axis - 1][setting] = value;
     });
 
     axes_polar = axes_polar.map(axis => ({ length: axis.length, angle: axis.angle % 360 }));
     init.axes = axes_polar.map(axis => v.polar_to_cartesian(axis.length, axis.angle));
     let sum = 0;
+    let invalid = false;
     for (let i=0; i<3; i++) {
         const diff = (axes_polar[(i + 1) % 3].angle - axes_polar[i].angle + 720) % 360;
+        if (diff === 180) {
+            invalid = true;
+            break;
+        }
+
         sum += Math.min(diff, 360 - diff);
     }
-    if (sum < 360) {
+    if (invalid || sum < 360) {
         init.status = ["invalid", "The axis directions must not all lie within the same semicircle."];
-        $("#init-box-confirm").css("color", "var(--error-color)");
-        $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
     }
 
-    Object.values(init).forEach(canvas => {
-        if (canvas instanceof CanvasControl) {
-            canvas.set_axes(init.axes);
-            canvas.activate();
-        }
-    });
     init["init-vertex"].selected_elements.selected = [$(this).data("axis")];
-    init["init-vertex"].display_init_vertex();
-    init["init-penrose"].display_init_penrose_triangle();
+    init["init-vertex"].set_axes(init.axes);
+    init["init-vertex"].render_frame();
 
     if (init.status[0] === "valid") {
+        init["init-penrose"].set_axes(init.axes);
+        init["init-penrose"].render_frame();
         $("#init-box-confirm").css("color", "var(--success-color)");
         $("#init-box-axes-message").addClass("invisible");
+    } else {
+        init["init-penrose"].clear();
+        $("#init-box-confirm").css("color", "var(--error-color)");
+        $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
     }
 });
 

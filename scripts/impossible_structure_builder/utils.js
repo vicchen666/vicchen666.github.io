@@ -130,18 +130,22 @@ export function toggle_element_settings(c, show) {
         $("#element-settings").addClass("invisible");
     }
     c.set_canvas(true);
+    c.render_frame();
 }
 
 export function center_element(c, id) {
     if (c.vertices.has(id)) {
         const element = c.vertices.get(id);
         c.center_on(element.position);
+        c.render_frame();
     } else if (c.beams.has(id)) {
         const element = c.beams.get(id);
         const midpoint = v.scale(v.add(element.vertices[0].position, element.vertices[1].position), 0.5);
         c.center_on(midpoint);
+        c.render_frame();
     }
     c.set_canvas();
+    c.render_frame();
 }
 
 export function delete_element(c, id) {

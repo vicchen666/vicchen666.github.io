@@ -62,6 +62,7 @@ export default class CanvasControlBase {
         this.size *= e.deltaY > 0 ? 1 / 1.1 : 1.1;
         this.origin = origin;
         this.set_canvas();
+        this.render_frame();
     }
 
     handle_mouseleave(e) {
@@ -100,6 +101,7 @@ export default class CanvasControlBase {
         this.mouse_x = e.clientX;
         this.mouse_y = e.clientY;
         this.set_canvas();
+        this.render_frame();
     }
 
     handle_mouseup() {
@@ -108,6 +110,7 @@ export default class CanvasControlBase {
 
     handle_resize() {
         this.set_canvas(true);
+        this.render_frame();
     }
 
     hover_item_from_canvas(e) {
@@ -127,7 +130,6 @@ export default class CanvasControlBase {
             this.size, 0, 0, -this.size,
             -this.origin[0] * this.size, this.origin[1] * this.size
         );
-        this.render_frame();
     }
 
     start_animation() {

@@ -216,6 +216,7 @@ function toggle_element_settings(show) {
         $("#element-settings").addClass("invisible");
     }
     c.set_canvas(true);
+    c.render_frame();
 }
 
 $("#element-settings").on("change", "> #element-settings-select-type", function() {
@@ -320,7 +321,7 @@ function center_element(id) {
         index = c.optical_elements.findIndex(e => e.id === id);
     }
     c.center_on(c[type][index].position);
-    c.set_canvas();
+    c.render_frame();
 }
 
 function delete_element(id) {

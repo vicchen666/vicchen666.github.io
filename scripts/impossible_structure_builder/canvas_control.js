@@ -699,6 +699,8 @@ export default class CanvasControl extends CanvasControlBase {
                 this.display_init_vertex(this.selected_elements.selected[0]);
                 break;
             case "init_penrose":
+                this.clear();
+                this.display_init_penrose();
                 break;
         }
 
@@ -1186,7 +1188,7 @@ export default class CanvasControl extends CanvasControlBase {
     }
 
 
-    display_init_vertex() {
+    display_init_vertex(selected_axis=-1) {
         const vertex = this.create_vertex([0, 0]);
 
         const vec_to_center = v.scale(v.add(v.add(this.axes[0], this.axes[1]), this.axes[2]), 0.5);
@@ -1214,7 +1216,7 @@ export default class CanvasControl extends CanvasControlBase {
         ctx.lineWidth = settings.axis_width / this.size;
         this.axes.forEach((axis, index) => {
             ctx.strokeStyle = settings.axis_style;
-            if (this.selected_elements.selected[0] === index + 1) ctx.strokeStyle = settings.selected_style;
+            if (selected_axis === index + 1) ctx.strokeStyle = settings.selected_style;
 
             const unit_axis = v.unit(axis);
             let position = v.sub(vertex.position, vec_to_center);
@@ -1230,8 +1232,37 @@ export default class CanvasControl extends CanvasControlBase {
         });
     }
 
-    display_init_penrose_triangle() {
+    display_init_penrose() {
+        const positions = [];
+        positions.push([0, 0]);
+        positions.push(v.add(positions[0], this.axes[0]));
+        positions.push(v.line_intersection(positions[0], this.axes[1], positions[1], this.axes[2]));
 
+        const lines = [v.len(v.sub(positions[1], positions[0])), v.len(v.sub(positions[2], positions[0])), v.len(v.sub(positions[2], positions[1]))];
+        const i = lines.indexOf(Math.min(...lines));
+
+        const vertex1 = this.create_vertex([0, 0]);
+        const longest_axis = this.axes.reduce((max, axis) => v.len(axis) > v.len(max) ? axis : max, [0, 0]);
+        const vertex2 = this.create_vertex(v.add(vertex1.position, v.scale(this.axes[i], v.len(longest_axis) / v.len(this.axes[i]) * 5)));
+        const intersection = v.line_intersection(vertex1.position, this.axes[(i + 1) % 3], vertex2.position, this.axes[(i + 2) % 3]);
+        const vertex3 = this.create_vertex(intersection);
+        const beam1 = this.create_beam([vertex1, vertex2], i + 1);
+        const beam2 = this.create_beam([vertex1, vertex3], (i + 1) % 3 + 1);
+        const beam3 = this.create_beam([vertex2, vertex3], (i + 2) % 3 + 1);
+
+        const bounding_box = v.get_bounding_box([vertex1.position, vertex2.position, vertex3.position]);
+        this.set_bounding_box(bounding_box, 0.4);
+
+        const ctx = this.ctx;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 2 / this.size;
+        vertex1.fill();
+        vertex2.fill();
+        vertex3.fill();
+        beam1.fill();
+        beam2.fill();
+        beam3.fill();
     }
 
     draw_tools() {
