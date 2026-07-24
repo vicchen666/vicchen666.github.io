@@ -69,13 +69,17 @@ table {
     border-collapse: collapse;
 }
 dialog {
-    position: absolute;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: var(--background-color);
     margin: 0;
-    padding: 0;
-    border: none;
     color: var(--text-color);
     user-select: none;
+}
+dialog:-internal-dialog-in-top-layer::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 .icon-button {
     width: fit-content;
