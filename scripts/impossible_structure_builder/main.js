@@ -67,18 +67,20 @@ document.addEventListener("keydown", e => {
 });
 
 $("#init-box-axes-grid").on("input", "> input", function() {
-    if ($(this).data("setting") === "length" && +$(this).val() <= 0) {
-        init.status = ["invalid", "Invalid Input! Length must be greater than 0"];
-        $("#init-box-confirm").css("color", "var(--error-color)");
-        $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
-        return;
-    }
-
+    init.status = ["valid"];
     let axes_polar = [];
     $("#init-box-axes-grid > input").each(function() {
         const axis = +$(this).data("axis");
         const setting = $(this).data("setting");
         const value = +$(this).val();
+
+        if (setting === "length" && value <= 0) {
+            init.status = ["invalid", "Length must be greater than 0"];
+            $("#init-box-confirm").css("color", "var(--error-color)");
+            $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
+            return;
+        }
+
         if (!axes_polar[axis - 1]) axes_polar[axis - 1] = {};
         axes_polar[axis - 1][setting] = value;
     });
@@ -91,13 +93,9 @@ $("#init-box-axes-grid").on("input", "> input", function() {
         sum += Math.min(diff, 360 - diff);
     }
     if (sum < 360) {
-        init.status = ["invalid", "Invalid Input! The axis directions must not all lie within the same semicircle."];
+        init.status = ["invalid", "The axis directions must not all lie within the same semicircle."];
         $("#init-box-confirm").css("color", "var(--error-color)");
         $("#init-box-axes-message").text(init.status[1]).removeClass("invisible");
-    } else {
-        init.status = ["valid"];
-        $("#init-box-confirm").css("color", "var(--success-color)");
-        $("#init-box-axes-message").addClass("invisible");
     }
 
     Object.values(init).forEach(canvas => {
@@ -109,6 +107,11 @@ $("#init-box-axes-grid").on("input", "> input", function() {
     init["init-vertex"].selected_elements.selected = [$(this).data("axis")];
     init["init-vertex"].display_init_vertex();
     init["init-penrose"].display_init_penrose_triangle();
+
+    if (init.status[0] === "valid") {
+        $("#init-box-confirm").css("color", "var(--success-color)");
+        $("#init-box-axes-message").addClass("invisible");
+    }
 });
 
 $("#init-box-confirm").on("click", function() {
@@ -117,6 +120,7 @@ $("#init-box-confirm").on("click", function() {
     c.set_axes(axes);
     c.activate();
     $("#init-box")[0].close();
+    utils.message("success", "Axes set successfully!");
 });
 
 $("#toolbar").on("click", ".tool-button", function() {
