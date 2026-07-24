@@ -54,12 +54,6 @@ export default class CanvasControl extends CanvasControlBase {
         this.settings.hover_dist.beam = Math.max(...this.axes.map(axis => v.len(axis)));
     }
 
-    activate() {
-        this.setup_listeners();
-        this.set_canvas(true);
-        this.draw();
-    }
-
     settings = {
         vertex_connect_length_threshold: 1e-5,
         hover_dist: { vertex: 0, beam: 0 },
@@ -685,18 +679,29 @@ export default class CanvasControl extends CanvasControlBase {
     }
 
     render_frame() {
-        this.highlight_selected_elements();
-        this.clear();
-        this.ctx.lineJoin = "round";
-        this.ctx.lineCap = "round";
-        this.ctx.lineWidth = 2 / this.size;
+        switch (this.name) {
+            case "main":
+                this.highlight_selected_elements();
+                this.clear();
+                this.ctx.lineJoin = "round";
+                this.ctx.lineCap = "round";
+                this.ctx.lineWidth = 2 / this.size;
 
-        this.render_order.forEach(key => {
-            const element = this.beams.get(key) || this.vertices.get(key);
-            element?.fill();
-        });
+                this.render_order.forEach(key => {
+                    const element = this.beams.get(key) || this.vertices.get(key);
+                    element?.fill();
+                });
 
-        this.draw_tools();
+                this.draw_tools();
+                break;
+            case "init_vertex":
+                this.clear();
+                this.display_init_vertex(this.selected_elements.selected[0]);
+                break;
+            case "init_penrose":
+                break;
+        }
+
         // this.display_sierpinski(8);
         // this.display_all_possibilities();
         // this.display_penrose_triangle();
@@ -1181,10 +1186,8 @@ export default class CanvasControl extends CanvasControlBase {
     }
 
 
-    display_init_vertex(hovered_axis=-1) {
+    display_init_vertex() {
         const vertex = this.create_vertex([0, 0]);
-        this.vertices.set(0, vertex);
-        this.render_order.push(0);
 
         const vec_to_center = v.scale(v.add(v.add(this.axes[0], this.axes[1]), this.axes[2]), 0.5);
         const length = this.axes.reduce((max, axis) => Math.max(max, v.len(v.sub(axis, vec_to_center))), 0);
@@ -1200,23 +1203,18 @@ export default class CanvasControl extends CanvasControlBase {
         const bounding_box = v.get_bounding_box(tips);
         this.set_bounding_box(bounding_box, 0.1);
 
-        // const min_x = Math.min(...tips.map(tip => tip[0]));
-        // const max_x = Math.max(...tips.map(tip => tip[0]));
-        // const min_y = Math.min(...tips.map(tip => tip[1]));
-        // const max_y = Math.max(...tips.map(tip => tip[1]));
-
-        // const side_length = Math.max(max_x - min_x, max_y - min_y);
-        // this.origin = [min_x, max_y];
-        // this.size = this.canvas.clientHeight / side_length;
-        // this.set_canvas();
-
         const settings = this.settings;
         const ctx = this.ctx;
-        ctx.lineWidth = settings.axis_width / this.size;
 
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.lineWidth = 2 / this.size;
+        vertex.fill();
+
+        ctx.lineWidth = settings.axis_width / this.size;
         this.axes.forEach((axis, index) => {
             ctx.strokeStyle = settings.axis_style;
-            if (hovered_axis === index + 1) ctx.strokeStyle = settings.selected_style;
+            if (this.selected_elements.selected[0] === index + 1) ctx.strokeStyle = settings.selected_style;
 
             const unit_axis = v.unit(axis);
             let position = v.sub(vertex.position, vec_to_center);

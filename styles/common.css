@@ -16,6 +16,7 @@ button {
     background-color: transparent;
     color: var(--text-color);
     cursor: pointer;
+    user-select: none;
 }
 li > button, li > .text-button{
     width: stretch;
@@ -69,10 +70,12 @@ table {
 }
 dialog {
     position: absolute;
+    background-color: var(--background-color);
     margin: 0;
     padding: 0;
     border: none;
     color: var(--text-color);
+    user-select: none;
 }
 .icon-button {
     width: fit-content;

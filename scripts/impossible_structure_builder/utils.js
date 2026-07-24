@@ -187,3 +187,15 @@ export function parse_style_with_alpha(style) {
         alpha: 1,
     };
 }
+
+export function message(type, text) {
+    switch (type) {
+        case "success":
+            $("#message-box").css("background-color", "var(--success-color)");
+            break;
+        case "fail":
+            $("#message-box").css("background-color", "var(--error-color)");
+            break;
+    }
+    $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);
+}

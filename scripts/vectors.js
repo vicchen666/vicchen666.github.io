@@ -120,6 +120,19 @@ export function cartesian_to_polar(v) {
     return [r, theta];
 }
 
+export function angle_between(v1, v2, directed=false) {
+    const dot_product = dot(v1, v2);
+    const len_product = len(v1) * len(v2);
+    if (len_product === 0) return 0;
+    if (directed) {
+        const cross_product = v1[0] * v2[1] - v1[1] * v2[0];
+        const angle = Math.atan2(cross_product, dot_product) * 360 / TAU;
+        return (angle + 360) % 360;
+    }
+    const cos_theta = dot_product / len_product;
+    return Math.acos(Math.min(Math.max(cos_theta, -1), 1)) * 360 / TAU;
+}
+
 export function get_bounding_box(points) {
     if (!points.length) return null;
     let box = { min: [], max: [] };

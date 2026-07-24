@@ -4,6 +4,7 @@ import * as v from "vectors";
 
 const TAU = Math.PI * 2;
 const c = new CanvasControl($("#main-canvas > canvas")[0]);
+c.activate();
 
 window.addEventListener("beforeunload", e => {
     e.preventDefault();
@@ -418,6 +419,8 @@ function download_project() {
     a.click();
     a.href = "";
     URL.revokeObjectURL(url);
+
+    message("success", "Project downloaded!");
 }
 
 $("#button-open").on("click", () => {
@@ -492,10 +495,10 @@ function reload_general_settings() {
 function message(type, text) {
     switch (type) {
         case "success":
-            $("#message-box").css("background-color", "limegreen");
+            $("#message-box").css("background-color", "var(--success-color)");
             break;
         case "fail":
-            $("#message-box").css("background-color", "crimson");
+            $("#message-box").css("background-color", "var(--error-color)");
             break;
     }
     $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);

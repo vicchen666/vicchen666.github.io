@@ -64,9 +64,6 @@ export default class CanvasControl extends CanvasControlBase {
          */
         this.optical_elements = [];
         this.update_light_path();
-        this.setup_listeners();
-        this.set_canvas(true);
-        this.draw();
     }
 
     add_element(type, element) {

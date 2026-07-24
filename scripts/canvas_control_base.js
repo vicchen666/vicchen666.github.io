@@ -23,6 +23,12 @@ export default class CanvasControlBase {
         this.name = name;
     }
 
+    activate() {
+        this.setup_listeners();
+        this.set_canvas(true);
+        this.draw();
+    }
+
     setup_listeners() {
         if (!this.moveable) return;
         this.canvas.addEventListener("wheel", e => this.handle_wheel(e));
@@ -113,7 +119,6 @@ export default class CanvasControlBase {
     }
 
     set_canvas(adjust_size=false) {
-        console.log(this.size, this.origin);
         if (adjust_size) {
             this.canvas.height = this.canvas.clientHeight;
             this.canvas.width = this.canvas.clientWidth;
