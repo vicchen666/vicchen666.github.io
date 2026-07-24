@@ -9,6 +9,6 @@
 
 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
 
-<g id="SVGRepo_iconCarrier"> <path stroke="#ffffff" stroke-linecap="round" stroke-width="2" d="M6 16h21"/> <path stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 8l-8 8 8 8"/> </g>
+<g id="SVGRepo_iconCarrier"> <path stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M29 16a13 13 0 11-26 0 13 13 0 0126 0h0z"/> <path stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 14h1v9h1"/> <path fill="#ffffff" d="M17.5 9.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/> </g>
 
 </svg>
