@@ -2,6 +2,7 @@
 import CanvasControl from "canvas_control";
 import * as v from "vectors";
 import * as utils from "utils";
+import * as storage from "storage";
 
 // window.addEventListener("beforeunload", e => {
 //     e.preventDefault();
@@ -17,8 +18,6 @@ const init = {
     "axes": [],
     "status": ["valid"]
 };
-init["init-vertex"].activate();
-init["init-penrose"].activate();
 
 const c = new CanvasControl($("#main-canvas > canvas")[0]);
 
@@ -62,6 +61,12 @@ document.addEventListener("keydown", e => {
         case "c":
             if (!c.selected_elements.selected.length) return;
             utils.center_element(c, c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+            break;
+        case "s":
+            storage.download_project(c);
+            break;
+        case "o":
+            storage.open_project(c, null);
             break;
     }
 });
@@ -279,4 +284,10 @@ $("#info-box-close").on("click", function() {
     $("#info-box")[0].close();
 });
 
+$("#button-download").on("click", () => {
+    storage.download_project(c);
+});
+
 $("#init-box-axes-grid > input").eq(0).trigger("input");
+init["init-vertex"].activate();
+init["init-penrose"].activate();

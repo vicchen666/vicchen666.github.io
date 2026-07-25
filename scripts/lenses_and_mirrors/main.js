@@ -1,6 +1,8 @@
 ﻿import $ from "jquery";
 import CanvasControl from "canvas_control";
 import * as v from "vectors";
+import * as utils from "utils";
+import * as storage from "storage";
 
 const TAU = Math.PI * 2;
 const c = new CanvasControl($("#main-canvas > canvas")[0]);
@@ -36,14 +38,14 @@ document.addEventListener("keydown", e => {
         case "backspace":
         case "d":
             if (!c.selected_elements.selected.length) return;
-            delete_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+            utils.delete_element(c, c.selected_elements.selected[c.selected_elements.selected.length - 1]);
             break;
         case "c":
             if (!c.selected_elements.selected.length) return;
-            center_element(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+            utils.center_element(c, c .selected_elements.selected[c.selected_elements.selected.length - 1]);
             break;
         case "s":
-            download_project();
+            storage.download_project(c);
             break;
         case "o":
             $("#input-open").click();
@@ -113,16 +115,16 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
     if (element_id === selected_id) {
         c.selected_elements.selected = [];
         $(this).removeClass("selected");
-        toggle_element_settings(false);
+        utils.toggle_element_settings(c, false);
     } else {
         c.selected_elements.selected = [element_id];
         $(".element-list-item > button").removeClass("selected");
         $(this).addClass("selected");
         const index = c.optical_elements.findIndex(e => e.id === element_id);
         if (index !== -1) {
-            reload_element_settings("optical_elements", index);
+            utils.reload_element_settings(c, "optical_elements", index);
         } else {
-            reload_element_settings("light_sources", c.light_sources.findIndex(e => e.id === element_id));
+            utils.reload_element_settings(c, "light_sources", c.light_sources.findIndex(e => e.id === element_id));
         }
     }
 }).on("mouseenter", "> .element-list-item > button", function () {
@@ -130,94 +132,6 @@ $("#element-list").on("click", "> .element-list-item > button", function() {
 }).on("mouseleave", "> .element-list-item > button", function() {
     c.selected_elements.hovered = -1;
 });
-
-function reload_element_settings(type, index) {
-    const optical_elements = ["Convex Lens", "Concave Lens", "Convex Mirror", "Concave Mirror", "Flat Mirror", "Barrier"];
-    const light_sources = ["Point Source", "Parallel Source"];
-    const settings = $("#element-settings");
-    const element = c[type][index];
-    settings.text("");
-    const type_select = $("<select>").attr("id","element-settings-select-type");
-    if (type === "optical_elements") {
-        settings.append($("<header>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Optical Element"));
-        optical_elements.forEach(e => {
-            type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
-        });
-    } else {
-        settings.append($("<header>").data({"type": type, "index": index}).attr("id", "element-settings-title").text("Light Source"));
-        light_sources.forEach(e => {
-            type_select.append($("<option>").attr("value", e.toLowerCase().replace(" ", "_")).text(e));
-        });
-    }
-    settings.append(type_select);
-    switch (element.type) {
-        case "lens":
-            type_select.val(element.focal_length > 0 ? "convex_lens" : "concave_lens");
-            break;
-        case "mirror":
-            type_select.val(element.focal_length > 0 ? "concave_mirror" : "convex_mirror");
-            break;
-        case "point":
-        case "parallel":
-            type_select.val(`${element.type}_source`);
-            break;
-        default:
-            type_select.val(element.type);
-    }
-
-    const settings_grid = $("<section>").attr("id", "element-settings-grid").appendTo(settings);
-    for (const [key, value] of Object.entries(element)) {
-        if (c.elements_settings[element.type].includes(key)) {
-            switch (key) {
-                case "name":
-                    settings_grid.append($("<div>").text("Name"));
-                    settings_grid.append($("<input>").attr("type", "text").data("setting", "name").val(value));
-                    break;
-                case "position":
-                    settings_grid.append($("<div>").text("X"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "x").val(value[0]));
-                    settings_grid.append($("<div>").text("Y"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "y").val(value[1]));
-                    break;
-                case "rotation":
-                    settings_grid.append($("<div>").text("Rotation (deg)"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any"}).data("setting", "rotation").val(value));
-                    break;
-                case "focal_length":
-                    settings_grid.append($("<div>").text("Focal Length"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "focal_length").val(Math.abs(value)));
-                    break;
-                case "size":
-                    settings_grid.append($("<div>").text("Size"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "size").val(value));
-                    break;
-                case "density":
-                    settings_grid.append($("<div>").text("Density"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0}).data("setting", "density").val(value));
-                    break;
-                case "angle":
-                    settings_grid.append($("<div>").text("Angle (deg)"));
-                    settings_grid.append($("<input>").attr({"type": "number", "step": "any", "min": 0, "max": 360}).data("setting", "angle").val(value));
-                    break;
-            }
-        }
-    }
-    settings.append($("<section>").css("display", "flex")
-    .append($("<button>").attr({"id": "element-center", "class": "text-button", "title": "Center the element"}).text("Center"))
-    .append($("<button>").attr({"id": "element-delete", "class": "text-button", "title": "Delete the element"}).text("Delete")));
-
-    toggle_element_settings(true);
-}
-
-function toggle_element_settings(show) {
-    if (show) {
-        $("#element-settings").removeClass("invisible");
-    } else {
-        $("#element-settings").addClass("invisible");
-    }
-    c.set_canvas(true);
-    c.render_frame();
-}
 
 $("#element-settings").on("change", "> #element-settings-select-type", function() {
     const type = $("#element-settings-title").data("type");
@@ -252,7 +166,7 @@ $("#element-settings").on("change", "> #element-settings-select-type", function(
             c[type][index].type = "parallel";
             break;
     }
-    reload_element_settings(type, index);
+    utils.reload_element_settings(c, type, index);
     c.update_light_path();
 }).on("input", "#element-settings-grid > input", function() {
     const type = $("#element-settings-title").data("type");
@@ -303,44 +217,12 @@ $("#element-settings").on("change", "> #element-settings-select-type", function(
 }).on("click", "#element-center", function() {
     const type = $("#element-settings-title").data("type");
     const index = $("#element-settings-title").data("index");
-    center_element(c[type][index].id);
+    utils.center_element(c, c[type][index].id);
 }).on("click", "#element-delete", () => {
     const type = $("#element-settings-title").data("type");
     const index = $("#element-settings-title").data("index");
-    delete_element(c[type][index].id);
+    utils.delete_element(c, c[type][index].id);
 });
-
-function center_element(id) {
-    let index = c.optical_elements.findIndex(e => e.id === id);
-    let type;
-    if (index === -1) {
-        type = "light_sources";
-        index = c.light_sources.findIndex(e => e.id === id);
-    } else {
-        type = "optical_elements";
-        index = c.optical_elements.findIndex(e => e.id === id);
-    }
-    c.center_on(c[type][index].position);
-    c.render_frame();
-}
-
-function delete_element(id) {
-    let index = c.optical_elements.findIndex(e => e.id === id);
-    if (index !== -1) {
-        $(".element-list-item > button").filter(function() { return $(this).data("id") === c.optical_elements[index].id }).parent().remove();
-        c.remove_element("optical_elements", index);
-    } else {
-        index = c.light_sources.findIndex(e => e.id === id);
-        if (index !== -1) {
-            $(".element-list-item > button").filter(function() { return $(this).data("id") === c.light_sources[index].id }).parent().remove();
-            c.remove_element("light_sources", index);
-        }
-    }
-
-    c.selected_elements.selected = [];
-    toggle_element_settings(false);
-    c.update_light_path();
-}
 
 $("#general-settings-icon").on("click", function() {
     $("#general-settings").toggleClass("invisible");
@@ -374,59 +256,13 @@ $("#info-box-close").on("click", function() {
 });
 
 $("#button-download").on("click", () => {
-    download_project();
+    storage.download_project(c);
 });
-
-function download_project() {
-    const data = {
-        version: 2,
-        general_settings: {
-            ray_settings: {
-                max_ray_length: c.max_distance,
-                solid_length: c.fill_length,
-                gap_length: c.sep_length
-            }
-        },
-        elements: {
-            optical_elements: [],
-            light_sources: []
-        },
-        misc: {
-            canvas: {
-                origin: c.origin,
-                scale: c.size
-            }
-        }
-    };
-
-    c.optical_elements.forEach(e => {
-        const index = data.elements.optical_elements.push({}) - 1;
-        for(const [key, value] of Object.entries(e)) {
-            data.elements.optical_elements[index][key] = value;
-        }
-    });
-    c.light_sources.forEach(e => {
-        const index = data.elements.light_sources.push({}) - 1;
-        for(const [key, value] of Object.entries(e)) {
-            data.elements.light_sources[index][key] = value;
-        }
-    });
-
-    const blob = new Blob([JSON.stringify(data, null, 2)]);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Lenses and Mirrors.json';
-    a.click();
-    a.href = "";
-    URL.revokeObjectURL(url);
-
-    message("success", "Project downloaded!");
-}
 
 $("#button-open").on("click", () => {
     $("#input-open").click();
 });
+
 $("#input-open").on("change", function(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -436,71 +272,11 @@ $("#input-open").on("change", function(event) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            open_project(data);
+            storage.open_project(c, data);
         } catch (err) {
             console.error(err);
-            message("fail", "Failed to open project! Invalid JSON file.");
+            utils.message("fail", "Failed to open project! Invalid JSON file.");
         }
     }
     reader.readAsText(file);
 });
-
-function open_project(data) {
-    try {
-        if (data.version === 1 || data.version === 2) {
-            const ray_settings = data.general_settings.ray_settings;
-            c.max_distance = ray_settings.max_ray_length;
-            c.fill_length = ray_settings.solid_length;
-            c.sep_length= ray_settings.gap_length;
-            reload_general_settings();
-            c.size = data.misc.canvas.scale;
-            c.origin = data.version === 1
-                ? data.misc.canvas.origin.map(value => value / c.size)
-                : data.misc.canvas.origin;
-
-            toggle_element_settings(false);
-            $("#element-list").text("");
-            c.selected_elements = { selected: [], hovered: -1 };
-            c.light_sources = [];
-            c.optical_elements = [];
-            let id = 0;
-            data.elements.optical_elements.forEach(e => {
-                c.add_element("optical_elements", e);
-                c.optical_elements[c.optical_elements.length - 1].id = id;
-                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-            });
-            data.elements.light_sources.forEach(e => {
-                c.add_element("light_sources", e);
-                c.light_sources[c.light_sources.length - 1].id = id;
-                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-            });
-            c.next_id = id;
-            c.set_canvas();
-            c.update_light_path();
-            message("success", "Project opened successfully!")
-        } else {
-            throw new Error("No version data");
-        }
-    } catch (err) {
-        console.error(err);
-        message("fail", "Failed to open project! Invalid JSON structure.");
-    }
-}
-
-function reload_general_settings() {
-    $("#general-settings input").each(function() {
-        $(this).val(c[$(this).data("setting")]);
-    });
-}
-
-function message(type, text) {
-    switch (type) {
-        case "success":
-            $("#message-box").css("background-color", "var(--success-color)");
-            break;
-        case "fail":
-            $("#message-box").css("background-color", "var(--error-color)");
-            break;
-    }
-    $("#message-box").text(text).hide().fadeIn(500).delay(3000).fadeOut(1000);
-}
