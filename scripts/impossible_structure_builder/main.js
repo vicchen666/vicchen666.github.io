@@ -123,6 +123,10 @@ $("#init-box-confirm").on("click", function() {
     c.set_axes(axes);
     c.activate();
     $("#init-box")[0].close();
+    init["init-vertex"].destroy();
+    init["init-penrose"].destroy();
+    init["init-vertex"] = null;
+    init["init-penrose"] = null;
     utils.message("success", "Axes set successfully!");
 });
 
