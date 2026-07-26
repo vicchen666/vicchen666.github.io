@@ -163,6 +163,52 @@ export function delete_element(c, id) {
     c.render_frame();
 }
 
+export function reload_general_settings(c) {
+    $("#general-settings input").each(function() {
+        switch ($(this).data("setting")) {
+            case "background_color":
+                $(this).val($("#main-canvas > canvas").css("background-color"));
+                break;
+            case "vertex_fill_color_1":
+                $(this).val(c.settings.fill_styles.vertex[0]);
+                break;
+            case "vertex_fill_color_2":
+                $(this).val(c.settings.fill_styles.vertex[1]);
+                break;
+            case "vertex_fill_color_3":
+                $(this).val(c.settings.fill_styles.vertex[2]);
+                break;
+            case "beam_fill_color_1":
+                $(this).val(c.settings.fill_styles.beam[0]);
+                break;
+            case "beam_fill_color_2":
+                $(this).val(c.settings.fill_styles.beam[1]);
+                break;
+            case "beam_fill_color_3":
+                $(this).val(c.settings.fill_styles.beam[2]);
+                break;
+            case "hovered_color":
+                $(this).val(c.settings.hovered_style);
+                break;
+            case "hovered_alpha":
+                $(this).val(parse_style_with_alpha(c.settings.hovered_style).alpha);
+                break;
+            case "selected_color":
+                $(this).val(c.settings.selected_style);
+                break;
+            case "selected_alpha":
+                $(this).val(parse_style_with_alpha(c.settings.selected_style).alpha);
+                break;
+            case "axis_arrow_color":
+                $(this).val(c.settings.axis_style);
+                break;
+            case "preview_alpha":
+                $(this).val(c.settings.preview_alpha);
+                break;
+        }
+    });
+}
+
 export function normalize_hex_color(value) {
     const hex = String(value).replace("#", "").toLowerCase();
     if (hex.length === 3) {

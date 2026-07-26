@@ -1,5 +1,5 @@
 import $ from "jquery";
-import { message } from "./utils.js";
+import * as utils from "utils";
 
 export function download_project(c) {
     const id_map = new Map(
@@ -69,8 +69,29 @@ export function download_project(c) {
     a.href = "";
     URL.revokeObjectURL(url);
 
-    message("success", "Project downloaded!");
+    utils.message("success", "Project downloaded!");
 }
 
 export function open_project(c, data) {
+    try {
+        switch (data.version) {
+            case 1: {
+                const rendering_styles = data.general_settings.rendering_styles;
+                $("#main-canvas > canvas").css("background-color", rendering_styles.background_color);
+                c.settings.fill_styles = rendering_styles.fill_styles;
+                c.settings.hovered_style = rendering_styles.hovered_style;
+                c.settings.selected_style = rendering_styles.selected_style;
+                c.settings.axis_style = rendering_styles.axis_style;
+                c.settings.preview_alpha = rendering_styles.preview_alpha;
+                utils.reload_general_settings(c);
+
+                
+            }
+            default:
+                throw new Error("No version data");
+        }
+    } catch (err) {
+        console.error(err);
+        utils.message("fail", "Failed to open project! Invalid JSON structure.");
+    }
 }

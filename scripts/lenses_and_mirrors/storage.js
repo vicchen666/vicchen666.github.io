@@ -50,39 +50,46 @@ export function download_project(c) {
 
 export function open_project(c, data) {
     try {
-        if (data.version === 1 || data.version === 2) {
-            const ray_settings = data.general_settings.ray_settings;
-            c.max_distance = ray_settings.max_ray_length;
-            c.fill_length = ray_settings.solid_length;
-            c.sep_length= ray_settings.gap_length;
-            utils.reload_general_settings(c);
-            c.size = data.misc.canvas.scale;
-            c.origin = data.version === 1
-                ? data.misc.canvas.origin.map(value => value / c.size)
-                : data.misc.canvas.origin;
+        switch (data.version) {
+            case 1:
+            case 2: {
+                const ray_settings = data.general_settings.ray_settings;
+                c.max_distance = ray_settings.max_ray_length;
+                c.fill_length = ray_settings.solid_length;
+                c.sep_length= ray_settings.gap_length;
+                utils.reload_general_settings(c);
 
-            utils.toggle_element_settings(c, false);
-            $("#element-list").text("");
-            c.selected_elements = { selected: [], hovered: -1 };
-            c.light_sources = [];
-            c.optical_elements = [];
-            let id = 0;
-            data.elements.optical_elements.forEach(e => {
-                c.add_element("optical_elements", e);
-                c.optical_elements[c.optical_elements.length - 1].id = id;
-                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-            });
-            data.elements.light_sources.forEach(e => {
-                c.add_element("light_sources", e);
-                c.light_sources[c.light_sources.length - 1].id = id;
-                $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
-            });
-            c.next_id = id;
-            c.set_canvas();
-            c.update_light_path();
-            utils.message("success", "Project opened successfully!")
-        } else {
-            throw new Error("No version data");
+                c.size = data.misc.canvas.scale;
+                c.origin = data.version === 1
+                    ? data.misc.canvas.origin.map(value => value / c.size)
+                    : data.misc.canvas.origin;
+
+                utils.toggle_element_settings(c, false);
+                $("#element-list").text("");
+                c.selected_elements = { selected: [], hovered: -1 };
+                c.light_sources = [];
+                c.optical_elements = [];
+
+                let id = 0;
+                data.elements.optical_elements.forEach(e => {
+                    c.add_element("optical_elements", e);
+                    c.optical_elements[c.optical_elements.length - 1].id = id;
+                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
+                });
+                data.elements.light_sources.forEach(e => {
+                    c.add_element("light_sources", e);
+                    c.light_sources[c.light_sources.length - 1].id = id;
+                    $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
+                });
+
+                c.next_id = id;
+                c.set_canvas();
+                c.update_light_path();
+                utils.message("success", "Project opened successfully!");
+                break;
+            }
+            default:
+                throw new Error("No version data");
         }
     } catch (err) {
         console.error(err);

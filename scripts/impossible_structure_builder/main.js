@@ -236,11 +236,11 @@ $(".general-settings-section-grid > input").on("change", function() {
             case "beam_fill_color_3":
                 c.settings.fill_styles.beam[2] = $(this).val();
                 break;
-            case "hover_color": {
+            case "hovered_color": {
                 c.settings.hovered_style = utils.build_style_with_alpha($(this).val(), utils.parse_style_with_alpha(c.settings.hovered_style).alpha);
                 break;
             }
-            case "hover_alpha": {
+            case "hovered_alpha": {
                 if ($(this).val() < 0) {
                     $(this).val(0);
                 } else if ($(this).val() > 1) {
@@ -249,10 +249,10 @@ $(".general-settings-section-grid > input").on("change", function() {
                 c.settings.hovered_style = utils.build_style_with_alpha(utils.parse_style_with_alpha(c.settings.hovered_style).color, $(this).val());
                 break;
             }
-            case "select_color":
+            case "selected_color":
                 c.settings.selected_style = utils.build_style_with_alpha($(this).val(), utils.parse_style_with_alpha(c.settings.selected_style).alpha);
                 break;
-            case "select_alpha":
+            case "selected_alpha":
                 if ($(this).val() < 0) {
                     $(this).val(0);
                 } else if ($(this).val() > 1) {
@@ -286,6 +286,28 @@ $("#info-box-close").on("click", function() {
 
 $("#button-download").on("click", () => {
     storage.download_project(c);
+});
+
+$("#button-open").on("click", () => {
+    $("#input-open").click();
+});
+
+$("#input-open").on("change", function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    $(this).val("");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            storage.open_project(c, data);
+        } catch (err) {
+            console.error(err);
+            utils.message("fail", "Failed to open project! Invalid JSON file.");
+        }
+    }
+    reader.readAsText(file);
 });
 
 $("#init-box-axes-grid > input").eq(0).trigger("input");
