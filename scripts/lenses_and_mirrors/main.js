@@ -5,7 +5,7 @@ import * as utils from "utils";
 import * as storage from "storage";
 
 const TAU = Math.PI * 2;
-const c = new CanvasControl($("#main-canvas > canvas")[0]);
+let c = new CanvasControl($("#main-canvas > canvas")[0]);
 c.activate();
 
 window.addEventListener("beforeunload", e => {
@@ -272,7 +272,12 @@ $("#input-open").on("change", function(event) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            storage.open_project(c, data);
+            let new_c = storage.open_project(data);
+            if (new_c !== null) {
+                c.destroy();
+                c = new_c;
+            }
+            c.render_frame();
         } catch (err) {
             console.error(err);
             utils.message("fail", "Failed to open project! Invalid JSON file.");

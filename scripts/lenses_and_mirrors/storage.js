@@ -1,4 +1,5 @@
 import $ from "jquery";
+import CanvasControl from "canvas_control";
 import * as utils from "utils";
 
 export function download_project(c) {
@@ -48,7 +49,8 @@ export function download_project(c) {
     utils.message("success", "Project downloaded!");
 }
 
-export function open_project(c, data) {
+export function open_project(data) {
+    let c = new CanvasControl($("#main-canvas > canvas")[0]);
     try {
         switch (data.version) {
             case 1:
@@ -66,9 +68,6 @@ export function open_project(c, data) {
 
                 utils.toggle_element_settings(c, false);
                 $("#element-list").text("");
-                c.selected_elements = { selected: [], hovered: -1 };
-                c.light_sources = [];
-                c.optical_elements = [];
 
                 let id = 0;
                 data.elements.optical_elements.forEach(e => {
@@ -83,10 +82,10 @@ export function open_project(c, data) {
                 });
 
                 c.next_id = id;
-                c.set_canvas();
                 c.update_light_path();
+                c.activate();
                 utils.message("success", "Project opened successfully!");
-                break;
+                return c;
             }
             default:
                 throw new Error("No version data");
@@ -94,5 +93,8 @@ export function open_project(c, data) {
     } catch (err) {
         console.error(err);
         utils.message("fail", "Failed to open project! Invalid JSON structure.");
+        c.destroy();
+        c = null;
+        return null;
     }
 }

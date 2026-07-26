@@ -19,7 +19,7 @@ const init = {
     "status": ["valid"]
 };
 
-const c = new CanvasControl($("#main-canvas > canvas")[0]);
+let c = new CanvasControl($("#main-canvas > canvas")[0]);
 
 document.addEventListener("keydown", e => {
     const active = document.activeElement;
@@ -66,7 +66,7 @@ document.addEventListener("keydown", e => {
             storage.download_project(c);
             break;
         case "o":
-            storage.open_project(c, null);
+            $("#input-open").click();
             break;
     }
 });
@@ -301,7 +301,12 @@ $("#input-open").on("change", function(event) {
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            storage.open_project(c, data);
+            let new_c = storage.open_project(data);
+            if (new_c) {
+                c.destroy();
+                c = new_c;
+            }
+            c.render_frame();
         } catch (err) {
             console.error(err);
             utils.message("fail", "Failed to open project! Invalid JSON file.");

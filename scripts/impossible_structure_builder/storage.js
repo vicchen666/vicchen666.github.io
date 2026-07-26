@@ -72,7 +72,8 @@ export function download_project(c) {
     utils.message("success", "Project downloaded!");
 }
 
-export function open_project(c, data) {
+export function open_project(data) {
+    let c = new CanvasControl($("#main-canvas > canvas")[0]);
     try {
         switch (data.version) {
             case 1: {
@@ -85,7 +86,8 @@ export function open_project(c, data) {
                 c.settings.preview_alpha = rendering_styles.preview_alpha;
                 utils.reload_general_settings(c);
 
-                
+
+                return c;
             }
             default:
                 throw new Error("No version data");
@@ -93,5 +95,8 @@ export function open_project(c, data) {
     } catch (err) {
         console.error(err);
         utils.message("fail", "Failed to open project! Invalid JSON structure.");
+        c.destroy();
+        c = null;
+        return null;
     }
 }
