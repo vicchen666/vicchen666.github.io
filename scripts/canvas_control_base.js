@@ -21,6 +21,15 @@ export default class CanvasControlBase {
         this.selected_elements = { selected: [], hovered: -1 };
         this.preview_elements = {};
         this.name = name;
+
+        this._listeners = {
+            wheel: e => this.handle_wheel(e),
+            mouseleave: e => this.handle_mouseleave(e),
+            mousedown: e => this.handle_mousedown(e),
+            mousemove: e => this.handle_mousemove(e),
+            mouseup: () => this.handle_mouseup(),
+            resize: () => this.handle_resize(),
+        };
     }
 
     activate() {
@@ -31,22 +40,22 @@ export default class CanvasControlBase {
 
     setup_listeners() {
         if (!this.moveable) return;
-        this.canvas.addEventListener("wheel", e => this.handle_wheel(e));
-        this.canvas.addEventListener("mouseleave", e => this.handle_mouseleave(e));
-        this.canvas.addEventListener("mousedown", e => this.handle_mousedown(e));
-        window.addEventListener("mousemove", e => this.handle_mousemove(e));
-        window.addEventListener("mouseup", () => this.handle_mouseup());
-        window.addEventListener("resize", () => this.handle_resize());
+        this.canvas.addEventListener("wheel", this._listeners.wheel);
+        this.canvas.addEventListener("mouseleave", this._listeners.mouseleave);
+        this.canvas.addEventListener("mousedown", this._listeners.mousedown);
+        window.addEventListener("mousemove", this._listeners.mousemove);
+        window.addEventListener("mouseup", this._listeners.mouseup);
+        window.addEventListener("resize", this._listeners.resize);
     }
 
     remove_listeners() {
         if (!this.moveable) return;
-        this.canvas.removeEventListener("wheel", this.handle_wheel);
-        this.canvas.removeEventListener("mouseleave", this.handle_mouseleave);
-        this.canvas.removeEventListener("mousedown", this.handle_mousedown);
-        window.removeEventListener("mousemove", this.handle_mousemove);
-        window.removeEventListener("mouseup", this.handle_mouseup);
-        window.removeEventListener("resize", this.handle_resize);
+        this.canvas.removeEventListener("wheel", this._listeners.wheel);
+        this.canvas.removeEventListener("mouseleave", this._listeners.mouseleave);
+        this.canvas.removeEventListener("mousedown", this._listeners.mousedown);
+        window.removeEventListener("mousemove", this._listeners.mousemove);
+        window.removeEventListener("mouseup", this._listeners.mouseup);
+        window.removeEventListener("resize", this._listeners.resize);
     }
 
     mouse_to_canvas(x, y) {
@@ -70,6 +79,7 @@ export default class CanvasControlBase {
     }
 
     handle_mousedown(e) {
+        console.log(this.name);
         this.handle_tool_use(e);
     }
 
@@ -188,6 +198,7 @@ export default class CanvasControlBase {
     }
 
     destroy() {
+        console.log(`Destroying ${this.name}`);
         this.stop_animation();
         this.remove_listeners();
     }

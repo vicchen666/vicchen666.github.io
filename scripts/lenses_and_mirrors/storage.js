@@ -80,10 +80,8 @@ export function open_project(data) {
                     c.light_sources[c.light_sources.length - 1].id = id;
                     $("#element-list").append($("<li>").addClass("element-list-item").append($("<button>").data("id", id++).text(e.name)));
                 });
-
                 c.next_id = id;
-                c.update_light_path();
-                c.activate();
+
                 utils.message("success", "Project opened successfully!");
                 return c;
             }

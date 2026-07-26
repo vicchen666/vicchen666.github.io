@@ -725,7 +725,7 @@ export default class CanvasControl extends CanvasControlBase {
                 if (e.which !== 1) return;
                 if (this.preview_elements.vertices.length !== 1) return;
 
-                this.register_preview(this.preview_elements.vertices[0]);
+                this.register_element(this.preview_elements.vertices[0]);
                 this.preview_elements.vertices = [];
                 break;
             case "add-vertex-beam":
@@ -745,9 +745,9 @@ export default class CanvasControl extends CanvasControlBase {
                         if (this.preview_elements.vertices.length !== 1) return;
 
                         this.remove_element(this.beams.get(this.selected_elements.selected[0]));
-                        this.register_preview(this.preview_elements.beams[0]);
-                        this.register_preview(this.preview_elements.beams[1]);
-                        this.register_preview(this.preview_elements.vertices[0]);
+                        this.register_element(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.beams[1]);
+                        this.register_element(this.preview_elements.vertices[0]);
                         this.preview_elements = { vertices: [], beams: [], axes: [] };
                         this.selected_elements.selected = [];
 
@@ -769,8 +769,8 @@ export default class CanvasControl extends CanvasControlBase {
                     case "add_vertex":
                         if (this.preview_elements.beams.length !== 1) return;
 
-                        this.register_preview(this.preview_elements.beams[0]);
-                        this.register_preview(this.preview_elements.vertices[0]);
+                        this.register_element(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.vertices[0]);
                         this.preview_elements = { vertices: [], beams: [], axes: [] };
                         this.selected_elements.selected = [];
 
@@ -814,7 +814,7 @@ export default class CanvasControl extends CanvasControlBase {
                     case "select_vertex_2":
                         if (this.selected_elements.hovered === -1) return;
 
-                        this.register_preview(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.beams[0]);
                         this.preview_elements.beams = [];
                         this.selected_elements.hovered = -1;
                         this.selected_elements.selected = [];
@@ -851,9 +851,9 @@ export default class CanvasControl extends CanvasControlBase {
                     case "select_axis_2":
                         if (this.preview_elements.vertices.length !== 1) return;
 
-                        this.register_preview(this.preview_elements.beams[0]);
-                        this.register_preview(this.preview_elements.beams[1]);
-                        this.register_preview(this.preview_elements.vertices[0]);
+                        this.register_element(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.beams[1]);
+                        this.register_element(this.preview_elements.vertices[0]);
                         this.preview_elements = { vertices: [], beams: [], axes: [] };
                         this.selected_elements.selected = [];
 
@@ -882,10 +882,10 @@ export default class CanvasControl extends CanvasControlBase {
                         if (this.selected_elements.hovered === -1) return;
 
                         this.remove_element(this.beams.get(this.selected_elements.hovered));
-                        this.register_preview(this.preview_elements.beams[0]);
-                        this.register_preview(this.preview_elements.beams[1]);
-                        this.register_preview(this.preview_elements.beams[2]);
-                        this.register_preview(this.preview_elements.vertices[0]);
+                        this.register_element(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.beams[1]);
+                        this.register_element(this.preview_elements.beams[2]);
+                        this.register_element(this.preview_elements.vertices[0]);
                         this.preview_elements = { vertices: [], beams: [], axes: [] };
                         this.selected_elements.hovered = -1;
                         this.selected_elements.selected = [];
@@ -910,11 +910,11 @@ export default class CanvasControl extends CanvasControlBase {
 
                         this.remove_element(this.beams.get(this.selected_elements.selected[0]));
                         this.remove_element(this.beams.get(this.selected_elements.hovered));
-                        this.register_preview(this.preview_elements.beams[0]);
-                        this.register_preview(this.preview_elements.beams[1]);
-                        this.register_preview(this.preview_elements.beams[2]);
-                        this.register_preview(this.preview_elements.beams[3]);
-                        this.register_preview(this.preview_elements.vertices[0]);
+                        this.register_element(this.preview_elements.beams[0]);
+                        this.register_element(this.preview_elements.beams[1]);
+                        this.register_element(this.preview_elements.beams[2]);
+                        this.register_element(this.preview_elements.beams[3]);
+                        this.register_element(this.preview_elements.vertices[0]);
                         this.preview_elements = { vertices: [], beams: [], axes: [] };
                         this.selected_elements.hovered = -1;
                         this.selected_elements.selected = [];
@@ -946,7 +946,7 @@ export default class CanvasControl extends CanvasControlBase {
                         const hovered_vertex = this.vertices.get(this.selected_elements.hovered);
                         const vertex1 = beam.vertices[0] === hovered_vertex ? beam.vertices[1] : beam.vertices[0];
                         const vertex2 = same_axis_beam.vertices[0] === hovered_vertex ? same_axis_beam.vertices[1] : same_axis_beam.vertices[0];
-                        this.register_preview(this.create_beam([vertex1, vertex2], Math.abs(Number(dir))));
+                        this.register_element(this.create_beam([vertex1, vertex2], Math.abs(Number(dir))));
                     }
                 });
                 this.remove_element(this.vertices.get(this.selected_elements.hovered));
@@ -964,20 +964,21 @@ export default class CanvasControl extends CanvasControlBase {
         this.handle_mousemove(e);
     }
 
-    // Add preview element to this.vertices or this.beams
-    register_preview(element) {
+    // Add element to this.vertices or this.beams
+    register_element(element) {
         element.preview = false;
         element.id = this.next_id;
-        this.render_order.push(this.next_id);
+        this.render_order.push(element.id);
         if (element instanceof Vertex) {
             element.name = `Vertex ${this.next_name.vertex++}`;
-            this.vertices.set(this.next_id, element);
+            this.vertices.set(element.id, element);
         } else if (element instanceof Beam) {
             element.name = `Beam ${this.next_name.beam++}`;
-            this.beams.set(this.next_id, element);
+            this.beams.set(element.id, element);
         }
-        const order = $("<div>").text(this.render_order.indexOf(this.next_id) + 1);
-        const button = $("<button>").data("id", this.next_id).text(element.name);
+
+        const order = $("<div>").text(this.render_order.indexOf(element.id) + 1);
+        const button = $("<button>").data("id", element.id).text(element.name);
         switch (this.tool_status.tool) {
             case "move":
             case "select":
@@ -988,6 +989,7 @@ export default class CanvasControl extends CanvasControlBase {
                 break;
         }
         $("#element-list").append($("<li>").addClass("element-list-item").append(order).append(button));
+    
         this.next_id++;
         this.update_element_order();
     }
@@ -1302,11 +1304,11 @@ export default class CanvasControl extends CanvasControlBase {
         ]);
     }
 
-    create_vertex(position, { id=0, preview=false, show=true, name="" } = {}) {
+    create_vertex(position, { id=-1, preview=false, show=true, name="" } = {}) {
         return new Vertex(this, position, { id, preview, show, name });
     }
 
-    create_beam(vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
+    create_beam(vertices, direction, { id=-1, preview=false, show=true, name="" } = {}) {
         return new Beam(this, vertices, direction, { id, preview, show, name });
     }
 
@@ -1316,7 +1318,7 @@ export default class CanvasControl extends CanvasControlBase {
 }
 
 class Vertex {
-    constructor(canvas_control, position, { id=0, preview=false, show=true, name="" } = {}) {
+    constructor(canvas_control, position, { id=-1, preview=false, show=true, name="" } = {}) {
         this.c = canvas_control;
         this.position = position;
         this.id = id;
@@ -1533,7 +1535,7 @@ class Vertex {
 }
 
 class Beam {
-    constructor(canvas_control, vertices, direction, { id=0, preview=false, show=true, name="" } = {}) {
+    constructor(canvas_control, vertices, direction, { id=-1, preview=false, show=true, name="" } = {}) {
         this.c = canvas_control;
         this.vertices = vertices;
         this.direction = direction;

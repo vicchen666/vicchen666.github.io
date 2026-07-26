@@ -302,9 +302,11 @@ $("#input-open").on("change", function(event) {
         try {
             const data = JSON.parse(e.target.result);
             let new_c = storage.open_project(data);
-            if (new_c) {
+            if (new_c !== null) {
                 c.destroy();
                 c = new_c;
+                c.activate();
+                $(".tool-button.selected").click();
             }
             c.render_frame();
         } catch (err) {

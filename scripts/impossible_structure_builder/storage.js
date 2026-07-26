@@ -1,4 +1,5 @@
 import $ from "jquery";
+import CanvasControl from "canvas_control";
 import * as utils from "utils";
 
 export function download_project(c) {
@@ -77,6 +78,8 @@ export function open_project(data) {
     try {
         switch (data.version) {
             case 1: {
+                c.set_axes(data.misc.axes);
+
                 const rendering_styles = data.general_settings.rendering_styles;
                 $("#main-canvas > canvas").css("background-color", rendering_styles.background_color);
                 c.settings.fill_styles = rendering_styles.fill_styles;
@@ -86,7 +89,33 @@ export function open_project(data) {
                 c.settings.preview_alpha = rendering_styles.preview_alpha;
                 utils.reload_general_settings(c);
 
+                c.origin = data.canvas.origin;
+                c.size = data.canvas.scale;
 
+                utils.toggle_element_settings(c, false);
+                $("#element-list").text("");
+
+                c.render_order = data.elements.render_order;
+                data.elements.vertices.forEach(([id, vertex_data]) => {
+                    const vertex = c.create_vertex(vertex_data.position, { id, name: vertex_data.name });
+                    c.vertices.set(vertex.id, vertex);
+                });
+                data.elements.beams.forEach(([id, beam_data]) => {
+                    const beam = c.create_beam([c.vertices.get(beam_data.vertices[0]), c.vertices.get(beam_data.vertices[1])], beam_data.direction, { id, name: beam_data.name });
+                    c.beams.set(beam.id, beam);
+                });
+                c.render_order.forEach(id => {
+                    if (c.vertices.has(id)) {
+                        register_element(c, c.vertices.get(id));
+                    } else if (c.beams.has(id)) {
+                        register_element(c, c.beams.get(id));
+                    }
+                });
+                c.update_element_order();
+                c.next_id = Math.max(-1, ...c.render_order) + 1;
+                c.next_name = data.elements.next_name;
+
+                utils.message("success", "Project opened successfully!");
                 return c;
             }
             default:
@@ -99,4 +128,10 @@ export function open_project(data) {
         c = null;
         return null;
     }
+}
+
+function register_element(c, element) {
+    const order = $("<div>").text(c.render_order.indexOf(element.id) + 1);
+    const button = $("<button>").data("id", element.id).text(element.name);
+    $("#element-list").append($("<li>").addClass("element-list-item").append(order).append(button));
 }

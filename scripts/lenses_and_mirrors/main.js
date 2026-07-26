@@ -276,6 +276,8 @@ $("#input-open").on("change", function(event) {
             if (new_c !== null) {
                 c.destroy();
                 c = new_c;
+                c.update_light_path();
+                c.activate();
             }
             c.render_frame();
         } catch (err) {
