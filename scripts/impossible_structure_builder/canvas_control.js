@@ -167,7 +167,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
         },
-        "extend-beam-vertex": {
+        "extrude-beam-vertex": {
             "select_vertex": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
@@ -218,7 +218,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
         },
-        "extend-beam-length": {
+        "extrude-beam-length": {
             "select_vertex": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
@@ -755,7 +755,7 @@ export default class CanvasControl extends CanvasControlBase {
                         break;
                 }
                 break;
-            case "extend-beam-vertex":
+            case "extrude-beam-vertex":
                 if (e.which !== 1) return;
                 switch (this.tool_status.status) {
                     case "select_vertex":
@@ -778,7 +778,7 @@ export default class CanvasControl extends CanvasControlBase {
                         break;
                 }
                 break;
-            case "extend-beam-length":
+            case "extrude-beam-length":
                 if (e.which !== 1) return;
                 switch (this.tool_status.status) {
                     case "select_vertex":

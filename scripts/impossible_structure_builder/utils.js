@@ -44,8 +44,8 @@ export function select_tool(c, tool) {
         case "add-vertex-click":
             c.tool_status.status = "add_vertex";
             break;
-        case "extend-beam-vertex":
-        case "extend-beam-length":
+        case "extrude-beam-vertex":
+        case "extrude-beam-length":
         case "connect-vertices":
         case "connect-vertex-along-axes":
         case "connect-vertex-beam":
