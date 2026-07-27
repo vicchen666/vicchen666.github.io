@@ -79,7 +79,6 @@ export default class CanvasControlBase {
     }
 
     handle_mousedown(e) {
-        console.log(this.name);
         this.handle_tool_use(e);
     }
 
@@ -198,7 +197,6 @@ export default class CanvasControlBase {
     }
 
     destroy() {
-        console.log(`Destroying ${this.name}`);
         this.stop_animation();
         this.remove_listeners();
     }

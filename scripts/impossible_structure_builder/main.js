@@ -28,6 +28,7 @@ document.addEventListener("keydown", e => {
     }
     const key = e.key.toLowerCase();
 
+    if ($(".sortable-ghost").length) return;
     if ($("dialog[open]").length) {
         switch (key) {
             case "i":
@@ -47,6 +48,9 @@ document.addEventListener("keydown", e => {
             $this.addClass("selected");
             $this.parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
             utils.select_tool(c, $this.data("tool"));
+            break;
+        case "escape":
+            $(".tool-button.selected").first().trigger("click");
             break;
         case "i":
             $("#info-box")[0].showModal();
@@ -306,7 +310,7 @@ $("#input-open").on("change", function(event) {
                 c.destroy();
                 c = new_c;
                 c.activate();
-                $(".tool-button.selected").click();
+                $(".tool-button.selected").first().trigger("click");
             }
             c.render_frame();
         } catch (err) {
