@@ -76,6 +76,7 @@ dialog {
     max-height: 80%;
     background-color: var(--background-color);
     margin: 0;
+    border: var(--section-border-color) 2px solid;
     color: var(--text-color);
     user-select: none;
 }

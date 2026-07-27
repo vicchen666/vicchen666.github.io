@@ -261,7 +261,6 @@ body {
     flex-direction: column;
     width: 700px;
     background-color: var(--primary-color);
-    border: var(--section-border-color) 1px solid;
     padding: 10px;
     &[open] {
         display: flex;
@@ -304,7 +303,6 @@ body {
     flex-direction: column;
     width: 700px;
     background-color: var(--primary-color);
-    border: var(--section-border-color) 1px solid;
     padding: 10px;
     &[open] {
         display: flex;
