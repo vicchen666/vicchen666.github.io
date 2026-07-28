@@ -60,12 +60,12 @@ export default class CanvasControl extends CanvasControlBase {
         vertex_hover_dist: 0,
         beam_hover_dist: 0,
         preview_alpha: 0.5,
-        axis_style: "white",
+        axis_style: "#ffffff",
         axis_width: 5,
         hovered_style: "#add8e680",
         selected_style: "#ade6b5cc",
-        outline_style: "yellow",
-        fill_styles: { vertex: ["white", "gray", "black"], beam: ["white", "gray", "black"] },
+        outline_style: "#ffff00",
+        fill_styles: { vertex: ["#ffffff", "#808080", "#000000"], beam: ["#ffffff", "#808080", "#000000"] },
         seal_cracks_line_width: 1,
     };
 
