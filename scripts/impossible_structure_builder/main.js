@@ -77,7 +77,7 @@ document.addEventListener("keydown", e => {
             storage.download_project(c);
             break;
         case "o":
-            $("#input-open").click();
+            $("#button-open").click();
             break;
     }
 });
@@ -147,14 +147,20 @@ $("#init-box-confirm").on("click", function() {
 });
 
 $("#init-box-open").on("click", function() {
-    c.set_axes([1, 0], [0, 1], [-1, -1]);
-    c.activate();
-    $("#init-box")[0].close();
-    init["init-vertex"].destroy();
-    init["init-penrose"].destroy();
-    init["init-vertex"] = null;
-    init["init-penrose"] = null;
-    $("#input-open").click();
+    storage.open_project().then(new_c => {
+        if (new_c !== null) {
+            c.destroy();
+            c = new_c;
+            c.activate();
+            $("#init-box")[0].close();
+            init["init-vertex"].destroy();
+            init["init-penrose"].destroy();
+            init["init-vertex"] = null;
+            init["init-penrose"] = null;
+
+            $(".tool-button.selected").first().trigger("click");
+        }
+    });
 });
 
 $("#toolbar").on("click", ".tool-button", function() {
@@ -422,14 +428,7 @@ $("#button-download").on("click", () => {
 });
 
 $("#button-open").on("click", () => {
-    $("#input-open").click();
-});
-
-$("#input-open").on("change", function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    $(this).val("");
-    storage.read_project(file).then(new_c => {
+    storage.open_project().then(new_c => {
         if (new_c !== null) {
             c.destroy();
             c = new_c;

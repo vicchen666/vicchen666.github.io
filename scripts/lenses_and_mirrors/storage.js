@@ -49,13 +49,39 @@ export function download_project(c) {
     utils.message("success", "Project downloaded!");
 }
 
-export function read_project(file) {
+export function open_project() {
+    return new Promise(resolve => {
+        const input = document.getElementById("input-open");
+        if (!input) {
+            resolve(null);
+            return;
+        }
+
+        const handle_change = function(event) {
+            const file = event.target.files[0];
+            input.removeEventListener("change", handle_change);
+            input.value = "";
+
+            if (!file) {
+                resolve(null);
+                return;
+            }
+
+            read_project(file).then(resolve);
+        };
+
+        input.addEventListener("change", handle_change);
+        input.click();
+    });
+}
+
+function read_project(file) {
     return new Promise(resolve => {
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                const new_c = open_project(data);
+                const new_c = load_project(data);
                 resolve(new_c);
             } catch (err) {
                 console.error(err);
@@ -71,7 +97,7 @@ export function read_project(file) {
     });
 }
 
-function open_project(data) {
+function load_project(data) {
     let c = new CanvasControl($("#main-canvas > canvas")[0]);
     try {
         switch (data.version) {

@@ -412,7 +412,8 @@ body {
 }
 #init-box-footer {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-evenly;
     margin-top: 10px;
 }
 #init-box-confirm, #init-box-open {

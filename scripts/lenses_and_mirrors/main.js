@@ -6,7 +6,6 @@ import * as storage from "storage";
 
 const TAU = Math.PI * 2;
 let c = new CanvasControl($("#main-canvas > canvas")[0]);
-c.activate();
 
 window.addEventListener("beforeunload", e => {
     e.preventDefault();
@@ -48,7 +47,7 @@ document.addEventListener("keydown", e => {
             storage.download_project(c);
             break;
         case "o":
-            $("#input-open").click();
+            $("#button-open").click();
             break;
     }
 });
@@ -260,15 +259,7 @@ $("#button-download").on("click", () => {
 });
 
 $("#button-open").on("click", () => {
-    $("#input-open").click();
-});
-
-$("#input-open").on("change", function(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    $(this).val("");
-
-    storage.read_project(file).then(new_c => {
+    storage.open_project().then(new_c => {
         if (new_c !== null) {
             c.destroy();
             c = new_c;
@@ -278,3 +269,5 @@ $("#input-open").on("change", function(event) {
         c.render_frame();
     });
 });
+
+c.activate();
