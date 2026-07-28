@@ -49,7 +49,29 @@ export function download_project(c) {
     utils.message("success", "Project downloaded!");
 }
 
-export function open_project(data) {
+export function read_project(file) {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                const new_c = open_project(data);
+                resolve(new_c);
+            } catch (err) {
+                console.error(err);
+                utils.message("fail", "Failed to open project! Invalid JSON file.");
+                resolve(null);
+            }
+        };
+        reader.onerror = function() {
+            utils.message("fail", "Failed to read the selected file.");
+            resolve(null);
+        };
+        reader.readAsText(file);
+    });
+}
+
+function open_project(data) {
     let c = new CanvasControl($("#main-canvas > canvas")[0]);
     try {
         switch (data.version) {

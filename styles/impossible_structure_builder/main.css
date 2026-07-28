@@ -132,7 +132,7 @@ body {
     justify-content: center;
     margin-top: 10px;
 }
-#tool-box-confirm {
+#tool-box-confirm{
     font-size: 30px;
     margin: 0;
 }
@@ -415,7 +415,7 @@ body {
     justify-content: center;
     margin-top: 10px;
 }
-#init-box-confirm {
+#init-box-confirm, #init-box-open {
     margin: 0;
 }
 

@@ -146,6 +146,17 @@ $("#init-box-confirm").on("click", function() {
     utils.message("success", "Axes set successfully!");
 });
 
+$("#init-box-open").on("click", function() {
+    c.set_axes([1, 0], [0, 1], [-1, -1]);
+    c.activate();
+    $("#init-box")[0].close();
+    init["init-vertex"].destroy();
+    init["init-penrose"].destroy();
+    init["init-vertex"] = null;
+    init["init-penrose"] = null;
+    $("#input-open").click();
+});
+
 $("#toolbar").on("click", ".tool-button", function() {
     $(".tool-button.selected").removeClass("selected");
     $(this).addClass("selected");
@@ -418,25 +429,15 @@ $("#input-open").on("change", function(event) {
     const file = event.target.files[0];
     if (!file) return;
     $(this).val("");
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            let new_c = storage.open_project(data);
-            if (new_c !== null) {
-                c.destroy();
-                c = new_c;
-                c.activate();
-                $(".tool-button.selected").first().trigger("click");
-            }
-            c.render_frame();
-        } catch (err) {
-            console.error(err);
-            utils.message("fail", "Failed to open project! Invalid JSON file.");
+    storage.read_project(file).then(new_c => {
+        if (new_c !== null) {
+            c.destroy();
+            c = new_c;
+            c.activate();
+            $(".tool-button.selected").first().trigger("click");
         }
-    }
-    reader.readAsText(file);
+        c.render_frame();
+    });
 });
 
 $("#init-box-axes-grid > input").eq(0).trigger("input");
