@@ -225,17 +225,60 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
     const inputs = $("#tool-box-add-vertex-coordinates input");
     switch(setting) {
         case "x":
-        case "y":
+        case "y": {
             const pos = [
                 +inputs.filter("[data-setting='x']").val() ?? 0,
                 +inputs.filter("[data-setting='y']").val() ?? 0
             ];
-            c.tool_preview["add-vertex-coordinates"]["add_vertex"](pos);
+
+            // fix axis_3, and make axis_1 plus axis_2 equal to pos
+            const axes = c.axes;
+            const axis_3 = inputs.filter("[data-setting='axis_3']").val() ?? 0;
+            const new_pos = v.sub(pos, v.scale(axes[2], axis_3));
+            const result = v.lineq2(axes[0], axes[1], new_pos);
+            const axis_1 = result[0];
+            const axis_2 = result[1];
+            inputs.filter("[data-setting='axis_1']").val(axis_1);
+            inputs.filter("[data-setting='axis_2']").val(axis_2);
+
+            c.preview_elements.vertices = [];
+            c.preview_elements.vertices.push(c.create_vertex(pos, { preview: true }));
+            c.render_frame();
             break;
+        }
         case "axis_1":
         case "axis_2":
-        case "axis_3":
+        case "axis_3": {
+            const axes = [
+                +inputs.filter("[data-setting='axis_1']").val() ?? 0,
+                +inputs.filter("[data-setting='axis_2']").val() ?? 0,
+                +inputs.filter("[data-setting='axis_3']").val() ?? 0
+            ];
+            const pos = v.add(v.scale(c.axes[0], axes[0]), v.add(v.scale(c.axes[1], axes[1]), v.scale(c.axes[2], axes[2])));
+
+            inputs.filter("[data-setting='x']").val(pos[0]);
+            inputs.filter("[data-setting='y']").val(pos[1]);
+
+            c.preview_elements.vertices = [];
+            c.preview_elements.vertices.push(c.create_vertex(pos, { preview: true }));
+            c.render_frame();
+            break;    
+        }
+
+    }
+}).on("click", "#tool-box-confirm", function() {
+    switch(c.tool_status.tool) {
+        case "add-vertex-coordinates":
+            if (c.preview_elements.vertices.length !== 1) return;
+
+            c.register_element(c.preview_elements.vertices[0]);
+            c.preview_elements.vertices = [];
+            c.render_frame();
             break;
+    }
+}).on("keydown", "#tool-box-add-vertex-coordinates input", function(e) {
+    if (e.key === "Enter") {
+        $("#tool-box-confirm").trigger("click");
     }
 });
 

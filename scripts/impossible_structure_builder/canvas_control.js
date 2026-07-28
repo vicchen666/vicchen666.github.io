@@ -121,14 +121,6 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
         },
-        "add-vertex-coordinates": {
-            "add_vertex": pos => {
-                if (!(pos instanceof Array) || pos.length !== 2) return;
-                this.preview_elements.vertices = [];
-                this.preview_elements.vertices.push(this.create_vertex(pos, { preview: true }));
-                this.render_frame();
-            },
-        },
         "add-vertex-beam": {
             "select_beam": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
@@ -730,13 +722,6 @@ export default class CanvasControl extends CanvasControlBase {
                 reload_element_settings(this, this.selected_elements.selected[0]);
                 break;
             case "add-vertex-click":
-                if (e.which !== 1) return;
-                if (this.preview_elements.vertices.length !== 1) return;
-
-                this.register_element(this.preview_elements.vertices[0]);
-                this.preview_elements.vertices = [];
-                break;
-            case "add-vertex-coordinates":
                 if (e.which !== 1) return;
                 if (this.preview_elements.vertices.length !== 1) return;
 

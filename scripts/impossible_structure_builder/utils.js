@@ -43,9 +43,15 @@ export function select_tool(c, tool) {
             buttons.removeClass("default-cursor");
             break;
         case "add-vertex-coordinates":
+            const center = v.round(c.get_canvas_center());
+
             $("#tool-box").removeClass("invisible");
             $("#tool-box > .tool-box-content").addClass("invisible");
             $("#tool-box-add-vertex-coordinates").removeClass("invisible");
+            $("#tool-box-add-vertex-coordinates > .tool-box-content-grid > input[data-setting='x']").val(center[0]);
+            $("#tool-box-add-vertex-coordinates > .tool-box-content-grid > input[data-setting='y']").val(center[1]);
+            $("#tool-box-add-vertex-coordinates > .tool-box-content-grid > input[data-setting='x']").trigger("input");
+            break;
         case "add-vertex-click":
             c.tool_status.status = "add_vertex";
             break;
