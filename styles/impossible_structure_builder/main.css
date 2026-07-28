@@ -56,7 +56,7 @@ body {
     height: 40px;
 }
 .tool-submenu {
-    z-index: 1;
+    z-index: 2;
     position: absolute;
     top: 70px;
     left: 0;
@@ -82,6 +82,59 @@ body {
 .tool-submenu-button > img {
     height: 40px;
     margin-right: 10px;
+}
+
+/* tool box */
+#tool-box {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    top: 10px;
+    left: 10px;
+    background-color: var(--primary-color);
+    border: 1px solid var(--section-border-color);
+    border-radius: 5px;
+    padding: 10px;
+}
+#tool-box input {
+    background-color: var(--primary-color);
+}
+#tool-box-header {
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+.tool-box-content-title {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+.tool-box-content {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--section-border-color);
+    border-bottom: 1px solid var(--section-border-color);
+    padding: 10px;
+}
+#tool-box-add-vertex-coordinates > .tool-box-content-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    width: fit-content;
+}
+#tool-box-add-vertex-coordinates > .tool-box-content-grid > * {
+    margin: 5px;
+}
+#tool-box-add-vertex-coordinates > .tool-box-content-grid > input {
+    font-size: 20px;
+    max-width: 100px;
+}
+#tool-box-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+#tool-box-confirm {
+    font-size: 30px;
+    margin: 0;
 }
 
 /* canvas */
@@ -359,9 +412,7 @@ body {
 }
 #init-box-footer {
     display: flex;
-    flex-direction: column;
     justify-content: center;
-    align-items: center;
     margin-top: 10px;
 }
 #init-box-confirm {
@@ -371,7 +422,7 @@ body {
 /* message */
 #message-box {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     top: 220px;
     left: 50%;
     font-size: 30px;

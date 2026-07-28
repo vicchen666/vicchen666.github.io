@@ -4,12 +4,19 @@ import * as v from "vectors";
 import * as utils from "utils";
 import * as storage from "storage";
 
+const TAU = Math.PI * 2;
+
 // window.addEventListener("beforeunload", e => {
 //     e.preventDefault();
 //     e.returnValue = "";
 //     return "";
 // });
-const TAU = Math.PI * 2;
+document.addEventListener("mousedown", e => {
+    if ($("dialog[open]").length) return;
+    if ($(e.target).closest("#toolbar").length) return;
+
+    $(".tool-submenu").addClass("invisible");
+});
 
 $("#init-box")[0].showModal();
 const init = {
@@ -45,8 +52,8 @@ document.addEventListener("keydown", e => {
         case "4":
         case "5":
             const $this = $(".toolbar-item").eq(+key - 1).find(".tool-button");
+            $(".tool-button.selected").removeClass("selected");
             $this.addClass("selected");
-            $this.parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
             utils.select_tool(c, $this.data("tool"));
             break;
         case "escape":
@@ -140,19 +147,20 @@ $("#init-box-confirm").on("click", function() {
 });
 
 $("#toolbar").on("click", ".tool-button", function() {
+    $(".tool-button.selected").removeClass("selected");
     $(this).addClass("selected");
-    $(this).parent().siblings(".toolbar-item").find(".tool-button").removeClass("selected");
     utils.select_tool(c, $(this).data("tool"));
 }).on("mouseenter", ".tool-button", function() {
     if ($(".sortable-ghost").length) return;
 
-    $(this).parent().siblings().find(".tool-submenu").addClass("invisible");
+    $(".tool-submenu").addClass("invisible");
     $(this).parent().find(".tool-submenu").removeClass("invisible");
 }).on("click", ".tool-submenu-button", function() {
     $(this).parent().addClass("invisible");
     const tool_button = $(this).parent().siblings(".tool-button");
+    $(".tool-button.selected").removeClass("selected");
     tool_button.addClass("selected");
-    tool_button.parent().siblings().find(".tool-button").removeClass("selected");
+
     tool_button.data("tool", $(this).data("tool"));
     tool_button.children(".tool-icon").attr("src", $(this).children(".tool-icon").attr("src"));
     utils.select_tool(c, $(this).data("tool"));
@@ -210,6 +218,25 @@ $("#element-settings").on("input", "#element-settings-grid > input", function() 
     utils.center_element(c, $("#element-settings-title").data("id"));
 }).on("click", "#element-delete", () => {
     utils.delete_element(c, $("#element-settings-title").data("id"));
+});
+
+$("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() {
+    const setting = $(this).data("setting");
+    const inputs = $("#tool-box-add-vertex-coordinates input");
+    switch(setting) {
+        case "x":
+        case "y":
+            const pos = [
+                +inputs.filter("[data-setting='x']").val() ?? 0,
+                +inputs.filter("[data-setting='y']").val() ?? 0
+            ];
+            c.tool_preview["add-vertex-coordinates"]["add_vertex"](pos);
+            break;
+        case "axis_1":
+        case "axis_2":
+        case "axis_3":
+            break;
+    }
 });
 
 $("#general-settings-icon").on("click", function() {

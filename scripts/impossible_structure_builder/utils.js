@@ -23,6 +23,7 @@ export function select_tool(c, tool) {
         }
     });
     c.selected_elements = { selected: [], hovered: -1 };
+    $("#tool-box").addClass("invisible");
     $(".tool-submenu").addClass("invisible");
     toggle_element_settings(c, false);
     sortable($("#element-list")[0], false);
@@ -41,6 +42,10 @@ export function select_tool(c, tool) {
             c.tool_status.status = "select_element";
             buttons.removeClass("default-cursor");
             break;
+        case "add-vertex-coordinates":
+            $("#tool-box").removeClass("invisible");
+            $("#tool-box > .tool-box-content").addClass("invisible");
+            $("#tool-box-add-vertex-coordinates").removeClass("invisible");
         case "add-vertex-click":
             c.tool_status.status = "add_vertex";
             break;
