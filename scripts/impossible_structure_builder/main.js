@@ -231,7 +231,7 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
                 +inputs.filter("[data-setting='y']").val() ?? 0
             ];
 
-            // fix axis_3, and make axis_1 plus axis_2 equal to pos
+            // Maintain axis_3 coordinate while changing axis_1 and axis_2 to fit the new x and y coordinates
             const axes = c.axes;
             const axis_3 = inputs.filter("[data-setting='axis_3']").val() ?? 0;
             const new_pos = v.sub(pos, v.scale(axes[2], axis_3));
@@ -266,6 +266,42 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
         }
 
     }
+}).on("input", "#tool-box-extrude-beam-length input", function() {
+    const setting = $(this).data("setting");
+    const inputs = $("#tool-box-extrude-beam-length input");
+    const direction = c.preview_elements.axes[0].direction;
+    const axis = c.generate_axis_map().get(direction);
+    let length;
+    switch(setting) {
+        case "length": {
+            length = +inputs.filter("[data-setting='length']").val() ?? 0;
+            inputs.filter("[data-setting='axis']").val(length / v.len(axis));
+            break;
+        }
+        case "axis": {
+            length = +inputs.filter("[data-setting='axis']").val() ?? 0;
+            length *= v.len(axis);
+            inputs.filter("[data-setting='length']").val(length);
+            break;
+        }
+    }
+
+    c.preview_elements.axes[0].show = true;
+    c.preview_elements.vertices = [];
+    c.preview_elements.beams[c.preview_elements.beams.length - 1]?.destroy();
+    c.preview_elements.beams = [];
+
+    if (length <= 0) {
+        c.render_frame();
+        return;
+    }
+
+    const vertex1 = c.vertices.get(c.selected_elements.selected[c.selected_elements.selected.length - 1]);
+    const vertex2 = c.create_vertex(v.add(vertex1.position, v.scale(v.unit(axis), length)), { preview: true });
+    c.preview_elements.axes[0].show = false;
+    c.preview_elements.vertices.push(vertex2);
+    c.preview_elements.beams.push(c.create_beam([vertex1, vertex2], Math.abs(direction), { preview: true }));
+    c.render_frame();
 }).on("click", "#tool-box-confirm", function() {
     switch(c.tool_status.tool) {
         case "add-vertex-coordinates":
@@ -275,8 +311,20 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
             c.preview_elements.vertices = [];
             c.render_frame();
             break;
+        case "extrude-beam-length":
+            if (c.preview_elements.beams.length !== 1) return;
+
+            c.register_element(c.preview_elements.beams[0]);
+            c.register_element(c.preview_elements.vertices[0]);
+            c.preview_elements.beams = [];
+            c.preview_elements.vertices = [];
+            c.selected_elements.selected = [];
+            c.tool_status.status = "select_vertex";
+            c.render_frame();
+            $("#tool-box").addClass("invisible");
+            break;
     }
-}).on("keydown", "#tool-box-add-vertex-coordinates input", function(e) {
+}).on("keydown", "input", function(e) {
     if (e.key === "Enter") {
         $("#tool-box-confirm").trigger("click");
     }

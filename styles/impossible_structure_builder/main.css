@@ -115,15 +115,15 @@ body {
     border-bottom: 1px solid var(--section-border-color);
     padding: 10px;
 }
-#tool-box-add-vertex-coordinates > .tool-box-content-grid {
+.tool-box-content-grid {
     display: grid;
     grid-template-columns: auto auto;
     width: fit-content;
 }
-#tool-box-add-vertex-coordinates > .tool-box-content-grid > * {
+.tool-box-content-grid > * {
     margin: 5px;
 }
-#tool-box-add-vertex-coordinates > .tool-box-content-grid > input {
+.tool-box-content-grid > input {
     font-size: 20px;
     max-width: 100px;
 }

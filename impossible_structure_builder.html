@@ -150,14 +150,21 @@
                     <div style="font-weight: bold; align-self: center;">or</div>
                     <section class="tool-box-content-grid">
                         <div>Axis 1</div>
-                        <input type="number" data-setting="axis_1" value="0">
+                        <input type="number" step="any" data-setting="axis_1" value="0">
                         <div>Axis 2</div>
-                        <input type="number" data-setting="axis_2" value="0">
+                        <input type="number" step="any" data-setting="axis_2" value="0">
                         <div>Axis 3</div>
-                        <input type="number" data-setting="axis_3" value="0">
+                        <input type="number" step="any" data-setting="axis_3" value="0">
                     </section>
                 </section>
                 <section id="tool-box-extrude-beam-length" class="tool-box-content invisible">
+                    <header class="tool-box-content-title">Extrude Beam with Length</header>
+                    <section class="tool-box-content-grid">
+                        <div>Length</div>
+                        <input type="number" step="any" min="0" data-setting="length" value="0">
+                        <div>Axis</div>
+                        <input type="number" step="any" min="0" data-setting="axis" value="0">
+                    </section>
                 </section>
                 <footer id="tool-box-footer">
                     <button id="tool-box-confirm" class="text-button">Confirm</button>

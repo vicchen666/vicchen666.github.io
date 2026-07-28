@@ -243,6 +243,25 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
             "select_axis": e => {
+                this.preview_elements.axes = [];
+
+                const vertex = this.vertices.get(this.selected_elements.selected[this.selected_elements.selected.length - 1]);
+                const unit_axes = map_filter(this.generate_axis_map(true), (_, key) => !vertex.beams.has(key));
+
+                const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
+                const dot_prods = map_map(unit_axes, axis_vec => v.dot(axis_vec, v.sub(canvas_point, vertex.position)));
+                const nearest_axis = map_reduce(dot_prods,
+                    (best, value, key) => value > best.value ? { key, value } : best,
+                    { key: null, value: -Infinity }
+                );
+                if (dot_prods.get(nearest_axis.key) < 0) {
+                    this.render_frame();
+                    return;
+                };
+
+                this.preview_elements.axes.push(this.create_axis(vertex, nearest_axis.key, { preview: true }));
+                this.canvas.style.cursor = "pointer";
+                this.render_frame();
             },
             "enter_length": e => {
             },
@@ -788,15 +807,17 @@ export default class CanvasControl extends CanvasControlBase {
                         this.selected_elements.hovered = -1;
 
                         this.tool_status.status = "select_axis";
-                        this.tool_status.can_select_elements = new Set();
-                        this.tool_status.create_element = "axis";
                         break;
                     case "select_axis":
                         if (this.preview_elements.axes.length !== 1) return;
 
+                        this.preview_elements.axes[this.preview_elements.axes.length - 1].preview = false;
                         this.tool_status.status = "enter_length";
-                        break;
-                    case "enter_length":
+
+                        $("#tool-box").removeClass("invisible");
+                        $("#tool-box > .tool-box-content").addClass("invisible");
+                        $("#tool-box-extrude-beam-length").removeClass("invisible");
+                        $("#tool-box-extrude-beam-length > .tool-box-content-grid > input[data-setting='length']").trigger("input");
                         break;
                 }
                 break;
