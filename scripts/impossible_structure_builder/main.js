@@ -6,11 +6,11 @@ import * as storage from "storage";
 
 const TAU = Math.PI * 2;
 
-window.addEventListener("beforeunload", e => {
-    e.preventDefault();
-    e.returnValue = "";
-    return "";
-});
+// window.addEventListener("beforeunload", e => {
+//     e.preventDefault();
+//     e.returnValue = "";
+//     return "";
+// });
 
 document.addEventListener("mousedown", e => {
     if ($("dialog[open]").length) return;
@@ -284,9 +284,9 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
         }
 
     }
-}).on("input", "#tool-box-extrude-beam-length input", function() {
+}).on("input", "#tool-box-extrude-vertex-length input", function() {
     const setting = $(this).data("setting");
-    const inputs = $("#tool-box-extrude-beam-length input");
+    const inputs = $("#tool-box-extrude-vertex-length input");
     const direction = c.preview_elements.axes[0].direction;
     const axis = c.generate_axis_map().get(direction);
     let length;
@@ -329,7 +329,7 @@ $("#tool-box").on("input", "#tool-box-add-vertex-coordinates input", function() 
             c.preview_elements.vertices = [];
             c.render_frame();
             break;
-        case "extrude-beam-length":
+        case "extrude-vertex-length":
             if (c.preview_elements.beams.length !== 1) return;
 
             c.register_element(c.preview_elements.beams[0]);

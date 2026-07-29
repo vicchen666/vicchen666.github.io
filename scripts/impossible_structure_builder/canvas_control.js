@@ -167,7 +167,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
         },
-        "extrude-beam-vertex": {
+        "extrude-vertex-vertex": {
             "select_vertex": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
@@ -218,7 +218,7 @@ export default class CanvasControl extends CanvasControlBase {
                 this.render_frame();
             },
         },
-        "extrude-beam-length": {
+        "extrude-vertex-length": {
             "select_vertex": e => {
                 const canvas_point = this.mouse_to_canvas(e.clientX, e.clientY);
 
@@ -774,7 +774,7 @@ export default class CanvasControl extends CanvasControlBase {
                         break;
                 }
                 break;
-            case "extrude-beam-vertex":
+            case "extrude-vertex-vertex":
                 if (e.which !== 1) return;
                 switch (this.tool_status.status) {
                     case "select_vertex":
@@ -797,7 +797,7 @@ export default class CanvasControl extends CanvasControlBase {
                         break;
                 }
                 break;
-            case "extrude-beam-length":
+            case "extrude-vertex-length":
                 if (e.which !== 1) return;
                 switch (this.tool_status.status) {
                     case "select_vertex":
@@ -816,8 +816,8 @@ export default class CanvasControl extends CanvasControlBase {
 
                         $("#tool-box").removeClass("invisible");
                         $("#tool-box > .tool-box-content").addClass("invisible");
-                        $("#tool-box-extrude-beam-length").removeClass("invisible");
-                        $("#tool-box-extrude-beam-length > .tool-box-content-grid > input[data-setting='length']").trigger("input");
+                        $("#tool-box-extrude-vertex-length").removeClass("invisible");
+                        $("#tool-box-extrude-vertex-length > .tool-box-content-grid > input[data-setting='length']").trigger("input");
                         break;
                 }
                 break;
