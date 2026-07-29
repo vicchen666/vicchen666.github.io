@@ -6,11 +6,11 @@ import * as storage from "storage";
 
 const TAU = Math.PI * 2;
 
-// window.addEventListener("beforeunload", e => {
-//     e.preventDefault();
-//     e.returnValue = "";
-//     return "";
-// });
+window.addEventListener("beforeunload", e => {
+    e.preventDefault();
+    e.returnValue = "";
+    return "";
+});
 
 document.addEventListener("mousedown", e => {
     if ($("dialog[open]").length) return;
