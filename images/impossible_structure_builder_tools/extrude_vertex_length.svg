@@ -9,7 +9,7 @@
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
-   sodipodi:docname="add_vertex_click.svg"
+   sodipodi:docname="extrude_vertex_length.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#505050"
      inkscape:document-units="px"
-     inkscape:zoom="22.627417"
-     inkscape:cx="30.759145"
-     inkscape:cy="20.218835"
+     inkscape:zoom="32"
+     inkscape:cx="10.546875"
+     inkscape:cy="14.640625"
      inkscape:window-width="2560"
      inkscape:window-height="1411"
      inkscape:window-x="-9"
@@ -36,43 +36,50 @@
      showguides="true"
      showborder="false"
      borderlayer="true"
-     showgrid="true">
+     showgrid="true"
+     guidecolor="#0086e5"
+     guideopacity="0.50196078">
     <inkscape:grid
        type="axonomgrid"
-       id="grid1"
+       id="grid40"
        units="px"
        originx="16"
        originy="16"
        spacingx="3.7795276"
-       spacingy="6"
+       spacingy="1.5"
        empcolor="#0099e5"
-       empopacity="0.30196078"
+       empopacity="0.8"
        color="#0099e5"
-       opacity="0.14901961"
+       opacity="0.8"
        empspacing="1"
        dotted="false"
        gridanglex="30"
        gridanglez="30"
        enabled="true"
-       visible="true" />
+       visible="true"
+       snapvisiblegridlinesonly="true" />
   </sodipodi:namedview>
   <defs
-     id="defs1">
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="-14.863246 : 8.5812992 : 0"
-       inkscape:vp_y="-2.0307193e-13 : 1105.4721 : 0"
-       inkscape:vp_z="14.112002 : 8.1475683 : 0"
-       inkscape:persp3d-origin="15.976599 : 9.7409073 : 1"
-       id="perspective2" />
-  </defs>
+     id="defs1" />
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <path
-       id="path3"
-       style="fill:none;stroke:#ffffff;stroke-width:1.99985;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none"
-       d="M 16.000001,16 27.258403,9.4999575 m -22.5168065,0 L 16.000002,16 V 29.000084 M 4.7415965,22.500042 V 9.4999575 L 16.000001,2.9999155 27.258403,9.4999575 V 22.500042 l -11.258401,6.500042 z" />
+    <g
+       id="g84"
+       transform="matrix(1.0027578,0,0,1.0027578,5.1962904,-1.5097622)">
+      <path
+         id="path73"
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.923;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;paint-order:normal"
+         d="m 5.6076952,10 v 6 M 0.41154273,7 5.6076952,10 10.803848,7 M 0.41154273,13 V 7 L 5.6076952,4 10.803848,7 v 6 l -5.1961528,3 z" />
+      <path
+         id="path75"
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.923;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;paint-order:normal"
+         d="m 18.196152,19 h 3 l -1.5,-2.598076 M 13.401924,14.5 21.196152,19" />
+      <path
+         id="path82"
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.923;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:0;paint-order:normal"
+         d="m 21.196152,28 v 3 M 5.6076954,20.5 21.196152,29.5 M 5.6076954,19 v 3" />
+    </g>
   </g>
 </svg>
