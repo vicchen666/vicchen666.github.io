@@ -10,6 +10,7 @@ export function download_project(c) {
     );
 
     const data = {
+        project: "Impossible Structure Builder",
         version: 1,
         general_settings: {
             rendering_styles: {
@@ -123,6 +124,9 @@ function read_project(file) {
 
 function load_project(data) {
     let c = new CanvasControl($("#main-canvas > canvas")[0]);
+    if (!data.project || data.project !== "Impossible Structure Builder") {
+        console.warn("Invalid project file (possibly caused by outdated or incorrect file):", data.project);
+    }
     try {
         switch (data.version) {
             case 1: {

@@ -4,6 +4,7 @@ import * as utils from "utils";
 
 export function download_project(c) {
     const data = {
+        project: "Lenses and Mirrors",
         version: 2,
         general_settings: {
             ray_settings: {
@@ -99,6 +100,9 @@ function read_project(file) {
 
 function load_project(data) {
     let c = new CanvasControl($("#main-canvas > canvas")[0]);
+    if (!data.project || data.project !== "Lenses and Mirrors") {
+        console.warn("Invalid project file (possibly caused by outdated or incorrect file):", data.project);
+    }
     try {
         switch (data.version) {
             case 1:
